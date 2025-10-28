@@ -14,12 +14,35 @@ interface DateInputFormProps {
   error: string;
 }
 
+const formatRussianDate = (text: string): string => {
+  let cleanedText = text.replace(/[^0-9]/g, '');
+
+  if (cleanedText.length > 8) {
+    cleanedText = cleanedText.substring(0, 8);
+  }
+
+  if (cleanedText.length > 2) {
+    cleanedText = cleanedText.substring(0, 2) + '.' + cleanedText.substring(2);
+  }
+
+  if (cleanedText.length > 5) {
+    cleanedText = cleanedText.substring(0, 5) + '.' + cleanedText.substring(5);
+  }
+
+  return cleanedText;
+};
+
 export function DateInputForm({
   onSubmit,
   date,
   setDate,
   error,
 }: DateInputFormProps) {
+  const handleTextChange = (text: string) => {
+    const formattedText = formatRussianDate(text);
+    setDate(formattedText);
+  };
+
   return (
     <View style={styles.container}>
       {/*<View style={styles.iconContainer}>*/}
@@ -32,10 +55,10 @@ export function DateInputForm({
       <View style={styles.inputWrapper}>
         <TextInput
           style={[styles.input, error ? styles.inputError : {}]}
-          placeholder="Введите дату рождения (ГГГГ-ММ-ДД)"
+          placeholder="Введите дату рождения (ДД.ММ.ГГГГ)"
           placeholderTextColor="#A0A0A0"
           value={date}
-          onChangeText={setDate}
+          onChangeText={handleTextChange}
           keyboardType="numbers-and-punctuation"
           maxLength={10}
         />

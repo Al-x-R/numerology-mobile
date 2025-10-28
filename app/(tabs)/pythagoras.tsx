@@ -15,13 +15,19 @@ export default function HomeScreen() {
   const [error, setError] = useState<string>('');
 
   const handleCalculate = () => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      setError('Введите дату в формате ГГГГ-ММ-ДД.');
+    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
+      setError('Введите дату в формате ДД.ММ.ГГГГ.');
       return;
     }
 
+    // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
+    const parts = dateString.split('.'); // ['02', '07', '1985']
+    // new Date() in JavaScript doesn't work well with DD/MM/YYYY,
+    // but works well with YYYY-MM-DD
+    const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
+
     try {
-      const dateObj = new Date(dateString);
+      const dateObj = new Date(isoDateString);
       if (isNaN(dateObj.getTime())) {
         setError('Некорректная дата.');
         return;
