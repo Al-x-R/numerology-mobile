@@ -1,32 +1,13 @@
-// app/index.tsx
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Platform,
-  Text, // Нужен только для ResultsDisplay
-} from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Импортируем компоненты
 import { DateInputForm } from '@/components/DateInputForm';
-// import { ResultsDisplay } from '../components/ResultsDisplay'; // Пока не создан
-
-// Импортируем наши "мозги"
+import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
 import { CalculationResult } from '@/lib/types';
-
-
-// --- (Заглушка ResultsDisplay остается пока здесь) ---
-const ResultsDisplay = ({ results, onBack, date }: any) => (
-  <ScrollView>
-    <Text style={styles.title}>Мой Анализ</Text>
-    <Text style={styles.subtitle}>{date}</Text>
-    {/* ... (остальной код заглушки) ... */}
-  </ScrollView>
-);
-
+import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
@@ -62,8 +43,11 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <LinearGradient colors={['#1A1C33', '#0D0F21']} style={styles.background}>
+        <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
+      </LinearGradient>
+      <View style={styles.content}>
         {!results ? (
           <DateInputForm
             date={dateString}
@@ -72,31 +56,33 @@ export default function HomeScreen() {
             error={error}
           />
         ) : (
-          <ResultsDisplay
-            results={results}
-            date={dateString}
-            onBack={handleBack}
-          />
+          <ResultsDisplay results={results} date={dateString} onBack={handleBack} />
         )}
       </View>
     </SafeAreaView>
   );
 }
 
-// --- Оставляем только базовые стили, остальные ушли в DateInputForm.tsx ---
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#0D0F21',
-  },
   container: {
     flex: 1,
-    paddingHorizontal: 20, // Используем paddingHorizontal вместо padding, чтобы не мешать центру
-    justifyContent: 'center', // Центрируем форму ввода
+    backgroundColor: 'transparent', // Match the gradient background
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 80,
+    // justifyContent: 'center',
     alignItems: 'center',
   },
-  // ... (оставшиеся стили ResultsDisplay, которые мы уберем позже)
-  title: { /* ... */ },
-  subtitle: { /* ... */ },
-  // ...
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+  },
+  logo: {
+    width: '150%', // Adjusted for better fit
+    maxWidth: 700,
+    maxHeight: 700,
+    opacity: 0.4,
+  },
 });

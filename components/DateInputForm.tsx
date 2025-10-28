@@ -1,10 +1,9 @@
-// components/DateInputForm.tsx
 import React from 'react';
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity, // use it for a custom button
+  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
@@ -23,9 +22,9 @@ export function DateInputForm({
 }: DateInputFormProps) {
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
-        <Text style={styles.icon}>#</Text>
-      </View>
+      {/*<View style={styles.iconContainer}>*/}
+      {/*  <Text style={styles.icon}>#</Text>*/}
+      {/*</View>*/}
 
       <Text style={styles.title}>Код Даты</Text>
       <Text style={styles.subtitle}>Рассчитайте свой Квадрат Пифагора</Text>
@@ -55,6 +54,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingVertical: 40,
+    backgroundColor: 'transparent', // Added to ensure transparency
   },
   iconContainer: {
     marginBottom: 10,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#E0B873',
     marginBottom: 4,
     letterSpacing: 0.5,
   },
@@ -106,14 +106,15 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '100%',
-    backgroundColor: '#7A5FFF', // Accent-bg
+    backgroundColor: '#7A5FFF',
     paddingVertical: 16,
+    paddingHorizontal: 16,
     borderRadius: 10,
     shadowColor: '#7A5FFF',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    elevation: 6, // Android shadow
+    elevation: 6,
   },
   buttonText: {
     color: '#FFFFFF',

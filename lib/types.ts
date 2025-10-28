@@ -1,4 +1,4 @@
-// lib/types.ts
+// lib/types.d.ts
 
 // A type for a matrix object where the key is a digit (1-9) and the value is a string (e.g., "111")
 export type MatrixData = {
