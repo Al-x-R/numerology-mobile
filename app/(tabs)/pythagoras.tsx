@@ -1,18 +1,50 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DateInputForm } from '@/components/DateInputForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
 import { CalculationResult } from '@/lib/types';
+import { LanguageButton } from '@/components/ui/LanguageButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+
+const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 10, // Небольшой отступ слева
+    }}
+  >
+    <MaterialCommunityIcons
+      name="arrow-left-thick"
+      size={24}
+      color="#A0A0A0"
+      style={{ marginRight: 6 }}
+    />
+    <Text
+      style={{
+        color: '#A0A0A0',
+        fontSize: 18,
+        marginLeft: -3,
+      }}
+    >
+      Back
+    </Text>
+  </TouchableOpacity>
+);
 
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
   const [results, setResults] = useState<CalculationResult | null>(null);
   const [error, setError] = useState<string>('');
+
+  const navigation = useNavigation();
 
   const handleCalculate = () => {
     if (!/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
@@ -42,18 +74,58 @@ export default function HomeScreen() {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setResults(null);
     setDateString('');
     setError('');
-  };
+  }, []);
+
+  const formattedDate = React.useMemo(() => {
+    if (!results) return '';
+    try {
+      const parts = dateString.split('.');
+      const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
+      return new Date(isoDateString).toLocaleDateString('ru-RU');
+    } catch {
+      return '...';
+    }
+  }, [results, dateString]);
+
+  const contentStyle: StyleProp<ViewStyle> = results ?
+    { justifyContent: 'flex-start', alignItems: 'stretch' } :
+    {  alignItems: 'center', marginTop: 80 };
+
+  useEffect(() => {
+    if (results) {
+      // Экран Результатов
+      navigation.setOptions({
+        headerTitle: () => (
+          <View style={{ alignItems: 'center' }}>
+            <Text style={styles.headerTitle}>Анализ Даты</Text>
+            <Text style={styles.headerSubtitle}>{formattedDate}</Text>
+          </View>
+        ),
+        headerLeft: () => <HeaderBackButton onPress={handleBack} />,
+        headerRight: () => (
+          <View style={{ alignItems: 'center' }} />
+        ),
+      });
+    } else {
+      navigation.setOptions({
+        headerTitle: 'Психоматрица',
+        headerLeft: () => null,
+        headerRight: () => <LanguageButton />,
+      });
+    }
+    // Мы зависим от results, navigation и данных для шапки
+  }, [navigation, results, formattedDate, handleBack]);
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1A1C33', '#0D0F21']} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
-      <View style={styles.content}>
+      <View style={[styles.content, contentStyle]}>
         {!results ? (
           <DateInputForm
             date={dateString}
@@ -74,10 +146,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent', // Match the gradient background
   },
+  headerTitle: {
+    color: '#E0B873',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  headerSubtitle: {
+    color: '#A0A0A0',
+    fontSize: 12,
+  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    marginTop: 80,
+    // marginTop: 80,
     // justifyContent: 'center',
     alignItems: 'center',
   },

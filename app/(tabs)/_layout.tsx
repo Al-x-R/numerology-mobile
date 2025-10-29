@@ -1,19 +1,8 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, View, StyleSheet } from 'react-native';
+import { LanguageButton } from '@/components/ui/LanguageButton';
 
-const LanguageButton = () => {
-  const handleLanguageChange = () => {
-    alert('Сменить язык!');
-  };
-
-  return (
-    <TouchableOpacity onPress={handleLanguageChange} style={{ marginRight: 15 }}>
-      <Ionicons name="globe-outline" size={24} color="#E0B873" />
-    </TouchableOpacity>
-  );
-};
 
 export default function TabLayout() {
   const ACCENT_COLOR = '#E0B873';
@@ -41,30 +30,26 @@ export default function TabLayout() {
           fontSize: 20,
           marginLeft: 15,
         },
-        headerShadowVisible: false,
+        headerShadowVisible: true,
         headerTintColor: ACCENT_COLOR,
+        headerTitleAlign: 'center',
+        // headerTitle: 'Destiny Code',
+        headerRight: () => <LanguageButton />,
       }}
     >
       <Tabs.Screen
         name="pythagoras"
         options={{
-          title: 'Пифагор',
-          headerShown: true,
-          headerTitle: 'Destiny Code',
-          headerTitleAlign: 'left',
+          title: 'Психоматрица',
           tabBarIcon: ({ color }) => (
             <Ionicons name="grid-outline" size={24} color={color} />
           ),
-          headerRight: () => <LanguageButton />,
         }}
       />
       <Tabs.Screen
         name="compatibility"
         options={{
           title: 'Совместимость',
-          headerTitle: 'Destiny Code',
-          headerTitleAlign: 'left',
-          headerRight: () => <LanguageButton />,
           tabBarIcon: ({ color }) => (
             <Ionicons name="heart-outline" size={24} color={color} />
           ),
@@ -74,9 +59,6 @@ export default function TabLayout() {
         name="numbers"
         options={{
           title: 'Числа',
-          headerTitle: 'Destiny Code',
-          headerTitleAlign: 'left',
-          headerRight: () => <LanguageButton />,
           tabBarIcon: ({ color }) => (
             <Ionicons name="keypad-outline" size={24} color={color} />
           ),

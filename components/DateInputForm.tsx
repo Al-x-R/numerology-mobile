@@ -45,9 +45,6 @@ export function DateInputForm({
 
   return (
     <View style={styles.container}>
-      {/*<View style={styles.iconContainer}>*/}
-      {/*  <Text style={styles.icon}>#</Text>*/}
-      {/*</View>*/}
 
       <Text style={styles.title}>Код Даты</Text>
       <Text style={styles.subtitle}>Рассчитайте свой Квадрат Пифагора</Text>
@@ -75,8 +72,9 @@ export function DateInputForm({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    maxWidth: 450,
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 50,
     backgroundColor: 'transparent', // Added to ensure transparency
   },
   iconContainer: {
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     color: '#E0B873',
-    marginBottom: 4,
+    marginBottom: 5,
     letterSpacing: 0.5,
   },
   subtitle: {
@@ -104,10 +102,10 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     width: '100%',
-    marginBottom: 25,
+    marginBottom: 35,
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     color: '#FFFFFF',

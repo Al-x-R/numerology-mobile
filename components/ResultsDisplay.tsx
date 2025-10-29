@@ -6,26 +6,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions
 } from 'react-native';
+
 import { CalculationResult } from '@/lib/types';
-import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
-
-// --- (Заглушка GridCell) ---
-// В будущем это будет отдельный компонент, пока оставим его здесь
-const GridCell = ({ id, value }: { id: string; value: string }) => {
-  const isAccent = ['1', '6'].includes(id); // Выделяем Характер и Труд
-  const title = getInterpretation(id, value).title.split(' (')[0];
-
-  return (
-    <TouchableOpacity style={[styles.cell, isAccent ? styles.cellAccent : {}]}>
-      <Text style={styles.cellLabel}>{title}</Text>
-      <Text style={[styles.cellValue, isAccent ? styles.textAccent : {}]}>
-        {value || '—'}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-// ----------------------------
+import { GridCell } from '@/components/GridCell';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -35,45 +20,38 @@ interface ResultsDisplayProps {
 
 export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   const { matrix, workingNumbers } = results;
+  const { width } = useWindowDimensions();
+  const PADDING = 20;
+  const GAP = 10;
 
-  // Форматируем дату (просто для вида)
-  const formattedDate = new Date(date).toLocaleDateString('ru-RU');
+  const gridWidth = width - (PADDING * 2);
+
+  const cellSize = (gridWidth - (GAP * 2)) / 3;
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
-      {/* Шапка с Назад */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Мой Анализ</Text>
-          <Text style={styles.dateText}>{formattedDate}</Text>
-        </View>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backText}>&lt; Назад</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 1. Психоматрица (Квадрат Пифагора) */}
-      <View style={styles.section}>
+      {/* 1. Psychomatrix (Pythagorean Square) */}
+      <View style={styles.pythagorasSection}>
         <Text style={styles.sectionTitle}>Психоматрица (Квадрат Пифагора)</Text>
         <View style={styles.grid}>
           {Object.entries(matrix).map(([id, value]) => (
-            <GridCell key={id} id={id} value={value} />
+            <GridCell key={id} id={id} value={value} cellSize={cellSize} />
           ))}
         </View>
       </View>
 
-      {/* 2. Дополнительные числа */}
-      <View style={styles.section}>
+      {/* 2. Additional numbers*/}
+      <View style={styles.numbersSection}>
         <Text style={styles.sectionTitle}>Дополнительные числа</Text>
         <View style={styles.numbersGrid}>
-          {/* Рабочие числа */}
+          {/* Working numbers */}
           {workingNumbers.map((num, index) => (
             <View
               key={index}
               style={[
                 styles.numberCard,
                 index === 1 ? styles.numberCardAccent : styles.numberCard,
-                //index === 1 ? styles.fateCard : {}, // Число Судьбы - особое
+                //index === 1 ? styles.fateCard : {}, // Destiny Number is special
               ]}
             >
               <Text style={styles.numberLabel}>
@@ -90,7 +68,7 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
             </View>
           ))}
 
-          {/* Число Судьбы (2-е рабочее число, но выделено) */}
+          {/* Destiny Number (2nd working number, but highlighted) */}
           <View style={[styles.numberCard, styles.fateCardFinal]}>
             <Text style={styles.numberLabel}>Число Судьбы</Text>
             <Text style={[styles.numberValue, styles.fateValue]}>
@@ -105,35 +83,14 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: 20,
-    backgroundColor: '#0D0F21',
+    width: '100%',
   },
-  // --- Шапка ---
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  dateText: {
-    color: '#A0A0A0',
-    fontSize: 14,
-  },
-  backButton: {
-    padding: 8,
-  },
-  backText: {
-    color: '#A0A0A0',
-  },
-  // --- Секции ---
+  // --- Sections ---
   section: {
-    marginBottom: 30,
+    marginBottom: 0,
+  },
+  pythagorasSection: {
+
   },
   sectionTitle: {
     fontSize: 18,
@@ -141,49 +98,24 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 15,
   },
-  // --- Сетка Пифагора ---
+  // --- Pythagorean grid ---
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  cell: {
-    width: '31.5%',
-    aspectRatio: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-    padding: 5,
-  },
-  cellAccent: {
-    backgroundColor: 'rgba(122, 95, 255, 0.1)',
-    borderColor: '#7A5FFF',
-  },
-  cellLabel: {
-    fontSize: 12,
-    color: '#A0A0A0',
-    textAlign: 'center',
-    position: 'absolute',
-    top: 5,
-  },
-  cellValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   textAccent: {
     color: '#E0B873',
   },
-  // --- Доп. числа ---
+  // --- Additional numbers ---
+  numbersSection: {
+    marginTop: 30,
+  },
   numbersGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 5
   },
   numberCard: {
     width: '48%',
@@ -192,10 +124,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 10,
     padding: 15,
-    marginBottom: 10,
+    alignItems: 'center',
   },
   numberCardAccent: {
-    // Для 2-го рабочего числа (Число Судьбы)
+    // For the 2nd working number (Destiny Number)
   },
   numberLabel: {
     fontSize: 12,
@@ -212,8 +144,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(224, 184, 115, 0.1)',
     borderColor: '#E0B873',
     marginTop: 5,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   fateValue: {
