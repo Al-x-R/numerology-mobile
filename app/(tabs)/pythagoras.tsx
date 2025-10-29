@@ -97,7 +97,6 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (results) {
-      // Экран Результатов
       navigation.setOptions({
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
@@ -117,7 +116,7 @@ export default function HomeScreen() {
         headerRight: () => <LanguageButton />,
       });
     }
-    // Мы зависим от results, navigation и данных для шапки
+
   }, [navigation, results, formattedDate, handleBack]);
 
   return (
@@ -158,8 +157,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    // marginTop: 80,
-    // justifyContent: 'center',
     alignItems: 'center',
   },
   background: {

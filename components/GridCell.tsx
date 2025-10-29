@@ -7,18 +7,20 @@ interface GridCellProps {
   id: string;
   value: string;
   cellSize: number;
+  onPress: () => void;
 }
 
-export function GridCell({ id, value, cellSize }: GridCellProps) {
+export function GridCell({ id, value, cellSize, onPress }: GridCellProps) {
   const isAccent = ['1', '6'].includes(id); // We emphasize Character and Work
   const title = getInterpretation(id, value).title.split(' (')[0];
 
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={[
         styles.cell,
         { width: cellSize },
-        isAccent ? styles.cellAccent : {}
+        // isAccent ? styles.cellAccent : {}
       ]}
     >
       <Text style={styles.cellLabel}>{title}</Text>
@@ -31,9 +33,11 @@ export function GridCell({ id, value, cellSize }: GridCellProps) {
 
 const styles = StyleSheet.create({
   cell: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    // backgroundColor: 'rgba(122, 95, 255, 0.1)',
+    // borderColor: '#7A5FFF',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -46,7 +50,7 @@ const styles = StyleSheet.create({
   },
   cellLabel: {
     fontSize: 12,
-    color: '#A0A0A0',
+    color: '#E0B873',
     textAlign: 'center',
   },
   cellValue: {

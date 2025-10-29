@@ -1,11 +1,10 @@
 // lib/calculators/pythagoreanSquare.ts
 import { CalculationResult, MatrixData } from '@/lib/types';
 
-// Вспомогательная функция для суммирования цифр числа
 function sumDigits(n: number | string): number {
   return String(n)
     .split('')
-    .reduce((acc, digit) => acc + parseInt(digit), 0);
+    .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
 }
 
 export function calculatePythagoreanSquare(date: Date): CalculationResult {
@@ -19,22 +18,23 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
 
   const fullDateStr = dStr + mStr + yStr;
 
-  const sum1 = sumDigits(fullDateStr);
-  const sum2 = sumDigits(sum1);
+  const sum1 = sumDigits(fullDateStr); // 1st working
+  const sum2 = sumDigits(sum1);        // 2nd working (Number of Destiny)
 
   let sum3: number;
   if (year >= 2000) {
     sum3 = sum1 + 19;
   } else {
-    const firstDayDigit = parseInt(dStr[0] === '0' ? dStr[1] : dStr[0]);
+    const firstDayDigit = parseInt(dStr[0], 10);
     sum3 = Math.abs(sum1 - 2 * firstDayDigit);
   }
 
-  const sum4 = sumDigits(sum3);
+  const sum4 = sumDigits(sum3); // 4th working
 
   const workingNumbers = [sum1, sum2, sum3, sum4];
-  const fullNumberSeries =
-    fullDateStr + workingNumbers.map(String).join('');
+
+  // We collect all the numbers: date + all working numbers
+  const fullNumberSeries = fullDateStr + workingNumbers.map(String).join('');
 
   const matrix: MatrixData = {
     '1': '', '2': '', '3': '', '4': '', '5': '', '6': '', '7': '', '8': '', '9': '',
