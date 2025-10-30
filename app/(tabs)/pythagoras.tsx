@@ -167,6 +167,6 @@ const styles = StyleSheet.create({
     width: '150%', // Adjusted for better fit
     maxWidth: 700,
     maxHeight: 700,
-    opacity: 0.4,
+    opacity: 0.2,
   },
 });

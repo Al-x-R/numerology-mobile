@@ -8,6 +8,11 @@
     "scheme": "numerologymobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/NumericalCompass.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D0F21"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.yourapp"

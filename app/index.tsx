@@ -1,11 +1,34 @@
-// app/index.tsx (главный вход)
+// app/index.tsx
 import { Redirect } from 'expo-router';
-import React from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect, useState } from 'react';
+import LoadingScreen from '@/components/ui/LoadingScreen';
 
-// Здесь мы можем использовать логику, чтобы проверить,
-// загрузились ли шрифты, данные и т.д.
+SplashScreen.preventAutoHideAsync();
 
-// Для начала просто перенаправляем на вкладки:
 export default function InitialLoadScreen() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Загрузи шрифты, кэш, API
+        // await Font.loadAsync(...);
+        // await initializeApp();
+        await new Promise(r => setTimeout(r, 1500)); // имитация
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setIsReady(true);
+        await SplashScreen.hideAsync();
+      }
+    }
+    prepare();
+  }, []);
+
+  if (!isReady) {
+    return <LoadingScreen />;
+  }
+
   return <Redirect href="/pythagoras" />;
 }

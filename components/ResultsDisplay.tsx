@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 
 import { GridCell } from '@/components/GridCell';
+import { GridCellAnimated } from '@/components/GridCellAnimated';
 import { InterpretationModal } from '@/components/InterpretationModal';
 import { WorkingNumbersDisplay } from '@/components/WorkingNumbersDisplay';
+import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDisplayAnimated';
 
 import { CalculationResult, Interpretation } from '@/lib/types';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
@@ -43,14 +45,15 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
         <View style={styles.pythagorasSection}>
           <Text style={styles.sectionTitle}>Психоматрица (Квадрат Пифагора)</Text>
           <View style={[styles.grid, { gap: GAP }]}>
-            {Object.entries(matrix).map(([id, value]) => {
+            {Object.entries(matrix).map(([id, value], index) => {
               const interpretationData = getInterpretation(id, value);
               return (
-                <GridCell
+                <GridCellAnimated
                   key={id}
                   id={id}
                   value={value}
                   cellSize={cellSize}
+                  index={index}
                   onPress={() => handlePress(interpretationData)}
                 />
               );
@@ -59,7 +62,7 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
         </View>
 
         {/* 2. Additional numbers */}
-        <WorkingNumbersDisplay
+        <WorkingNumbersDisplayAnimated
           workingNumbers={workingNumbers}
           onPress={handlePress}
           textAccentStyle={styles.textAccent}

@@ -1,13 +1,12 @@
-// components/ui/LoadingScreen.tsx
-import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+// components/LoadingScreen.tsx
+import { View, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import LOGO_IMAGE from '../../assets/images/NumericalCompass.png';
 
-export function LoadingScreen() {
+export default function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Destiny Code</Text>
-      <ActivityIndicator size="large" color="#E0B873" style={{ marginTop: 20 }} />
-      <Text style={styles.loadingText}>Loading Data...</Text>
+      <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
+      <ActivityIndicator size="large" color="#FFD700" style={styles.spinner} />
     </View>
   );
 }
@@ -19,15 +18,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 10,
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 30,
   },
-  loadingText: {
-    color: '#A0A0A0',
-    marginTop: 10,
-    fontSize: 16,
+  spinner: {
+    marginTop: 20,
   },
 });

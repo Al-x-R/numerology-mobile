@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   numberLabel: {
     fontSize: 12,
-    color: '#A0A0A0',
+    color: '#E0B873',
     marginBottom: 4,
   },
   numberValue: {

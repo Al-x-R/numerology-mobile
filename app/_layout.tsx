@@ -1,6 +1,8 @@
+//app/_layout.tsx
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, Image, StatusBar } from 'react-native';
+
 import LOGO_IMAGE from '../assets/images/NumericalCompass.png';
 
 const styles = StyleSheet.create({
