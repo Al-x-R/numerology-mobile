@@ -17,9 +17,17 @@ const translations: LocaleData = {
     buttonText: 'Рассчитать',
     loadingText: 'Расчёт...',
 
+    back: 'Назад',
+    pythagorasTitle: 'Психоматрица',
+    analysisTitle: 'Анализ Даты',
+
     errorEmpty: 'Введите дату',
     errorFormat: 'Формат: ДД.ММ.ГГГГ',
     errorInvalid: 'Некорректная дата',
+
+    compatibilityTitle: 'Совместимость',
+    numbersTitle: 'Числа',
+    changeLanguage: 'Сменить язык!',
 
     // TOOLTIPS
     tooltip_weak_character: 'Слабая воля',
@@ -264,6 +272,12 @@ const translations: LocaleData = {
     '9_999999': 'Overload. May be stuck in the past. Risk of depression and loneliness.',
 
     interpretation_unavailable: 'Detailed description not yet available.',
+
+    back: 'Back',
+    pythagorasTitle: 'Pythagoras Square',
+    analysisTitle: 'Date Analysis',
+    compatibilityTitle: 'Compatibility',
+    numbersTitle: 'Numbers',
   },
 };
 

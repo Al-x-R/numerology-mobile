@@ -2,6 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { COLORS } from '@/lib/constants/theme';
 
 export default function CompatibilityScreen() {
   return (
@@ -32,12 +33,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#E0B873',
+    color: COLORS.accent,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#A0A0A0',
+    color: COLORS.textSecondary,
     textAlign: 'center',
   },
   background: {

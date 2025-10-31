@@ -3,6 +3,7 @@ import { Platform, DimensionValue } from 'react-native';
 
 export const COLORS = {
   background: '#0D0F21',
+  headerBackground: '#1A1C33',
   card: 'rgba(255, 255, 255, 0.04)',
   cardFocused: 'rgba(167, 139, 250, 0.08)',
   border: 'rgba(255, 255, 255, 0.2)',
@@ -27,6 +28,7 @@ export const COLORS = {
 };
 
 export const GRADIENTS = {
+  background: ['#1A1C33', '#0D0F21'] as const,
   button: ['#B794F4', '#9F7AEA', '#7C3AED'] as const,
   buttonLoading: ['#9F7AEA', '#7C3AED'] as const,
 };

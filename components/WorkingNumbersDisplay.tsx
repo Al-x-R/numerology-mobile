@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
+import { COLORS } from '@/lib/constants/theme';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: COLORS.text,
     marginBottom: 15,
   },
   numbersGrid: {
@@ -92,18 +93,18 @@ const styles = StyleSheet.create({
   },
   numberLabel: {
     fontSize: 12,
-    color: '#E0B873',
+    color: COLORS.accent,
     marginBottom: 4,
   },
   numberValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   fateCardFinal: {
     width: '100%',
     backgroundColor: 'rgba(224, 184, 115, 0.1)',
-    borderColor: '#E0B873',
+    borderColor: COLORS.accent,
     borderRadius: 10,
     marginTop: 5,
     paddingVertical: 15,

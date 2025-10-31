@@ -12,6 +12,7 @@ import Animated, {
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
+import { COLORS } from '@/lib/constants/theme';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: COLORS.text,
     marginBottom: 15,
   },
   numbersGrid: {
@@ -167,13 +168,13 @@ const styles = StyleSheet.create({
   },
   numberLabel: {
     fontSize: 12,
-    color: '#E0B873',
+    color: COLORS.accent,
     marginBottom: 4,
   },
   numberValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   fateCardFinal: {
     width: '100%',

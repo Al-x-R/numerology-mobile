@@ -60,7 +60,7 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1A1C33',
+    backgroundColor: COLORS.headerBackground,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',

@@ -2,11 +2,12 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageButton } from '@/components/ui/LanguageButton';
+import { COLORS } from '@/lib/constants/theme';
 
 
 export default function TabLayout() {
-  const ACCENT_COLOR = '#E0B873';
-  const INACTIVE_COLOR = '#A0A0A0';
+  const ACCENT_COLOR = COLORS.accent;
+  const INACTIVE_COLOR = COLORS.textSecondary;
   const BG_COLOR = '#0D0F21';
 
   return (
@@ -22,7 +23,7 @@ export default function TabLayout() {
           position: 'absolute',
         },
         headerStyle: {
-          backgroundColor: '#1A1C33',
+          backgroundColor: COLORS.headerBackground,
         },
         headerTitleStyle: {
           color: ACCENT_COLOR,

@@ -1,6 +1,7 @@
 // app/(tabs)/numbers.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { COLORS } from '@/lib/constants/theme';
 
 export default function NumbersScreen() {
   return (
@@ -24,12 +25,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#E0B873',
+    color: COLORS.accent,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#A0A0A0',
+    color: COLORS.textSecondary,
     textAlign: 'center',
   },
 });

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Interpretation } from '@/lib/types';
+import { COLORS } from '@/lib/constants/theme';
 
 interface InterpretationModalProps {
   isVisible: boolean;
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 550,
     maxHeight: '80%',
-    backgroundColor: '#1A1C33',
+    backgroundColor: COLORS.headerBackground,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#E0B873',
+    color: COLORS.accent,
     marginBottom: 15,
     paddingRight: 30,
   },

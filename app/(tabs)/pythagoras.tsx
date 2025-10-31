@@ -11,6 +11,8 @@ import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare'
 import { CalculationResult } from '@/lib/types';
 import { LanguageButton } from '@/components/ui/LanguageButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { t } from '@/lib/constants/locales';
+import { COLORS, FONTS, GRADIENTS, SPACING } from '@/lib/constants/theme';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -18,23 +20,23 @@ const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
     style={{
       flexDirection: 'row',
       alignItems: 'center',
-      marginRight: 10,
+      marginRight: SPACING.md,
     }}
   >
     <MaterialCommunityIcons
       name="arrow-left-thick"
       size={24}
-      color="#A0A0A0"
-      style={{ marginRight: 6 }}
+      color={COLORS.textSecondary}
+      style={{ marginRight: SPACING.sm }}
     />
     <Text
       style={{
-        color: '#A0A0A0',
+        color: COLORS.textSecondary,
         fontSize: 18,
         marginLeft: -3,
       }}
     >
-      Back
+      {t('back')}
     </Text>
   </TouchableOpacity>
 );
@@ -79,7 +81,7 @@ export default function HomeScreen() {
       navigation.setOptions({
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
-            <Text style={styles.headerTitle}>Анализ Даты</Text>
+            <Text style={styles.headerTitle}>{t('analysisTitle')}</Text>
             <Text style={styles.headerSubtitle}>{dateString}</Text>
           </View>
         ),
@@ -125,12 +127,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // Match the gradient background
   },
   headerTitle: {
-    color: '#E0B873',
+    color: COLORS.accent,
     fontSize: 18,
     fontWeight: 'bold',
   },
   headerSubtitle: {
-    color: '#A0A0A0',
+    color: COLORS.textSecondary,
     fontSize: 12,
   },
   content: {

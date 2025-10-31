@@ -3,6 +3,8 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 
+import { COLORS, FONTS, GRADIENTS, SPACING } from '@/lib/constants/theme';
+
 interface GridCellProps {
   id: string;
   value: string;
@@ -50,15 +52,15 @@ const styles = StyleSheet.create({
   },
   cellLabel: {
     fontSize: 12,
-    color: '#E0B873',
+    color: COLORS.accent,
     textAlign: 'center',
   },
   cellValue: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.text,
   },
   textAccent: {
-    color: '#E0B873',
+    color: COLORS.accent,
   },
 });
