@@ -96,6 +96,11 @@ export default function HomeScreen() {
         headerTitle: 'Психоматрица',
         headerLeft: () => null,
         headerRight: () => <LanguageButton />,
+        tabBarStyle: {
+          display: 'flex',
+          backgroundColor: COLORS.background,
+          borderTopColor: COLORS.background
+        },
       });
     }
 

@@ -3,32 +3,46 @@ import { Redirect } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import { useAppFonts } from '@/hooks/useFonts';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function InitialLoadScreen() {
   const [isReady, setIsReady] = useState(false);
+  const [fontsLoaded, fontError] = useAppFonts();
 
   useEffect(() => {
     async function prepare() {
       try {
-        // Загрузи шрифты, кэш, API
-        // await Font.loadAsync(...);
-        // await initializeApp();
-        await new Promise(r => setTimeout(r, 1500)); // имитация
+        if (!fontsLoaded) return;
+
+        await new Promise(resolve => setTimeout(resolve, 800));
+
       } catch (e) {
-        console.warn(e);
+        console.warn('Prepare error:', e);
       } finally {
         setIsReady(true);
         await SplashScreen.hideAsync();
       }
     }
-    prepare();
-  }, []);
 
-  if (!isReady) {
+    console.log('fontsLoaded', fontsLoaded);
+    if (fontsLoaded || fontError) {
+      prepare();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
+  if (fontError) {
     return <LoadingScreen />;
   }
 
-  return <Redirect href="/pythagoras" />;
+  if (isReady) {
+    return <Redirect href="/pythagoras" />;
+  }
+
+  return <LoadingScreen />;
 }
