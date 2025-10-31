@@ -87,6 +87,7 @@ export default function HomeScreen() {
         headerRight: () => (
           <View style={{ alignItems: 'center' }} />
         ),
+        tabBarStyle: { display: 'none' },
       });
     } else {
       navigation.setOptions({
@@ -96,7 +97,7 @@ export default function HomeScreen() {
       });
     }
 
-  }, [navigation, results, handleBack]);
+  }, [navigation, results, handleBack, dateString]);
 
   return (
     <SafeAreaView style={styles.container}>
