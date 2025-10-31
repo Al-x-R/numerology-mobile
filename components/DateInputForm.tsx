@@ -12,15 +12,21 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { isValidRussianDate } from '@/lib/utils/validateDate';
-import { COLORS, FONTS } from '@/lib/constants/theme';
-import { GRADIENTS } from '@/lib/constants/gradient';
+import {
+  COLORS,
+  FONTS,
+  SPACING,
+  RADIUS,
+  SHADOWS,
+  LAYOUT,
+  GRADIENTS
+} from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 interface DateInputFormProps {
   onSubmit: () => void;
   date: string;
   setDate: (date: string) => void;
-  // error: string;
 }
 
 const formatRussianDate = (text: string): string => {
@@ -35,7 +41,6 @@ export function DateInputForm({
   onSubmit,
   date,
   setDate,
-  // error,
 }: DateInputFormProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -62,6 +67,7 @@ export function DateInputForm({
 
   const handleTextChange = (text: string) => {
     const formattedText = formatRussianDate(text);
+    setLocalError('');
     setDate(formattedText);
   };
 
@@ -99,24 +105,54 @@ export function DateInputForm({
     }, 2000);
   };
 
+  const errorOpacity = useRef(new Animated.Value(0)).current;
+  const errorY = useRef(new Animated.Value(-10)).current;
+
+  useEffect(() => {
+    if (localError) {
+      Animated.parallel([
+        Animated.timing(errorOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.spring(errorY, { toValue: 0, friction: 8, useNativeDriver: true }),
+      ]).start();
+    } else {
+      errorOpacity.setValue(0);
+      errorY.setValue(-10);
+    }
+  }, [localError]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>{t('subtitle')}</Text>
 
-      <Animated.View style={[styles.inputWrapper, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
-        <TextInput
-          style={[styles.input, isFocused && styles.inputFocused, localError && styles.inputError]}
-          placeholder={t('inputPlaceholder')}
-          placeholderTextColor={COLORS.textSecondary}
-          value={date}
-          onChangeText={handleTextChange}
-          keyboardType="numbers-and-punctuation"
-          maxLength={10}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-        />
-        {localError && <Text style={styles.errorText}>{localError}</Text>}
+      <Animated.View style={[styles.inputContainer, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={[styles.input, isFocused && styles.inputFocused, localError && styles.inputError]}
+            placeholder={t('inputPlaceholder')}
+            placeholderTextColor={COLORS.textSecondary}
+            value={date}
+            onChangeText={handleTextChange}
+            keyboardType="numbers-and-punctuation"
+            maxLength={10}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
+        </View>
+
+        {localError && (
+          <Animated.Text
+            style={[
+              styles.errorText,
+              {
+                opacity: errorOpacity,
+                transform: [{ translateY: errorY }],
+              },
+            ]}
+          >
+            {localError}
+          </Animated.Text>
+        )}
       </Animated.View>
 
       <Animated.View
@@ -156,94 +192,87 @@ export function DateInputForm({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    maxWidth: 450,
+    width: LAYOUT.formWidth,
+    maxWidth: LAYOUT.formMaxWidth,
     alignItems: 'center',
-    paddingVertical: 50,
+    paddingVertical: LAYOUT.containerPadding,
     backgroundColor: 'transparent',
   },
   title: {
-    ...FONTS.title,
-    color: COLORS.accent,
+  ...FONTS.title,
+      color: COLORS.accent,
   },
   subtitle: {
-    ...FONTS.subtitle,
-    marginBottom: 40,
-    textAlign: 'center',
+  ...FONTS.subtitle,
+    marginTop: 5,
+      marginBottom: 40,
+      textAlign: 'center',
+  },
+  inputContainer: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'relative' as const,
   },
   inputWrapper: {
     width: '100%',
-    marginBottom: 35,
+    marginBottom: 0,
   },
   input: {
     ...FONTS.input,
     backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
-    color: COLORS.text,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 10,
-    textAlign: 'center',
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.md,
+    ...SHADOWS.card,
   },
   inputFocused: {
-    borderColor: COLORS.primary,
+    borderColor: COLORS.borderFocused,
     borderWidth: 2,
-    backgroundColor: 'rgba(167, 139, 250, 0.08)',
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: COLORS.cardFocused,
+    ...SHADOWS.inputFocused,
   },
   inputError: {
     borderColor: COLORS.error,
     borderWidth: 2,
   },
   errorText: {
-    color: COLORS.error,
-    textAlign: 'center',
-    marginTop: 8,
-    fontSize: 14,
+    ...FONTS.error,
+    position: 'absolute' as const,
+    bottom: -24,
+    left: 0,
+    right: 0,
   },
   buttonContainer: {
     width: '100%',
-    marginTop: 10,
+    marginTop: SPACING.formGap,
   },
   button: {
     width: '100%',
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 16,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden' as const,
+    ...SHADOWS.button,
   },
   buttonGradient: {
-    paddingVertical: 18,
+    paddingVertical: SPACING.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   buttonText: {
     ...FONTS.button,
-    color: COLORS.text,
     textShadowColor: 'rgba(167, 139, 250, 0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
   loadingContent: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+      alignItems: 'center',
+      gap: 12,
   },
   loadingText: {
     color: COLORS.text,
-    fontSize: 16,
-    fontWeight: '600',
+      fontSize: 16,
+      fontWeight: '600',
   },
 });
