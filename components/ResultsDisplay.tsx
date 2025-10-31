@@ -8,10 +8,8 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import { GridCell } from '@/components/GridCell';
 import { GridCellAnimated } from '@/components/GridCellAnimated';
 import { InterpretationModal } from '@/components/InterpretationModal';
-import { WorkingNumbersDisplay } from '@/components/WorkingNumbersDisplay';
 import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDisplayAnimated';
 
 import { CalculationResult, Interpretation } from '@/lib/types';
@@ -38,6 +36,10 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
     setSelected(interpretationData);
   };
 
+  const maxLength = Math.max(
+    ...Object.values(results.matrix).map(v => v?.length || 0)
+  );
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -55,6 +57,7 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
                   cellSize={cellSize}
                   index={index}
                   onPress={() => handlePress(interpretationData)}
+                  maxLength={maxLength}
                 />
               );
             })}

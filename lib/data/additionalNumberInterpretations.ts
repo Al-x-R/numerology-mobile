@@ -1,24 +1,29 @@
 // lib/data/additionalNumberInterpretations.ts
+import { t } from '@/lib/constants/locales';
+import { Interpretation } from '@/lib/types';
 
-export const contextualInterpretations = {
+export const contextualInterpretations: Record<
+  'working1' | 'working2' | 'working3' | 'working4' | 'destiny',
+  Interpretation
+> = {
   working1: {
-    title: '1-е Рабочее Число',
-    description: 'Это "сырой" жизненный потенциал.',
+    title: t('working1_title'),
+    description: t('working1_desc'),
   },
   working2: {
-    title: '2-е Рабочее Число',
-    description: 'Это ваша главная жизненная задача и миссия.',
+    title: t('working2_title'),
+    description: t('working2_desc'),
   },
   working3: {
-    title: '3-е Рабочее Число',
-    description: 'Это "кармическая поправка" — то, что нужно отработать.',
+    title: t('working3_title'),
+    description: t('working3_desc'),
   },
   working4: {
-    title: '4-е Рабочее Число',
-    description: 'Это "ключ" к решению кармических задач.',
+    title: t('working4_title'),
+    description: t('working4_desc'),
   },
   destiny: {
-    title: 'Число Судьбы',
-    description: 'Это ваша путеводная звезда.',
+    title: t('destiny_title'),
+    description: t('destiny_desc'),
   },
 };

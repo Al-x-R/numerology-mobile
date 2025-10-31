@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { getHighlightType } from '@/lib/utils/highlight';
+import { getTooltipText } from '@/lib/utils/tooltip';
 
 
 interface GridCellProps {
@@ -19,9 +20,10 @@ interface GridCellProps {
   cellSize: number;
   onPress: () => void;
   index: number;
+  maxLength: number;
 }
 
-export function GridCellAnimated({ id, value, cellSize, onPress, index }: GridCellProps) {
+export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLength }: GridCellProps) {
   const title = getInterpretation(id, value).title.split(' (')[0];
 
   // Анимационные значения
@@ -33,21 +35,23 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index }: GridCe
   const valueOpacity = useSharedValue(0);
   const tooltipOpacity = useSharedValue(0);
 
-  useEffect(() => {
-    const delay = index * 80; // Каждая ячейка с задержкой
+  const highlight = getHighlightType(id, value);
 
-    // 1. Контейнер
+  useEffect(() => {
+    const delay = index * 80; // Each cell with a delay
+
+    // 1. Container
     containerOpacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
     containerScale.value = withDelay(
       delay,
       withTiming(1, { duration: 500, easing: Easing.out(Easing.quad) })
     );
 
-    // 2. Заголовок
+    // 2. Headline
     labelOpacity.value = withDelay(delay + 200, withTiming(1, { duration: 300 }));
     labelY.value = withDelay(delay + 200, withTiming(0, { duration: 400, easing: Easing.out(Easing.quad) }));
 
-    // 3. Значение
+    // 3. Meaning
     valueOpacity.value = withDelay(delay + 300, withTiming(1, { duration: 400 }));
     valueScale.value = withDelay(
       delay + 300,
@@ -81,35 +85,8 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index }: GridCe
     opacity: tooltipOpacity.value,
   }));
 
-  const getTooltipText = (id: string, value: string): string => {
-    const v = value || '—';
-
-    // СЛАБЫЕ
-    if (id === '1' && (v === '1' || v === '11')) return 'Слабая воля';
-    if (v === '—' && id !== '7') {
-      const labels: Record<string, string> = {
-        '4': 'Слабое здоровье',
-        '2': 'Нет энергии',
-        '5': 'Слабая логика',
-        '6': 'Лень',
-        '8': 'Эгоизм',
-        '9': 'Плохая память',
-      };
-      return labels[id] || 'Нужно развивать';
-    }
-
-    // СИЛЬНЫЕ
-    if (v.includes('222')) return 'Экстрасенс';
-    if (v.includes('333')) return 'Гениальность';
-    if (v.includes('555')) return 'Ясновидение';
-    if (v.includes('666')) return 'Темперамент';
-    if (v.includes('888')) return 'Ответственность';
-    if (v.includes('999')) return 'Пророк';
-
-    return 'Суперсила!';
-  };
-
-  const highlight = getHighlightType(id, value);
+  const displayValue = value && value.length > 6 ? value.slice(0, 6) : (value || '—');
+  const valueFontSize = maxLength > 4 ? 27 : 32;
 
   return (
     <Animated.View style={[containerStyle]}>
@@ -132,9 +109,10 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index }: GridCe
           style={[
             styles.cellValue,
             valueStyle,
+            { fontSize: valueFontSize },
           ]}
         >
-          {value || '—'}
+          {displayValue || '—'}
         </Animated.Text>
 
         {/* Tooltip */}
@@ -191,7 +169,7 @@ const styles = StyleSheet.create({
     paddingTop: 5
   },
   cellValue: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },

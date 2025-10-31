@@ -18,7 +18,7 @@ const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
     style={{
       flexDirection: 'row',
       alignItems: 'center',
-      marginRight: 10, // Небольшой отступ слева
+      marginRight: 10,
     }}
   >
     <MaterialCommunityIcons
@@ -70,17 +70,6 @@ export default function HomeScreen() {
     setDateString('');
   }, []);
 
-  const formattedDate = React.useMemo(() => {
-    if (!results) return '';
-    try {
-      const parts = dateString.split('.');
-      const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
-      return new Date(isoDateString).toLocaleDateString('ru-RU');
-    } catch {
-      return '...';
-    }
-  }, [results, dateString]);
-
   const contentStyle: StyleProp<ViewStyle> = results ?
     { justifyContent: 'flex-start', alignItems: 'stretch' } :
     {  alignItems: 'center', marginTop: 80 };
@@ -91,7 +80,7 @@ export default function HomeScreen() {
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
             <Text style={styles.headerTitle}>Анализ Даты</Text>
-            <Text style={styles.headerSubtitle}>{formattedDate}</Text>
+            <Text style={styles.headerSubtitle}>{dateString}</Text>
           </View>
         ),
         headerLeft: () => <HeaderBackButton onPress={handleBack} />,
@@ -107,7 +96,7 @@ export default function HomeScreen() {
       });
     }
 
-  }, [navigation, results, formattedDate, handleBack]);
+  }, [navigation, results, handleBack]);
 
   return (
     <SafeAreaView style={styles.container}>
