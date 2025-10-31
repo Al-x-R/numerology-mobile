@@ -11,11 +11,16 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { isValidRussianDate } from '@/lib/utils/validateDate';
+import { COLORS, FONTS } from '@/lib/constants/theme';
+import { GRADIENTS } from '@/lib/constants/gradient';
+import { t } from '@/lib/constants/locales';
+
 interface DateInputFormProps {
   onSubmit: () => void;
   date: string;
   setDate: (date: string) => void;
-  error: string;
+  // error: string;
 }
 
 const formatRussianDate = (text: string): string => {
@@ -30,12 +35,12 @@ export function DateInputForm({
   onSubmit,
   date,
   setDate,
-  error,
+  // error,
 }: DateInputFormProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Animations
   const inputOpacity = useRef(new Animated.Value(0)).current;
   const inputY = useRef(new Animated.Value(30)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
@@ -72,28 +77,38 @@ export function DateInputForm({
 
   const handleSubmit = () => {
     if (isLoading) return;
+    setLocalError(null);
 
-    // Start download
+    if (!date) {
+      setLocalError(t('errorEmpty'));
+      return;
+    }
+    if (date.length !== 10) {
+      setLocalError(t('errorFormat'));
+      return;
+    }
+    if (!isValidRussianDate(date)) {
+      setLocalError(t('errorInvalid'));
+      return;
+    }
+
     setIsLoading(true);
-
-    // Simulation of calculation (2 sec)
     setTimeout(() => {
       setIsLoading(false);
-      onSubmit(); // Calling the real onSubmit
+      onSubmit();
     }, 2000);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Код Даты</Text>
-      <Text style={styles.subtitle}>Рассчитайте свой Квадрат Пифагора</Text>
+      <Text style={styles.title}>{t('title')}</Text>
+      <Text style={styles.subtitle}>{t('subtitle')}</Text>
 
-      {/* Animated input */}
       <Animated.View style={[styles.inputWrapper, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
         <TextInput
-          style={[styles.input, isFocused && styles.inputFocused, error && styles.inputError]}
-          placeholder="Введите дату рождения (ДД.ММ.ГГГГ)"
-          placeholderTextColor="#A0A0A0"
+          style={[styles.input, isFocused && styles.inputFocused, localError && styles.inputError]}
+          placeholder={t('inputPlaceholder')}
+          placeholderTextColor={COLORS.textSecondary}
           value={date}
           onChangeText={handleTextChange}
           keyboardType="numbers-and-punctuation"
@@ -101,17 +116,13 @@ export function DateInputForm({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {localError && <Text style={styles.errorText}>{localError}</Text>}
       </Animated.View>
 
-      {/* Animated loading button */}
       <Animated.View
         style={[
           styles.buttonContainer,
-          {
-            opacity: buttonOpacity,
-            transform: [{ translateY: buttonY }, { scale: buttonScale }],
-          },
+          { opacity: buttonOpacity, transform: [{ translateY: buttonY }, { scale: buttonScale }] },
         ]}
       >
         <TouchableOpacity
@@ -123,18 +134,18 @@ export function DateInputForm({
           disabled={isLoading}
         >
           <LinearGradient
-            colors={isLoading ? ['#9F7AEA', '#7C3AED'] : ['#B794F4', '#9F7AEA', '#7C3AED']}
+            colors={isLoading ? GRADIENTS.buttonLoading : GRADIENTS.button}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.buttonGradient}
           >
             {isLoading ? (
               <View style={styles.loadingContent}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={styles.loadingText}>Расчёт...</Text>
+                <ActivityIndicator size="small" color={COLORS.text} />
+                <Text style={styles.loadingText}>{t('loadingText')}</Text>
               </View>
             ) : (
-              <Text style={styles.buttonText}>Рассчитать</Text>
+              <Text style={styles.buttonText}>{t('buttonText')}</Text>
             )}
           </LinearGradient>
         </TouchableOpacity>
@@ -152,15 +163,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#E0B873',
-    marginBottom: 5,
-    letterSpacing: 0.5,
+    ...FONTS.title,
+    color: COLORS.accent,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#A0A0A0',
+    ...FONTS.subtitle,
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -169,36 +176,36 @@ const styles = StyleSheet.create({
     marginBottom: 35,
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    ...FONTS.input,
+    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    color: '#FFFFFF',
+    borderColor: COLORS.border,
+    color: COLORS.text,
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderRadius: 10,
-    fontSize: 18,
     textAlign: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   inputFocused: {
-    borderColor: '#A78BFA',
+    borderColor: COLORS.primary,
     borderWidth: 2,
     backgroundColor: 'rgba(167, 139, 250, 0.08)',
-    shadowColor: '#A78BFA',
+    shadowColor: COLORS.primary,
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
   },
   inputError: {
-    borderColor: '#FF6B6B',
+    borderColor: COLORS.error,
     borderWidth: 2,
   },
   errorText: {
-    color: '#FF6B6B',
+    color: COLORS.error,
     textAlign: 'center',
     marginTop: 8,
     fontSize: 14,
@@ -211,7 +218,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#A78BFA',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
@@ -223,10 +230,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    ...FONTS.button,
+    color: COLORS.text,
     textShadowColor: 'rgba(167, 139, 250, 0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
@@ -237,7 +242,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
   },

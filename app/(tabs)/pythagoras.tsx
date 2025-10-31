@@ -42,16 +42,10 @@ const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
   const [results, setResults] = useState<CalculationResult | null>(null);
-  const [error, setError] = useState<string>('');
 
   const navigation = useNavigation();
 
   const handleCalculate = () => {
-    if (!/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
-      setError('Введите дату в формате ДД.ММ.ГГГГ.');
-      return;
-    }
-
     // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
     const parts = dateString.split('.'); // ['02', '07', '1985']
     // new Date() in JavaScript doesn't work well with DD/MM/YYYY,
@@ -61,15 +55,12 @@ export default function HomeScreen() {
     try {
       const dateObj = new Date(isoDateString);
       if (isNaN(dateObj.getTime())) {
-        setError('Некорректная дата.');
         return;
       }
 
       const calcResults = calculatePythagoreanSquare(dateObj);
       setResults(calcResults);
-      setError('');
     } catch (e) {
-      setError('Ошибка при расчете.');
       console.error(e);
     }
   };
@@ -77,7 +68,6 @@ export default function HomeScreen() {
   const handleBack = useCallback(() => {
     setResults(null);
     setDateString('');
-    setError('');
   }, []);
 
   const formattedDate = React.useMemo(() => {
@@ -130,7 +120,6 @@ export default function HomeScreen() {
             date={dateString}
             setDate={setDateString}
             onSubmit={handleCalculate}
-            error={error}
           />
         ) : (
           <ResultsDisplay results={results} date={dateString} onBack={handleBack} />
