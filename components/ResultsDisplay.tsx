@@ -7,13 +7,18 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
+import Animated, {
+  SlideOutDown,
+  SlideInDown,
+} from 'react-native-reanimated';
 
 import { GridCellAnimated } from '@/components/GridCellAnimated';
-import { InterpretationModal } from '@/components/InterpretationModal';
 import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDisplayAnimated';
 
 import { CalculationResult, Interpretation } from '@/lib/types';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
+import { InterpretationCard } from '@/components/InterpretationCard';
+import { SPACING } from '@/lib/constants/theme';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -33,6 +38,9 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   const [selected, setSelected] = useState<Interpretation | null>(null);
 
   const handlePress = (interpretationData: Interpretation) => {
+    if (selected) {
+      return;
+    }
     setSelected(interpretationData);
   };
 
@@ -49,6 +57,11 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
           <View style={[styles.grid, { gap: GAP }]}>
             {Object.entries(matrix).map(([id, value], index) => {
               const interpretationData = getInterpretation(id, value);
+              const interpretationDataFull = {
+                ...interpretationData,
+                value
+              };
+
               return (
                 <GridCellAnimated
                   key={id}
@@ -56,13 +69,24 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
                   value={value}
                   cellSize={cellSize}
                   index={index}
-                  onPress={() => handlePress(interpretationData)}
+                  onPress={() => handlePress(interpretationDataFull)}
                   maxLength={maxLength}
                 />
               );
             })}
           </View>
         </View>
+
+        {selected && (
+
+          <Animated.View
+            entering={SlideInDown.duration(400).springify()}
+            exiting={SlideOutDown.duration(300).springify()}
+            style={styles.floatingCard}
+          >
+            <InterpretationCard interpretation={selected} onClose={() => setSelected(null)} />
+          </Animated.View>
+        )}
 
         {/* 2. Additional numbers */}
         <WorkingNumbersDisplayAnimated
@@ -71,12 +95,6 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
           textAccentStyle={styles.textAccent}
         />
       </ScrollView>
-
-      <InterpretationModal
-        isVisible={selected !== null}
-        onClose={() => setSelected(null)}
-        interpretation={selected}
-      />
     </>
   );
 }
@@ -106,5 +124,11 @@ const styles = StyleSheet.create({
   },
   textAccent: {
     color: '#E0B873',
+  },
+  floatingCard: {
+    position: 'absolute',
+    bottom: SPACING.lg,
+    zIndex: 1000,
+    elevation: 10,
   },
 });

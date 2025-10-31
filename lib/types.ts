@@ -15,4 +15,5 @@ export interface CalculationResult {
 export interface Interpretation {
   title: string;
   description: string;
+  value?: string;
 }

@@ -15,6 +15,15 @@ export const COLORS = {
   error: '#FF6B6B',
   shadow: '#000',
   shadowAccent: '#A78BFA',
+  // === НОВЫЕ: ПОДСВЕТКА ЯЧЕЕК ===
+  highlightWeak: '#FF9500',
+  highlightStrong: '#8B5CF6',
+
+  battery: {
+    empty: '#FF3B30',     // красный — пусто
+    full: '#34C759',      // зелёный — полный заряд
+    light: '#A8E6A1',     // светло-зелёный (для градиента)
+  },
 };
 
 export const GRADIENTS = {
@@ -115,4 +124,73 @@ export const LAYOUT = {
   formMaxWidth: 450,
   formWidth: '100%' as DimensionValue,
   containerPadding: 50,
+};
+
+// === GRID CELL ANIMATED STYLES ===
+export const GRID_CELL_ANIMATED = {
+  container: (cellSize: number) => ({
+    width: cellSize,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: RADIUS.md,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    marginBottom: SPACING.sm,
+    padding: SPACING.xs,
+    position: 'relative' as const,
+  }),
+
+  // Подсветка
+  highlight: {
+    weak: {
+      borderColor: COLORS.highlightWeak,
+      backgroundColor: 'rgba(255, 107, 107, 0.08)',
+    },
+    strong: {
+      borderColor: COLORS.highlightStrong,
+      backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    },
+  },
+
+  // Текст заголовка
+  label: {
+    fontSize: 12,
+    color: COLORS.accent,
+    textAlign: 'center' as const,
+    paddingTop: SPACING.xs,
+    fontFamily: FONTS.systemRegular,
+  },
+
+  value: (fontSize: number) => ({
+    fontSize,
+    fontWeight: 'bold' as const,
+    color: COLORS.text,
+    fontFamily: FONTS.bold,
+    textAlign: 'center' as const,
+  }),
+
+  // Tooltip
+  tooltip: {
+    wrapper: {
+      position: 'absolute' as const,
+      top: -8,
+      alignItems: 'center' as const,
+      zIndex: 10,
+    },
+    container: (isWeak: boolean) => ({
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: RADIUS.sm,
+      minWidth: 50,
+      alignItems: 'center' as const,
+      backgroundColor: isWeak ? COLORS.highlightWeak : COLORS.highlightStrong,
+    }),
+    text: {
+      color: COLORS.text,
+      fontSize: 9,
+      fontWeight: '600' as const,
+      textAlign: 'center' as const,
+    },
+  },
 };
