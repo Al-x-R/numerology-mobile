@@ -51,14 +51,12 @@ const styles = StyleSheet.create({
     borderColor: '#7A5FFF',
   },
   cellLabel: {
-    fontSize: 12,
-    color: COLORS.accent,
-    textAlign: 'center',
+    ...FONTS.cellLabel,
+    textAlign: 'center' as const,
   },
   cellValue: {
+    ...FONTS.cellValue,
     fontSize: 32,
-    fontWeight: 'bold',
-    color: COLORS.text,
   },
   textAccent: {
     color: COLORS.accent,

@@ -12,7 +12,7 @@ import Animated, {
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
-import { COLORS } from '@/lib/constants/theme';
+import { FONTS, SPACING, COLORS } from '@/lib/constants/theme';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -144,12 +144,10 @@ const FateCard: React.FC<{
 };
 
 const styles = StyleSheet.create({
-  numbersSection: { marginTop: 30 },
+  numbersSection: { marginTop: SPACING.xl, },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 15,
+    ...FONTS.sectionTitle,
+    marginBottom: SPACING.md,
   },
   numbersGrid: {
     flexDirection: 'row',
@@ -167,19 +165,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   numberLabel: {
-    fontSize: 12,
-    color: COLORS.accent,
-    marginBottom: 4,
+    ...FONTS.workingLabel,
+    marginBottom: SPACING.xs,
   },
   numberValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    ...FONTS.workingValue,
   },
   fateCardFinal: {
     width: '100%',
     backgroundColor: 'rgba(224, 184, 115, 0.1)',
-    borderColor: '#7A5FFF',
+    borderColor: COLORS.borderAccent,
     borderWidth: 1,
     borderRadius: 10,
     marginTop: 5,
@@ -188,6 +183,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   fateValue: {
-    fontSize: 30,
+    ...FONTS.fateValue,
   },
 });

@@ -1,5 +1,19 @@
 // constants/theme.ts
-import { Platform, DimensionValue } from 'react-native';
+import { DimensionValue } from 'react-native';
+
+export const FONT_FAMILY = {
+  playfair: {
+    bold: 'PlayfairDisplay-Bold',
+    regular: 'PlayfairDisplay-Regular',
+  },
+  manrope: {
+    bold: 'Manrope-Bold',
+    regular: 'Manrope-Regular',
+  },
+  cinzel: {
+    regular: 'Cinzel-Regular',
+  },
+} as const;
 
 export const COLORS = {
   background: '#0D0F21',
@@ -8,6 +22,7 @@ export const COLORS = {
   cardFocused: 'rgba(167, 139, 250, 0.08)',
   border: 'rgba(255, 255, 255, 0.2)',
   borderFocused: '#A78BFA',
+  borderAccent: '#E0B873',
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
   accent: '#E0B873',
@@ -36,51 +51,6 @@ export const GRADIENTS = {
 //   button: ['#4F46E5', '#7C3AED'] as const, // ← as const
 //   buttonLoading: ['#6366F1', '#8B5CF6'] as const,
 // } satisfies Record<string, readonly [string, string, ...string[]]>;
-
-export const FONTS = {
-  bold: Platform.select({ ios: 'Georgia-Bold', android: 'serif' }),
-  regular: Platform.select({ ios: 'Georgia', android: 'serif' }),
-  systemBold: Platform.select({ ios: 'SFProDisplay-Bold', android: 'sans-serif-medium' }),
-  systemRegular: Platform.select({ ios: 'SFProDisplay-Regular', android: 'sans-serif' }),
-
-  title: {
-    fontFamily: Platform.select({ ios: 'Georgia-Bold', android: 'serif' }),
-    fontSize: 32,
-    fontWeight: 'bold' as const,
-    letterSpacing: 0.5,
-    color: COLORS.accent,
-  },
-  subtitle: {
-    fontFamily: Platform.select({ ios: 'Georgia', android: 'serif' }),
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: 'center' as const,
-  },
-  button: {
-    fontFamily: Platform.select({ ios: 'SFProDisplay-Bold', android: 'sans-serif-medium' }),
-    fontSize: 18,
-    fontWeight: '700' as const,
-    letterSpacing: 0.5,
-    color: COLORS.text,
-  },
-  input: {
-    fontFamily: Platform.select({ ios: 'SFProDisplay-Regular', android: 'sans-serif' }),
-    fontSize: 18,
-    color: COLORS.text,
-    textAlign: 'center' as const,
-  },
-  error: {
-    fontSize: 14,
-    fontWeight: '500' as const,
-    color: COLORS.error,
-    textAlign: 'center' as const,
-  },
-  loading: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: COLORS.text,
-  },
-};
 
 export const SPACING = {
   xs: 4,
@@ -128,8 +98,144 @@ export const LAYOUT = {
   containerPadding: 50,
 };
 
+export const FONTS = {
+  title: {
+    fontFamily: FONT_FAMILY.playfair.bold,
+    fontSize: 32,
+    fontWeight: '700' as const,
+    letterSpacing: 0.5,
+    color: COLORS.accent,
+  },
+  subtitle: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center' as const,
+  },
+  headerTitle: {
+    fontFamily: FONT_FAMILY.playfair.bold,
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: COLORS.accent,
+  },
+  headerSubtitle: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center' as const,
+  },
+  button: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 18,
+    fontWeight: '700' as const,
+    letterSpacing: 0.5,
+    color: COLORS.text,
+  },
+  input: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 18,
+    color: COLORS.text,
+    textAlign: 'center' as const,
+  },
+  error: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: COLORS.error,
+    textAlign: 'center' as const,
+  },
+  loading: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: COLORS.textSecondary,
+  },
+  cellLabel: {
+    fontFamily: FONT_FAMILY.cinzel.regular,
+    fontSize: 12,
+    color: COLORS.accent,
+  },
+  cellValue: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 24,
+    color: COLORS.text,
+  },
+  tooltip: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 9,
+    fontWeight: '600' as const,
+    color: COLORS.text,
+  },
+  cardTitle: {
+    fontFamily: FONT_FAMILY.playfair.bold,
+    fontSize: 22,
+    fontWeight: '700' as const,
+    color: COLORS.accent,
+  },
+  cardDescription: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: '#D0D0D0',
+    lineHeight: 24,
+  },
+  batteryLabel: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: COLORS.textSecondary,
+  },
+  sectionTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 18,
+    fontWeight: '600' as const,
+    color: COLORS.text,
+  },
+  workingLabel: {
+    fontFamily: FONT_FAMILY.cinzel.regular,
+    fontSize: 12,
+    color: COLORS.accent,
+  },
+  workingValue: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: COLORS.text,
+  },
+  fateValue: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 30,
+    fontWeight: '700' as const,
+    color: COLORS.accent,
+  },
+} as const;
+
+export const FORM_STYLES = {
+  subtitle: {
+    ...FONTS.subtitle,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.xl * 1.5,
+    textAlign: 'center' as const,
+  },
+} as const;
+
 // === GRID CELL ANIMATED STYLES ===
 export const GRID_CELL_ANIMATED = {
+  label: {
+    ...FONTS.cellLabel,
+    textAlign: 'center' as const,
+    paddingTop: SPACING.xs,
+  },
+  value: (fontSize: number) => ({
+    ...FONTS.cellValue,
+    fontSize,
+    textAlign: 'center' as const,
+  }),
+  tooltip: {
+    text: {
+      ...FONTS.tooltip,
+      textAlign: 'center' as const,
+    },
+  },
   container: (cellSize: number) => ({
     width: cellSize,
     borderWidth: 1,
@@ -155,44 +261,29 @@ export const GRID_CELL_ANIMATED = {
     },
   },
 
-  // Текст заголовка
-  label: {
-    fontSize: 12,
-    color: COLORS.accent,
-    textAlign: 'center' as const,
-    paddingTop: SPACING.xs,
-    fontFamily: FONTS.systemRegular,
-  },
-
-  value: (fontSize: number) => ({
-    fontSize,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    fontFamily: FONTS.bold,
-    textAlign: 'center' as const,
-  }),
-
   // Tooltip
-  tooltip: {
-    wrapper: {
-      position: 'absolute' as const,
-      top: -8,
-      alignItems: 'center' as const,
-      zIndex: 10,
-    },
-    container: (isWeak: boolean) => ({
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      borderRadius: RADIUS.sm,
-      minWidth: 50,
-      alignItems: 'center' as const,
-      backgroundColor: isWeak ? COLORS.highlightWeak : COLORS.highlightStrong,
-    }),
-    text: {
-      color: COLORS.text,
-      fontSize: 9,
-      fontWeight: '600' as const,
-      textAlign: 'center' as const,
-    },
-  },
+  // tooltip: {
+  //   wrapper: {
+  //     position: 'absolute' as const,
+  //     top: -8,
+  //     alignItems: 'center' as const,
+  //     zIndex: 10,
+  //   },
+  //   container: (isWeak: boolean) => ({
+  //     paddingHorizontal: 6,
+  //     paddingVertical: 2,
+  //     borderRadius: RADIUS.sm,
+  //     minWidth: 50,
+  //     alignItems: 'center' as const,
+  //     backgroundColor: isWeak ? COLORS.highlightWeak : COLORS.highlightStrong,
+  //   }),
+  //   text: {
+  //     color: COLORS.text,
+  //     fontSize: 9,
+  //     fontWeight: '600' as const,
+  //     fontFamily: 'Manrope-Bold',
+  //     textAlign: 'center' as const,
+  //   },
+  // },
 };
+

@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageButton } from '@/components/ui/LanguageButton';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, FONTS } from '@/lib/constants/theme';
 
 
 export default function TabLayout() {
@@ -26,9 +26,7 @@ export default function TabLayout() {
           backgroundColor: COLORS.headerBackground,
         },
         headerTitleStyle: {
-          color: ACCENT_COLOR,
-          fontWeight: 'bold',
-          fontSize: 20,
+          ...FONTS.headerTitle,
           marginLeft: 15,
         },
         headerShadowVisible: true,

@@ -12,7 +12,7 @@ import Animated, {
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { getHighlightType } from '@/lib/utils/highlight';
 import { getTooltipText } from '@/lib/utils/tooltip';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, FONTS, SPACING, RADIUS } from '@/lib/constants/theme';
 
 
 interface GridCellProps {
@@ -164,15 +164,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   cellLabel: {
-    fontSize: 12,
-    color: COLORS.accent,
-    textAlign: 'center',
+    ...FONTS.cellLabel,
+    textAlign: 'center' as const,
     paddingTop: 5
   },
   cellValue: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    ...FONTS.cellValue,
+    textAlign: 'center' as const,
   },
   textAccent: {
     color: COLORS.accent,
@@ -187,20 +185,18 @@ const styles = StyleSheet.create({
   tooltip: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     minWidth: 50,
     alignItems: 'center',
   },
   tooltipWeak: {
-    backgroundColor: '#FF9500',
+    backgroundColor: COLORS.highlightWeak,
   },
   tooltipStrong: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: COLORS.highlightStrong,
   },
   tooltipText: {
-    color: COLORS.text,
-    fontSize: 9,
-    fontWeight: '600',
-    textAlign: 'center',
+    ...FONTS.tooltip,
+    textAlign: 'center' as const,
   },
 });

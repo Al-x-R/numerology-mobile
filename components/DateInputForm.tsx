@@ -19,7 +19,7 @@ import {
   RADIUS,
   SHADOWS,
   LAYOUT,
-  GRADIENTS
+  GRADIENTS, FORM_STYLES
 } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
@@ -118,7 +118,7 @@ export function DateInputForm({
       errorOpacity.setValue(0);
       errorY.setValue(-10);
     }
-  }, [localError]);
+  }, [errorOpacity, errorY, localError]);
 
   return (
     <View style={styles.container}>
@@ -203,10 +203,10 @@ const styles = StyleSheet.create({
       color: COLORS.accent,
   },
   subtitle: {
-  ...FONTS.subtitle,
+    ...FORM_STYLES.subtitle,
     marginTop: 5,
-      marginBottom: 40,
-      textAlign: 'center',
+    marginBottom: 40,
+    textAlign: 'center',
   },
   inputContainer: {
     width: '100%',

@@ -18,7 +18,7 @@ import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDispla
 import { CalculationResult, Interpretation } from '@/lib/types';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
-import { COLORS, SPACING } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -111,10 +111,8 @@ const styles = StyleSheet.create({
 
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 15,
+    ...FONTS.sectionTitle,
+    marginBottom: SPACING.md,
   },
   // --- Pythagorean grid ---
   grid: {
@@ -127,7 +125,7 @@ const styles = StyleSheet.create({
   },
   floatingCard: {
     position: 'absolute',
-    bottom: SPACING.lg,
+    bottom: 0,
     zIndex: 1000,
     elevation: 10,
   },

@@ -29,13 +29,7 @@ const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
       color={COLORS.textSecondary}
       style={{ marginRight: SPACING.sm }}
     />
-    <Text
-      style={{
-        color: COLORS.textSecondary,
-        fontSize: 18,
-        marginLeft: -3,
-      }}
-    >
+    <Text style={FONTS.button}>
       {t('back')}
     </Text>
   </TouchableOpacity>
@@ -81,8 +75,8 @@ export default function HomeScreen() {
       navigation.setOptions({
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
-            <Text style={styles.headerTitle}>{t('analysisTitle')}</Text>
-            <Text style={styles.headerSubtitle}>{dateString}</Text>
+            <Text style={FONTS.headerTitle}>{t('analysisTitle')}</Text>
+            <Text style={FONTS.headerSubtitle}>{dateString}</Text>
           </View>
         ),
         headerLeft: () => <HeaderBackButton onPress={handleBack} />,
@@ -131,15 +125,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent', // Match the gradient background
   },
-  headerTitle: {
-    color: COLORS.accent,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  headerSubtitle: {
-    color: COLORS.textSecondary,
-    fontSize: 12,
-  },
+  // headerTitle: {
+  //   fontFamily: 'PlayfairDisplay-Bold',
+  //   fontSize: 18,
+  //   fontWeight: '700' as const,
+  //   color: COLORS.accent,
+  // },
+  // headerSubtitle: {
+  //   fontFamily: 'Manrope-Regular',
+  //   fontSize: 12,
+  //   color: COLORS.textSecondary,
+  //   textAlign: 'center' as const,
+  // },
   content: {
     flex: 1,
     paddingHorizontal: 20,

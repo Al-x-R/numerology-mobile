@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types';
-import { COLORS, SPACING, RADIUS } from '@/lib/constants/theme';
+import { COLORS, SPACING, RADIUS, FONTS, SHADOWS } from '@/lib/constants/theme';
 
 interface InterpretationCardProps {
   interpretation: Interpretation;
@@ -25,7 +25,7 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
 
   const getFillColor = () => {
     if (strength === 0) return '#FF3B30';
-    if (strength < 2) return '#FF9500';
+    // if (strength < 2) return '#FF9500';
     return '#34C759';
   };
 
@@ -62,9 +62,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.headerBackground,
     borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 2,
+    borderColor: COLORS.borderFocused,
     padding: SPACING.lg,
+    ...SHADOWS.card,
   },
   closeButton: {
     position: 'absolute',
@@ -73,9 +74,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.accent,
+    ...FONTS.cardTitle,
     marginBottom: SPACING.sm,
     paddingRight: 40,
   },
@@ -111,13 +110,9 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   batteryLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
+    ...FONTS.batteryLabel,
   },
   description: {
-    fontSize: 16,
-    color: '#D0D0D0',
-    lineHeight: 24,
+    ...FONTS.cardDescription,
   },
 });
