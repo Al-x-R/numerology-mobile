@@ -161,8 +161,8 @@ export const FONTS = {
   },
   subtitle: {
     fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 16,
-    color: COLORS.textSecondary,
+    fontSize: 22,
+    color: COLORS.accent,
     textAlign: 'center' as const,
   },
   headerTitle: {

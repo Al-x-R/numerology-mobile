@@ -181,8 +181,28 @@ const translations: LocaleData = {
     loadingNumerology: 'Загрузка нумерологии...',
 
     // COMPATIBILITY SCREEN
-    compatibilityComingSoon: 'Скоро: Совместимость',
-    compatibilityDescription: 'Проверка нумерологической совместимости с партнером.',
+    compatibilitySubtitle: 'Рассчитайте нумерологическую совместимость с партнером',
+    partner1Label: 'Партнер 1',
+    partner2Label: 'Партнер 2',
+    partner1Placeholder: 'Дата рождения партнера 1 (ДД.ММ.ГГГГ)',
+    partner2Placeholder: 'Дата рождения партнера 2 (ДД.ММ.ГГГГ)',
+    compatibilityButtonText: 'Рассчитать совместимость',
+    compatibilityLoadingText: 'Расчёт совместимости...',
+    compatibilityResultsTitle: 'Совместимость',
+    // COMPATIBILITY PARAMETERS
+    compatibilityEnergy: 'Энергия',
+    compatibilityCharacter: 'Характер',
+    compatibilityInterest: 'Интерес',
+    compatibilityKarma: 'Карма',
+    compatibilityFamily: 'Семья',
+    compatibilityTalent: 'Талант',
+    compatibilitySpirituality: 'Духовность',
+    compatibilityTotal: 'Общая совместимость',
+    compatibilityFullTotal: 'Полная совместимость',
+    compatibilityRecommendations: 'Рекомендации',
+    compatibilityPartner1: 'Партнер 1',
+    compatibilityPartner2: 'Партнер 2',
+    compatibilityPercentage: '{pct}%',
 
     // NUMBERS SCREEN
     numbersScreenTitle: 'Числа Судьбы',
@@ -360,8 +380,28 @@ const translations: LocaleData = {
     loadingNumerology: 'Loading numerology...',
 
     // COMPATIBILITY SCREEN
-    compatibilityComingSoon: 'Coming Soon: Compatibility',
-    compatibilityDescription: 'Check numerological compatibility with a partner.',
+    compatibilitySubtitle: 'Calculate numerological compatibility with your partner',
+    partner1Label: 'Partner 1',
+    partner2Label: 'Partner 2',
+    partner1Placeholder: 'Partner 1 birth date (DD.MM.YYYY)',
+    partner2Placeholder: 'Partner 2 birth date (DD.MM.YYYY)',
+    compatibilityButtonText: 'Calculate Compatibility',
+    compatibilityLoadingText: 'Calculating compatibility...',
+    compatibilityResultsTitle: 'Compatibility',
+    // COMPATIBILITY PARAMETERS
+    compatibilityEnergy: 'Energy',
+    compatibilityCharacter: 'Character',
+    compatibilityInterest: 'Interest',
+    compatibilityKarma: 'Karma',
+    compatibilityFamily: 'Family',
+    compatibilityTalent: 'Talent',
+    compatibilitySpirituality: 'Spirituality',
+    compatibilityTotal: 'Total Compatibility',
+    compatibilityFullTotal: 'Full Compatibility',
+    compatibilityRecommendations: 'Recommendations',
+    compatibilityPartner1: 'Partner 1',
+    compatibilityPartner2: 'Partner 2',
+    compatibilityPercentage: '{pct}%',
 
     // NUMBERS SCREEN
     numbersScreenTitle: 'Destiny Numbers',
