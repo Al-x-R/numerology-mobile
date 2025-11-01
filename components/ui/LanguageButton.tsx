@@ -1,8 +1,9 @@
 // components/ui/LanguageButton.tsx
+import { t } from '@/lib/constants/locales';
+import { COLORS, LAYOUT } from '@/lib/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { t } from '@/lib/constants/locales';
 
 export const LanguageButton = () => {
   const handleLanguageChange = () => {
@@ -10,8 +11,8 @@ export const LanguageButton = () => {
   };
 
   return (
-    <TouchableOpacity onPress={handleLanguageChange} style={{ marginRight: 15 }}>
-      <Ionicons name="globe-outline" size={24} color="#E0B873" />
+    <TouchableOpacity onPress={handleLanguageChange} style={{ marginRight: LAYOUT.languageButtonMarginRight }}>
+      <Ionicons name="globe-outline" size={LAYOUT.iconSize} color={COLORS.accent} />
     </TouchableOpacity>
   );
 };

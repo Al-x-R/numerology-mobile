@@ -12,7 +12,7 @@ import { CalculationResult } from '@/lib/types';
 import { LanguageButton } from '@/components/ui/LanguageButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
-import { COLORS, FONTS, GRADIENTS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -25,7 +25,7 @@ const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   >
     <MaterialCommunityIcons
       name="arrow-left-thick"
-      size={24}
+      size={LAYOUT.iconSize}
       color={COLORS.textSecondary}
       style={{ marginRight: SPACING.sm }}
     />
@@ -68,7 +68,7 @@ export default function HomeScreen() {
 
   const contentStyle: StyleProp<ViewStyle> = results ?
     { justifyContent: 'flex-start', alignItems: 'stretch' } :
-    {  alignItems: 'center', marginTop: 80 };
+    {  alignItems: 'center', marginTop: LAYOUT.topMarginLarge };
 
   useEffect(() => {
     if (results) {
@@ -102,7 +102,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1A1C33', '#0D0F21']} style={styles.background}>
+      <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
       <View style={[styles.content, contentStyle]}>
@@ -123,11 +123,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent', // Match the gradient background
+    backgroundColor: COLORS.transparent, // Match the gradient background
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: LAYOUT.contentPadding,
     alignItems: 'center',
   },
   background: {
@@ -136,8 +136,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '150%', // Adjusted for better fit
-    maxWidth: 700,
-    maxHeight: 700,
+    maxWidth: LAYOUT.logoLarge,
+    maxHeight: LAYOUT.logoLarge,
     opacity: 0.2,
   },
 });

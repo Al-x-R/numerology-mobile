@@ -3,7 +3,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 
-import { COLORS, FONTS, GRADIENTS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, SPACING, RADIUS } from '@/lib/constants/theme';
 
 interface GridCellProps {
   id: string;
@@ -36,19 +36,17 @@ export function GridCell({ id, value, cellSize, onPress }: GridCellProps) {
 const styles = StyleSheet.create({
   cell: {
     borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    // backgroundColor: 'rgba(122, 95, 255, 0.1)',
-    // borderColor: '#7A5FFF',
-    borderRadius: 10,
+    backgroundColor: COLORS.cardBackground,
+    borderColor: COLORS.cardBorder,
+    borderRadius: RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
-    padding: 5,
+    marginBottom: SPACING.sm,
+    padding: SPACING.xs,
   },
   cellAccent: {
-    backgroundColor: 'rgba(122, 95, 255, 0.1)',
-    borderColor: '#7A5FFF',
+    backgroundColor: COLORS.accentCardBorder,
+    borderColor: COLORS.primary,
   },
   cellLabel: {
     ...FONTS.cellLabel,
@@ -56,7 +54,6 @@ const styles = StyleSheet.create({
   },
   cellValue: {
     ...FONTS.cellValue,
-    fontSize: 32,
   },
   textAccent: {
     color: COLORS.accent,

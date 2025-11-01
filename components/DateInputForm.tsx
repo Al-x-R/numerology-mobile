@@ -1,27 +1,28 @@
 // components/ui/DateInputForm.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Animated,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Animated,
-  ActivityIndicator,
+  View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { isValidRussianDate } from '@/lib/utils/validateDate';
+import { t } from '@/lib/constants/locales';
 import {
   COLORS,
   FONTS,
-  SPACING,
+  FORM_STYLES,
+  GRADIENTS,
+  LAYOUT,
   RADIUS,
   SHADOWS,
-  LAYOUT,
-  GRADIENTS, FORM_STYLES
+  SPACING
 } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
+import { isValidRussianDate } from '@/lib/utils/validateDate';
 
 interface DateInputFormProps {
   onSubmit: () => void;
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     maxWidth: LAYOUT.formMaxWidth,
     alignItems: 'center',
     paddingVertical: LAYOUT.containerPadding,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
   },
   title: {
   ...FONTS.title,
@@ -204,8 +205,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     ...FORM_STYLES.subtitle,
-    marginTop: 5,
-    marginBottom: 40,
+    marginTop: SPACING.subtitleMargin,
+    marginBottom: SPACING.subtitleMarginBottom,
     textAlign: 'center',
   },
   inputContainer: {
@@ -261,18 +262,16 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...FONTS.button,
-    textShadowColor: 'rgba(167, 139, 250, 0.4)',
+    textShadowColor: COLORS.textShadow,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
   loadingContent: {
     flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: SPACING.loadingContentGap,
   },
   loadingText: {
-    color: COLORS.text,
-      fontSize: 16,
-      fontWeight: '600',
+    ...FONTS.loading,
   },
 });

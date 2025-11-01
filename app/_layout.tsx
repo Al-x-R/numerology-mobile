@@ -4,11 +4,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, Image, StatusBar } from 'react-native';
 
 import LOGO_IMAGE from '../assets/images/NumericalCompass.png';
+import { COLORS, LAYOUT } from '@/lib/constants/theme';
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0D0F21',
+    backgroundColor: COLORS.background,
   },
   background: {
     ...StyleSheet.absoluteFillObject,
@@ -17,20 +18,20 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    maxWidth: 600,
-    maxHeight: 600,
+    maxWidth: LAYOUT.logoMedium,
+    maxHeight: LAYOUT.logoMedium,
     opacity: 1,
   },
   navigation: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
   },
 });
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor="#0D0F21" />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <View style={styles.root}>
         {/* Background with logo */}
         <View style={styles.background}>

@@ -1,7 +1,7 @@
 // app/(tabs)/numbers.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONT_SIZES, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 export default function NumbersScreen() {
@@ -18,19 +18,19 @@ export default function NumbersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D0F21',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: LAYOUT.contentPadding,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: FONT_SIZES.screenTitle,
+    fontWeight: '700' as const,
     color: COLORS.accent,
-    marginBottom: 10,
+    marginBottom: SPACING.titleMarginBottom,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: FONT_SIZES.screenSubtitle,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },

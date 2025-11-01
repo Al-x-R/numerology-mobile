@@ -2,14 +2,14 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageButton } from '@/components/ui/LanguageButton';
-import { COLORS, FONTS } from '@/lib/constants/theme';
+import { COLORS, FONTS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 
 export default function TabLayout() {
   const ACCENT_COLOR = COLORS.accent;
   const INACTIVE_COLOR = COLORS.textSecondary;
-  const BG_COLOR = '#0D0F21';
+  const BG_COLOR = COLORS.background;
 
   return (
     <Tabs
@@ -18,9 +18,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: {
           backgroundColor: BG_COLOR,
-          borderTopColor: 'rgba(255, 255, 255, 0.1)',
-          height: 90,
-          paddingTop: 10,
+          borderTopColor: COLORS.cardBorder,
+          height: LAYOUT.tabBarHeight,
+          paddingTop: LAYOUT.tabBarPaddingTop,
           position: 'absolute',
         },
         headerStyle: {
@@ -28,7 +28,7 @@ export default function TabLayout() {
         },
         headerTitleStyle: {
           ...FONTS.headerTitle,
-          marginLeft: 15,
+          marginLeft: LAYOUT.headerTitleMarginLeft,
         },
         headerShadowVisible: true,
         headerTintColor: ACCENT_COLOR,
@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.pythagoras'),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="grid-outline" size={24} color={color} />
+            <Ionicons name="grid-outline" size={LAYOUT.iconSize} color={color} />
           ),
         }}
       />
@@ -51,7 +51,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.compatibility'),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="heart-outline" size={24} color={color} />
+            <Ionicons name="heart-outline" size={LAYOUT.iconSize} color={color} />
           ),
         }}
       />
@@ -60,7 +60,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.numbers'),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="keypad-outline" size={24} color={color} />
+            <Ionicons name="keypad-outline" size={LAYOUT.iconSize} color={color} />
           ),
         }}
       />

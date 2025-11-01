@@ -111,7 +111,7 @@ export function getInterpretation(
   const cellInterpretations = interpretations[id];
 
   if (!cellInterpretations) {
-    return { title, description: 'Description not found.' };
+    return { title, description: 'Description not found.', type: 'matrix' };
   }
 
   let description = cellInterpretations[value];
@@ -131,5 +131,5 @@ export function getInterpretation(
     description = 'Detailed description for this value is not yet available.';
   }
 
-  return { title, description };
+  return { title, description, type: 'matrix' };
 }

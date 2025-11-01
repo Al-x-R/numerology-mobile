@@ -13,7 +13,7 @@ import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
-import { FONTS, SPACING, COLORS } from '@/lib/constants/theme';
+import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
 import { t, getCurrentLocale } from '@/lib/constants/locales';
 
 interface WorkingNumbersDisplayProps {
@@ -158,15 +158,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 5,
+    gap: SPACING.numberCardGap,
   },
   numberCard: {
     width: (Dimensions.get('window').width - 48) / 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: COLORS.cardBackground,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
-    padding: 15,
+    borderColor: COLORS.cardBorder,
+    borderRadius: RADIUS.md,
+    padding: SPACING.cardPadding,
     alignItems: 'center',
   },
   numberLabel: {
@@ -178,14 +178,14 @@ const styles = StyleSheet.create({
   },
   fateCardFinal: {
     width: '100%',
-    backgroundColor: 'rgba(224, 184, 115, 0.1)',
+    backgroundColor: COLORS.accentCardBackground,
     borderColor: COLORS.borderAccent,
     borderWidth: 1,
-    borderRadius: 10,
-    marginTop: 5,
-    paddingVertical: 15,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.numberCardGap,
+    paddingVertical: SPACING.cardPadding,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.contentPadding,
   },
   fateValue: {
     ...FONTS.fateValue,

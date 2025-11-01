@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types';
-import { COLORS, SPACING, RADIUS, FONTS, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, SPACING, RADIUS, FONTS, SHADOWS, LAYOUT } from '@/lib/constants/theme';
 import { getCurrentLocale } from '@/lib/constants/locales';
 
 interface InterpretationCardProps {
@@ -33,15 +33,15 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
   const fillPercent = (strength / 6) * 100;
 
   const getFillColor = () => {
-    if (strength === 0) return '#FF3B30';
-    // if (strength < 2) return '#FF9500';
-    return '#34C759';
+    if (strength === 0) return COLORS.battery.empty;
+    // if (strength < 2) return COLORS.highlightWeak;
+    return COLORS.battery.full;
   };
 
   return (
     <View style={styles.card}>
       <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-        <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+        <Ionicons name="close" size={LAYOUT.closeIconSize} color={COLORS.textSecondary} />
       </TouchableOpacity>
 
       <Text style={styles.title}>{title}</Text>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   title: {
     ...FONTS.cardTitle,
     marginBottom: SPACING.sm,
-    paddingRight: 40,
+    paddingRight: LAYOUT.paddingRightLarge,
   },
   batteryContainer: {
     flexDirection: 'row',
@@ -96,12 +96,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   batteryOutline: {
-    width: 80,
-    height: 40,
-    borderRadius: 8,
+    width: LAYOUT.batteryWidth,
+    height: LAYOUT.batteryHeight,
+    borderRadius: RADIUS.sm,
     borderWidth: 2,
     borderColor: COLORS.border,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     position: 'relative',
     overflow: 'hidden',
     marginRight: SPACING.xs,
@@ -109,17 +109,17 @@ const styles = StyleSheet.create({
   batteryFill: {
     height: '100%',
     backgroundColor: COLORS.accent,
-    borderRadius: 6,
+    borderRadius: RADIUS.battery,
   },
   batteryCap: {
     position: 'absolute',
     right: -6,
     top: '50%',
     transform: [{ translateY: -6 }],
-    width: 8,
-    height: 12,
+    width: LAYOUT.batteryCapWidth,
+    height: LAYOUT.batteryCapHeight,
     backgroundColor: COLORS.border,
-    borderRadius: 2,
+    borderRadius: RADIUS.batteryCap,
   },
   batteryLabel: {
     ...FONTS.batteryLabel,

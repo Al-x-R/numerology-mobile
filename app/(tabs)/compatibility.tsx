@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONT_SIZES, FONTS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 export default function CompatibilityScreen() {
@@ -26,19 +26,19 @@ export default function CompatibilityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D0F21',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: LAYOUT.contentPadding,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: FONT_SIZES.screenTitle,
+    fontWeight: '700' as const,
     color: COLORS.accent,
-    marginBottom: 10,
+    marginBottom: SPACING.titleMarginBottom,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: FONT_SIZES.screenSubtitle,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    maxWidth: 600,
-    maxHeight: 600,
+    maxWidth: LAYOUT.logoMedium,
+    maxHeight: LAYOUT.logoMedium,
     opacity: 1,
   },
 });

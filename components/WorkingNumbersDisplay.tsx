@@ -5,7 +5,7 @@ import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, SPACING, RADIUS, FONT_SIZES, FONTS } from '@/lib/constants/theme';
 import { t, getCurrentLocale } from '@/lib/constants/locales';
 
 interface WorkingNumbersDisplayProps {
@@ -73,50 +73,45 @@ export function WorkingNumbersDisplay({ workingNumbers, onPress, textAccentStyle
 
 const styles = StyleSheet.create({
   numbersSection: {
-    marginTop: 30,
+    marginTop: SPACING.sectionMarginTop,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 15,
+    ...FONTS.sectionTitle,
+    marginBottom: SPACING.cardPadding,
   },
   numbersGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 5
+    gap: SPACING.numberCardGap
   },
   numberCard: {
     width: '48%',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: COLORS.cardBackground,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
-    padding: 15,
+    borderColor: COLORS.cardBorder,
+    borderRadius: RADIUS.md,
+    padding: SPACING.cardPadding,
     alignItems: 'center',
   },
   numberLabel: {
-    fontSize: 12,
-    color: COLORS.accent,
-    marginBottom: 4,
+    ...FONTS.workingLabel,
+    marginBottom: SPACING.xs,
   },
   numberValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: COLORS.text,
+    ...FONTS.workingValue,
   },
   fateCardFinal: {
     width: '100%',
-    backgroundColor: 'rgba(224, 184, 115, 0.1)',
+    backgroundColor: COLORS.accentCardBackground,
     borderColor: COLORS.accent,
-    borderRadius: 10,
-    marginTop: 5,
-    paddingVertical: 15,
+    borderRadius: RADIUS.md,
+    marginTop: SPACING.numberCardGap,
+    paddingVertical: SPACING.cardPadding,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.contentPadding,
   },
   fateValue: {
-    fontSize: 30,
+    ...FONTS.fateValue,
   },
 });

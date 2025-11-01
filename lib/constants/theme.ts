@@ -21,7 +21,7 @@ export const COLORS = {
   card: 'rgba(255, 255, 255, 0.04)',
   cardFocused: 'rgba(167, 139, 250, 0.08)',
   border: 'rgba(255, 255, 255, 0.2)',
-  borderFocused: '#A78BFA',
+  borderFocused: '#A78BFA', // Использует primary цвет
   borderAccent: '#E0B873',
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
@@ -30,7 +30,7 @@ export const COLORS = {
   primaryDark: '#7C3AED',
   error: '#FF6B6B',
   shadow: '#000',
-  shadowAccent: '#A78BFA',
+  shadowAccent: '#A78BFA', // Дубликат primary, но оставляем для совместимости
   // === НОВЫЕ: ПОДСВЕТКА ЯЧЕЕК ===
   highlightWeak: '#FF9500',
   highlightStrong: '#8B5CF6',
@@ -40,6 +40,20 @@ export const COLORS = {
     full: '#34C759',      // зелёный — полный заряд
     light: '#A8E6A1',     // светло-зелёный (для градиента)
   },
+  textTertiary: '#D0D0D0',  // серый для описаний
+  loading: '#FFD700',      // золотой для ActivityIndicator
+  
+  // RGBA значения для прозрачных фонов
+  cardBackground: 'rgba(255, 255, 255, 0.05)',
+  cardBorder: 'rgba(255, 255, 255, 0.1)',
+  accentCardBackground: 'rgba(224, 184, 115, 0.1)',
+  accentCardBorder: 'rgba(122, 95, 255, 0.1)',
+  weakHighlightBackground: 'rgba(255, 107, 107, 0.08)',
+  strongHighlightBackground: 'rgba(139, 92, 246, 0.08)',
+  pulseOverlay: 'rgba(224, 184, 115, 0.15)',
+  modalBackdrop: 'rgba(0, 0, 0, 0.75)',
+  textShadow: 'rgba(167, 139, 250, 0.4)',
+  transparent: 'transparent',
 };
 
 export const GRADIENTS = {
@@ -59,6 +73,19 @@ export const SPACING = {
   lg: 24,
   xl: 32,
   formGap: 35,
+  // Дополнительные отступы из компонентов
+  cardPadding: 15,
+  sectionMarginTop: 30,
+  subtitleMargin: 5,
+  subtitleMarginBottom: 40,
+  titleMarginBottom: 10,
+  numberCardGap: 5,
+  tooltipPadding: 6,
+  tooltipPaddingVertical: 2,
+  // Дополнительные отступы
+  loadingContentGap: 12,
+  cellLabelPaddingTop: 5,
+  contentPadding: 20,
 };
 
 export const RADIUS = {
@@ -66,6 +93,9 @@ export const RADIUS = {
   md: 10,
   lg: 16,
   xl: 24,
+  modal: 20,
+  battery: 6,
+  batteryCap: 2,
 };
 
 export const SHADOWS = {
@@ -96,6 +126,29 @@ export const LAYOUT = {
   formMaxWidth: 450,
   formWidth: '100%' as DimensionValue,
   containerPadding: 50,
+  // Размеры из компонентов
+  logoSmall: 120,
+  logoMedium: 600,
+  logoLarge: 700,
+  modalMaxWidth: 550,
+  contentPadding: 20,
+  tabBarHeight: 90,
+  tabBarPaddingTop: 10,
+  iconSize: 24,
+  closeIconSize: 24,
+  // Позиционирование
+  logoMarginBottom: 30,
+  spinnerMarginTop: 20,
+  languageButtonMarginRight: 15,
+  // Дополнительные размеры
+  batteryWidth: 80,
+  batteryHeight: 40,
+  batteryCapWidth: 8,
+  batteryCapHeight: 12,
+  paddingRightLarge: 40,
+  paddingRightMedium: 30,
+  topMarginLarge: 80,
+  headerTitleMarginLeft: 15,
 };
 
 export const FONTS = {
@@ -175,7 +228,7 @@ export const FONTS = {
   cardDescription: {
     fontFamily: FONT_FAMILY.manrope.regular,
     fontSize: 16,
-    color: '#D0D0D0',
+    color: COLORS.textTertiary,
     lineHeight: 24,
   },
   batteryLabel: {
@@ -212,10 +265,20 @@ export const FONTS = {
 export const FORM_STYLES = {
   subtitle: {
     ...FONTS.subtitle,
-    marginTop: SPACING.xs,
-    marginBottom: SPACING.xl * 1.5,
+    marginTop: SPACING.subtitleMargin,
+    marginBottom: SPACING.subtitleMarginBottom,
     textAlign: 'center' as const,
   },
+} as const;
+
+// Дополнительные константы для размеров шрифтов
+export const FONT_SIZES = {
+  screenTitle: 24,
+  screenSubtitle: 16,
+  cellValueLarge: 32,
+  cellValueMedium: 27,
+  modalTitle: 22,
+  loadingText: 16,
 } as const;
 
 // === GRID CELL ANIMATED STYLES ===
@@ -239,8 +302,8 @@ export const GRID_CELL_ANIMATED = {
   container: (cellSize: number) => ({
     width: cellSize,
     borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.cardBackground,
+    borderColor: COLORS.cardBorder,
     borderRadius: RADIUS.md,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
@@ -253,11 +316,11 @@ export const GRID_CELL_ANIMATED = {
   highlight: {
     weak: {
       borderColor: COLORS.highlightWeak,
-      backgroundColor: 'rgba(255, 107, 107, 0.08)',
+      backgroundColor: COLORS.weakHighlightBackground,
     },
     strong: {
       borderColor: COLORS.highlightStrong,
-      backgroundColor: 'rgba(139, 92, 246, 0.08)',
+      backgroundColor: COLORS.strongHighlightBackground,
     },
   },
 

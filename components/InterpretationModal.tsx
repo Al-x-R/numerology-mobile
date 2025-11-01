@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Interpretation } from '@/lib/types';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, SPACING, RADIUS, FONT_SIZES, FONTS, LAYOUT } from '@/lib/constants/theme';
 
 interface InterpretationModalProps {
   isVisible: boolean;
@@ -37,7 +37,7 @@ export function InterpretationModal({
       <View style={styles.backdrop}>
         <View style={styles.modalCard}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color="#A0A0A0" />
+            <Ionicons name="close" size={LAYOUT.closeIconSize} color={COLORS.textSecondary} />
           </TouchableOpacity>
 
           <Text style={styles.title}>{interpretation.title}</Text>
@@ -54,40 +54,36 @@ export function InterpretationModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: SPACING.contentPadding,
   },
   modalCard: {
     width: '100%',
-    maxWidth: 550,
+    maxWidth: LAYOUT.modalMaxWidth,
     maxHeight: '80%',
     backgroundColor: COLORS.headerBackground,
-    borderRadius: 20,
+    borderRadius: RADIUS.modal,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 20,
+    borderColor: COLORS.cardBorder,
+    padding: SPACING.contentPadding,
   },
   closeButton: {
     position: 'absolute',
-    top: 15,
-    right: 15,
+    top: SPACING.cardPadding,
+    right: SPACING.cardPadding,
     zIndex: 1,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORS.accent,
-    marginBottom: 15,
-    paddingRight: 30,
+    ...FONTS.cardTitle,
+    marginBottom: SPACING.cardPadding,
+    paddingRight: LAYOUT.paddingRightMedium,
   },
   scrollContainer: {
     maxHeight: '100%',
   },
   description: {
-    fontSize: 16,
-    color: '#D0D0D0',
-    lineHeight: 24,
+    ...FONTS.cardDescription,
   },
 });

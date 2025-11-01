@@ -12,7 +12,7 @@ import Animated, {
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { getHighlightType } from '@/lib/utils/highlight';
 import { getTooltipText } from '@/lib/utils/tooltip';
-import { COLORS, FONTS, SPACING, RADIUS } from '@/lib/constants/theme';
+import { COLORS, FONTS, SPACING, RADIUS, FONT_SIZES } from '@/lib/constants/theme';
 
 
 interface GridCellProps {
@@ -87,7 +87,7 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
   }));
 
   const displayValue = value && value.length > 6 ? value.slice(0, 6) : (value || '—');
-  const valueFontSize = maxLength > 4 ? 27 : 32;
+  const valueFontSize = maxLength > 4 ? FONT_SIZES.cellValueMedium : FONT_SIZES.cellValueLarge;
 
   return (
     <Animated.View style={[containerStyle]}>
@@ -137,36 +137,36 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
 const styles = StyleSheet.create({
   cell: {
     borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 10,
+    backgroundColor: COLORS.cardBackground,
+    borderColor: COLORS.cardBorder,
+    borderRadius: RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
-    padding: 5,
+    marginBottom: SPACING.sm,
+    padding: SPACING.xs,
     position: 'relative',
     // overflow: 'hidden',
   },
   cellAccent: {
-    backgroundColor: 'rgba(122, 95, 255, 0.1)',
-    borderColor: '#7A5FFF',
+    backgroundColor: COLORS.accentCardBorder,
+    borderColor: COLORS.primary,
   },
   cellWeak: {
-    borderColor: '#FF9500',
-    backgroundColor: 'rgba(255, 107, 107, 0.08)',
+    borderColor: COLORS.highlightWeak,
+    backgroundColor: COLORS.weakHighlightBackground,
   },
   cellStrong: {
-    borderColor: '#8B5CF6',
-    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderColor: COLORS.highlightStrong,
+    backgroundColor: COLORS.strongHighlightBackground,
   },
   pulseOverlay: {
-    backgroundColor: 'rgba(224, 184, 115, 0.15)',
-    borderRadius: 10,
+    backgroundColor: COLORS.pulseOverlay,
+    borderRadius: RADIUS.md,
   },
   cellLabel: {
     ...FONTS.cellLabel,
     textAlign: 'center' as const,
-    paddingTop: 5
+    paddingTop: SPACING.cellLabelPaddingTop
   },
   cellValue: {
     ...FONTS.cellValue,
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   tooltip: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: SPACING.tooltipPadding,
+    paddingVertical: SPACING.tooltipPaddingVertical,
     borderRadius: RADIUS.sm,
     minWidth: 50,
     alignItems: 'center',
