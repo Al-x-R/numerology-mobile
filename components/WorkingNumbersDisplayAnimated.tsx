@@ -25,7 +25,7 @@ function getFullWorkingInterpretation(id: string, value: number): Interpretation
   const meaning = workingMeanings[value];
 
   if (!context || !meaning) {
-    return { title: 'Ошибка', description: 'Данные не найдены.' };
+    return { title: 'Ошибка', description: 'Данные не найдены.', type: 'working' };
   }
 
   const fullDescription = `${context.description}\n\nИнтерпретация числа ${value}:\n${meaning}`;
@@ -33,6 +33,7 @@ function getFullWorkingInterpretation(id: string, value: number): Interpretation
   return {
     title: context.title,
     description: fullDescription,
+    type: 'working'
   };
 }
 

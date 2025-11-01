@@ -16,4 +16,5 @@ export interface Interpretation {
   title: string;
   description: string;
   value?: string;
+  type: 'matrix' | 'working';
 }

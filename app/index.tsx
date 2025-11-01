@@ -26,7 +26,6 @@ export default function InitialLoadScreen() {
       }
     }
 
-    console.log('fontsLoaded', fontsLoaded);
     if (fontsLoaded || fontError) {
       prepare();
     }

@@ -10,7 +10,7 @@ export const getInterpretation = (
 
   if (!cellValue || cellValue === '—') {
     const description = t(`${cellId}_empty`);
-    return { title, description };
+    return { title, description, type: 'matrix' };
   }
 
   const normalizedValue = cellValue.length > 6 ? cellValue.slice(0, 6) : cellValue;
@@ -28,5 +28,5 @@ export const getInterpretation = (
     description = t('interpretation_unavailable');
   }
 
-  return { title, description };
+  return { title, description, type: 'matrix' };
 };

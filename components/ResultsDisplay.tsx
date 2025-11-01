@@ -47,7 +47,6 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   const maxLength = Math.max(
     ...Object.values(results.matrix).map(v => v?.length || 0)
   );
-
   return (
     <>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -59,7 +58,8 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
               const interpretationData = getInterpretation(id, value);
               const interpretationDataFull = {
                 ...interpretationData,
-                value
+                value,
+                type: 'matrix' as const,
               };
 
               return (
@@ -84,7 +84,11 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
             exiting={SlideOutDown.duration(300).springify()}
             style={styles.floatingCard}
           >
-            <InterpretationCard interpretation={selected} onClose={() => setSelected(null)} />
+            <InterpretationCard
+              interpretation={selected}
+              onClose={() => setSelected(null)}
+              // showBattery={!selected.value}
+            />
           </Animated.View>
         )}
 

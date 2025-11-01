@@ -12,7 +12,9 @@ interface InterpretationCardProps {
 }
 
 export function InterpretationCard({ interpretation, onClose }: InterpretationCardProps) {
-  const { title, description, value } = interpretation;
+  const { title, description, value, type } = interpretation;
+
+  const showBattery = type === 'matrix';
 
   const strength = (() => {
     if (!value || value === '—' || description.includes('нет')) return 0;
@@ -37,21 +39,24 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
 
       <Text style={styles.title}>{title}</Text>
 
-      <View style={styles.batteryContainer}>
-        <View style={[
-          styles.batteryOutline,
-          { borderColor: strength === 0 ? COLORS.battery.empty : COLORS.border }
-        ]}>
-          <View
-            style={[
-              styles.batteryFill,
-              { width: fillPercent, backgroundColor: getFillColor() }
-            ]}
-          />
-          <View style={styles.batteryCap} />
+      {showBattery && strength !== null && (
+        <View style={styles.batteryContainer}>
+          <View style={[
+            styles.batteryOutline,
+            { borderColor: strength === 0 ? COLORS.battery.empty : COLORS.border }
+          ]}>
+            <View
+              style={[
+                styles.batteryFill,
+                { width: fillPercent, backgroundColor: getFillColor() }
+              ]}
+            />
+            <View style={styles.batteryCap} />
+          </View>
+          <Text style={styles.batteryLabel}>{strength}/6</Text>
         </View>
-        <Text style={styles.batteryLabel}>{strength}/6</Text>
-      </View>
+      )}
+
 
       <Text style={styles.description}>{description}</Text>
     </View>

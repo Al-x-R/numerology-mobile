@@ -87,6 +87,7 @@ export default function HomeScreen() {
       });
     } else {
       navigation.setOptions({
+        // TODO headerTitle -> t()
         headerTitle: 'Психоматрица',
         headerLeft: () => null,
         headerRight: () => <LanguageButton />,
@@ -125,18 +126,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent', // Match the gradient background
   },
-  // headerTitle: {
-  //   fontFamily: 'PlayfairDisplay-Bold',
-  //   fontSize: 18,
-  //   fontWeight: '700' as const,
-  //   color: COLORS.accent,
-  // },
-  // headerSubtitle: {
-  //   fontFamily: 'Manrope-Regular',
-  //   fontSize: 12,
-  //   color: COLORS.textSecondary,
-  //   textAlign: 'center' as const,
-  // },
   content: {
     flex: 1,
     paddingHorizontal: 20,
