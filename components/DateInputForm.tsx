@@ -123,7 +123,6 @@ export function DateInputForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('title')}</Text>
       <Text style={styles.subtitle}>{t('subtitle')}</Text>
 
       <Animated.View style={[styles.inputContainer, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
