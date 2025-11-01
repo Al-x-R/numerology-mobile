@@ -2,6 +2,7 @@
 import { View, Image, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import LOGO_IMAGE from '../../assets/images/NumericalCompass.png';
 import { SPACING } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 export default function LoadingScreen() {
   return (
@@ -9,7 +10,7 @@ export default function LoadingScreen() {
       <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       <ActivityIndicator size="large" color="#FFD700" style={styles.spinner} />
       <Text style={{ color: '#A0A0A0', marginTop: SPACING.md, fontFamily: 'Manrope-Regular' }}>
-        Загрузка нумерологии...
+        {t('loadingNumerology')}
       </Text>
     </View>
   );

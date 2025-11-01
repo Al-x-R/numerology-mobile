@@ -51,6 +51,12 @@ const translations: LocaleData = {
     tooltip_superpower: 'Суперсила!',
     tooltip_genius: 'Гений!',
     tooltip_godlike: 'Божественно!',
+    tooltip_strong_creativity: 'Творчество',
+    tooltip_strong_logic: 'Сильная логика',
+    tooltip_strong_temperament: 'Темперамент',
+    tooltip_strong_luck: 'Удача',
+    tooltip_strong_responsibility: 'Ответственность',
+    tooltip_strong_memory: 'Память',
 
     // ADDITIONAL NUMBERS
     working1_title: '1-е Рабочее Число',
@@ -158,6 +164,33 @@ const translations: LocaleData = {
 
     interpretation_unavailable: 'Подробное описание пока недоступно.',
 
+    // SECTION TITLES
+    section_workingNumbers: 'Дополнительные числа',
+    section_psychomatrix: 'Психоматрица (Квадрат Пифагора)',
+
+    // WORKING NUMBERS DISPLAY
+    workingNumberLabel: '{number}-е раб. число',
+    destinyNumberLabel: 'Число Судьбы',
+
+    // ERRORS
+    errorNotFound: 'Ошибка',
+    errorDataNotFound: 'Данные не найдены.',
+    workingNumberInterpretation: 'Интерпретация числа {value}:',
+
+    // LOADING SCREEN
+    loadingNumerology: 'Загрузка нумерологии...',
+
+    // COMPATIBILITY SCREEN
+    compatibilityComingSoon: 'Скоро: Совместимость',
+    compatibilityDescription: 'Проверка нумерологической совместимости с партнером.',
+
+    // NUMBERS SCREEN
+    numbersScreenTitle: 'Числа Судьбы',
+    numbersDescription: 'Здесь будет расчет номера телефона и номера автомобиля. (PRO-функция)',
+
+    // LANGUAGE BUTTON
+    changeLanguageAlert: 'Сменить язык!',
+
   },
   en: {
     title: 'Date Code',
@@ -191,6 +224,12 @@ const translations: LocaleData = {
     tooltip_superpower: 'Superpower!',
     tooltip_genius: 'Genius!',
     tooltip_godlike: 'Godlike!',
+    tooltip_strong_creativity: 'Creativity',
+    tooltip_strong_logic: 'Strong logic',
+    tooltip_strong_temperament: 'Temperament',
+    tooltip_strong_luck: 'Luck',
+    tooltip_strong_responsibility: 'Responsibility',
+    tooltip_strong_memory: 'Memory',
 
     // ADDITIONAL NUMBERS
     working1_title: '1st Working Number',
@@ -303,22 +342,57 @@ const translations: LocaleData = {
     analysisTitle: 'Date Analysis',
     compatibilityTitle: 'Compatibility',
     numbersTitle: 'Numbers',
+
+    // SECTION TITLES
+    section_workingNumbers: 'Additional Numbers',
+    section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
+
+    // WORKING NUMBERS DISPLAY
+    workingNumberLabel: '{number}th Working Number',
+    destinyNumberLabel: 'Destiny Number',
+
+    // ERRORS
+    errorNotFound: 'Error',
+    errorDataNotFound: 'Data not found.',
+    workingNumberInterpretation: 'Interpretation of number {value}:',
+
+    // LOADING SCREEN
+    loadingNumerology: 'Loading numerology...',
+
+    // COMPATIBILITY SCREEN
+    compatibilityComingSoon: 'Coming Soon: Compatibility',
+    compatibilityDescription: 'Check numerological compatibility with a partner.',
+
+    // NUMBERS SCREEN
+    numbersScreenTitle: 'Destiny Numbers',
+    numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
   },
 };
 
-let currentLocale: Locale = 'en';
+let currentLocale: Locale = 'ru';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;
 };
 
-export const t = (path: string, lang: string = 'ru'): string => {
+export const getCurrentLocale = (): Locale => {
+  return currentLocale;
+};
+
+export const t = (path: string, lang?: Locale): string => {
+  const locale = lang || currentLocale;
   const keys = path.split('.');
-  let result: any = translations[lang];
+  let result: any = translations[locale];
 
   for (const key of keys) {
     result = result?.[key];
     if (result === undefined) return path; // fallback
+  }
+
+  // Support simple placeholder replacement for {value} or {number}
+  if (typeof result === 'string' && (result.includes('{value}') || result.includes('{number}'))) {
+    // This is a template string - return as is for now
+    // Components will need to handle replacement manually
   }
 
   return typeof result === 'string' ? result : path;

@@ -10,9 +10,11 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
+import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types';
 import { FONTS, SPACING, COLORS } from '@/lib/constants/theme';
+import { t, getCurrentLocale } from '@/lib/constants/locales';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -22,13 +24,15 @@ interface WorkingNumbersDisplayProps {
 
 function getFullWorkingInterpretation(id: string, value: number): Interpretation {
   const context = contextualInterpretations[id as keyof typeof contextualInterpretations];
-  const meaning = workingMeanings[value];
+  const locale = getCurrentLocale();
+  const meanings = locale === 'en' ? workingMeaningsEn : workingMeanings;
+  const meaning = meanings[value];
 
   if (!context || !meaning) {
-    return { title: 'Ошибка', description: 'Данные не найдены.', type: 'working' };
+    return { title: t('errorNotFound'), description: t('errorDataNotFound'), type: 'working' };
   }
 
-  const fullDescription = `${context.description}\n\nИнтерпретация числа ${value}:\n${meaning}`;
+  const fullDescription = `${context.description}\n\n${t('workingNumberInterpretation').replace('{value}', value.toString())}\n${meaning}`;
 
   return {
     title: context.title,
@@ -44,7 +48,7 @@ export function WorkingNumbersDisplayAnimated({
 }: WorkingNumbersDisplayProps) {
   return (
     <View style={styles.numbersSection}>
-      <Text style={styles.sectionTitle}>Дополнительные числа</Text>
+      <Text style={styles.sectionTitle}>{t('section_workingNumbers')}</Text>
       <View style={styles.numbersGrid}>
         {workingNumbers.map((num, index) => (
           <WorkingNumberCard
@@ -92,7 +96,7 @@ const WorkingNumberCard: React.FC<{
     <Animated.View style={animatedStyle}>
       <TouchableOpacity style={styles.numberCard} onPress={() => onPress(interpretationData)}>
         <Text style={styles.numberLabel}>
-          {interpretationData.title.split(' ')[0]} раб. число
+          {t('workingNumberLabel').replace('{number}', (index + 1).toString())}
         </Text>
         <Text style={styles.numberValue}>{num}</Text>
       </TouchableOpacity>
@@ -135,7 +139,7 @@ const FateCard: React.FC<{
         style={styles.fateCardFinal}
         onPress={() => onPress(interpretationData)}
       >
-        <Text style={styles.numberLabel}>Число Судьбы</Text>
+        <Text style={styles.numberLabel}>{t('destinyNumberLabel')}</Text>
         <Text style={[styles.numberValue, styles.fateValue, textAccentStyle]}>
           {value}
         </Text>

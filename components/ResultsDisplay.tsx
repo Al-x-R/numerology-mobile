@@ -19,6 +19,7 @@ import { CalculationResult, Interpretation } from '@/lib/types';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
 import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -52,7 +53,7 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 1. Psychomatrix (Pythagorean Square) */}
         <View style={styles.pythagorasSection}>
-          <Text style={styles.sectionTitle}>Психоматрица (Квадрат Пифагора)</Text>
+          <Text style={styles.sectionTitle}>{t('section_psychomatrix')}</Text>
           <View style={[styles.grid, { gap: GAP }]}>
             {Object.entries(matrix).map(([id, value], index) => {
               const interpretationData = getInterpretation(id, value);

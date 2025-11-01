@@ -87,8 +87,7 @@ export default function HomeScreen() {
       });
     } else {
       navigation.setOptions({
-        // TODO headerTitle -> t()
-        headerTitle: 'Психоматрица',
+        headerTitle: t('pythagorasTitle'),
         headerLeft: () => null,
         headerRight: () => <LanguageButton />,
         tabBarStyle: {

@@ -2,13 +2,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 export default function NumbersScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Числа Судьбы</Text>
+      <Text style={styles.title}>{t('numbersScreenTitle')}</Text>
       <Text style={styles.subtitle}>
-        Здесь будет расчет номера телефона и номера автомобиля. (PRO-функция)
+        {t('numbersDescription')}
       </Text>
     </View>
   );

@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { COLORS } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 export default function CompatibilityScreen() {
   return (
@@ -14,9 +15,9 @@ export default function CompatibilityScreen() {
           resizeMode="contain"
         />
       </View>
-      <Text style={styles.title}>Скоро: Совместимость</Text>
+      <Text style={styles.title}>{t('compatibilityComingSoon')}</Text>
       <Text style={styles.subtitle}>
-        Проверка нумерологической совместимости с партнером.
+        {t('compatibilityDescription')}
       </Text>
     </View>
   );

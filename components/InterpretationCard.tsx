@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types';
 import { COLORS, SPACING, RADIUS, FONTS, SHADOWS } from '@/lib/constants/theme';
+import { getCurrentLocale } from '@/lib/constants/locales';
 
 interface InterpretationCardProps {
   interpretation: Interpretation;
@@ -17,7 +18,13 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
   const showBattery = type === 'matrix';
 
   const strength = (() => {
-    if (!value || value === '—' || description.includes('нет')) return 0;
+    if (!value || value === '—') return 0;
+    const locale = getCurrentLocale();
+    // Check for "empty" patterns in both languages
+    const emptyPatterns = locale === 'en' 
+      ? ['no ', 'No ', 'none', 'None'] 
+      : ['нет', 'Нет', 'отсутств'];
+    if (emptyPatterns.some(pattern => description.includes(pattern))) return 0;
     const match = value.match(/(\d+)/);
     if (!match) return 0;
     return Math.min(match[0].length, 6);

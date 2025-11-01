@@ -2,10 +2,11 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { t } from '@/lib/constants/locales';
 
 export const LanguageButton = () => {
   const handleLanguageChange = () => {
-    alert('Сменить язык!');
+    alert(t('changeLanguageAlert'));
   };
 
   return (
