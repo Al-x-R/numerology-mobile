@@ -1,6 +1,6 @@
 // components/CompatibilityResultsDisplay.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -16,6 +16,9 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
+import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
+
+
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 
@@ -23,6 +26,7 @@ interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
   date1: string;
   date2: string;
+  isPremium: boolean;
   onBack?: () => void;
 }
 
@@ -92,7 +96,8 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
 export function CompatibilityResultsDisplay({ 
   result, 
   date1, 
-  date2 
+  date2,
+  isPremium = false,
 }: CompatibilityResultsDisplayProps) {
   const getTotalColor = (pct: number) => {
     if (pct >= 80) return COLORS.battery.full;
@@ -117,23 +122,34 @@ export function CompatibilityResultsDisplay({
     datesTranslateY.value = withDelay(200, withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) }));
   }, []);
 
-  const titleAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: titleOpacity.value,
-    transform: [{ translateY: titleTranslateY.value }],
-  }));
+  const [showTeaser, setShowTeaser] = useState(false);
 
-  const datesAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: datesOpacity.value,
-    transform: [{ translateY: datesTranslateY.value }],
-  }));
+  useEffect(() => {
+    if (!isPremium) {
+      const timer = setTimeout(() => {
+        setShowTeaser(true);
+      }, 7000); // 7 сек
+      return () => clearTimeout(timer);
+    }
+  }, [isPremium]);
+
+  const handleUpgrade = () => {
+    setShowTeaser(false);
+    // TODO: открыть покупку
+  };
+
+  const handleClose = () => {
+    setShowTeaser(false);
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
 
       {/* Basic Compatibility Parameters */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('compatibilityTotal')}</Text>
-        
+
         <CompatibilityParamCard
           title={t('compatibilityEnergy')}
           p1={result.energy.p1}
@@ -141,7 +157,7 @@ export function CompatibilityResultsDisplay({
           pct={result.energy.pct}
           index={0}
         />
-        
+
         <CompatibilityParamCard
           title={t('compatibilityCharacter')}
           p1={result.character.p1}
@@ -149,7 +165,7 @@ export function CompatibilityResultsDisplay({
           pct={result.character.pct}
           index={1}
         />
-        
+
         <CompatibilityParamCard
           title={t('compatibilityInterest')}
           p1={result.interest.p1}
@@ -171,7 +187,7 @@ export function CompatibilityResultsDisplay({
       {result.karma && result.family && result.talent && result.spirituality && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('compatibilityFullTotal')}</Text>
-          
+
           <CompatibilityParamCard
             title={t('compatibilityKarma')}
             p1={result.karma.p1}
@@ -179,7 +195,7 @@ export function CompatibilityResultsDisplay({
             pct={result.karma.pct}
             index={4}
           />
-          
+
           <CompatibilityParamCard
             title={t('compatibilityFamily')}
             p1={result.family.p1}
@@ -187,7 +203,7 @@ export function CompatibilityResultsDisplay({
             pct={result.family.pct}
             index={5}
           />
-          
+
           <CompatibilityParamCard
             title={t('compatibilityTalent')}
             p1={result.talent.p1}
@@ -195,7 +211,7 @@ export function CompatibilityResultsDisplay({
             pct={result.talent.pct}
             index={6}
           />
-          
+
           <CompatibilityParamCard
             title={t('compatibilitySpirituality')}
             p1={result.spirituality.p1}
@@ -230,6 +246,13 @@ export function CompatibilityResultsDisplay({
         </View>
       )}
     </ScrollView>
+      <PremiumTeaserModal
+        visible={showTeaser}
+        onClose={handleClose}
+        onUpgrade={handleUpgrade}
+      />
+    </>
+
   );
 }
 

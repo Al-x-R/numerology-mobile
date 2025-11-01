@@ -211,6 +211,10 @@ const translations: LocaleData = {
     // LANGUAGE BUTTON
     changeLanguageAlert: 'Сменить язык!',
 
+    premiumTeaserTitle: 'Полная совместимость',
+    premiumTeaserText: 'Узнай карму, семью, талант и духовность',
+    premiumTeaserCTA: 'Купить премиум →',
+
   },
   en: {
     title: 'Date Code',
@@ -406,10 +410,14 @@ const translations: LocaleData = {
     // NUMBERS SCREEN
     numbersScreenTitle: 'Destiny Numbers',
     numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
+
+    premiumTeaserTitle: 'Full Compatibility',
+    premiumTeaserText: 'Unlock karma, family, talent, and spiritual connection',
+    premiumTeaserCTA: 'Get Premium →',
   },
 };
 
-let currentLocale: Locale = 'ru';
+let currentLocale: Locale = 'en';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;
