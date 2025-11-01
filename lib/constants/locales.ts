@@ -1,12 +1,14 @@
 // constants/locales.ts
 export type Locale = 'ru' | 'en';
 
+type TranslationValue = string | ((...args: any[]) => string);
+
 interface Translations {
-  [key: string]: string | ((...args: any[]) => string);
+  [key: string]: TranslationValue | Translations;
 }
 
 interface LocaleData {
-  [key: string]: Translations;
+  [lang: string]: Translations;
 }
 
 const translations: LocaleData = {
@@ -16,6 +18,12 @@ const translations: LocaleData = {
     inputPlaceholder: 'Введите дату рождения (ДД.ММ.ГГГГ)',
     buttonText: 'Рассчитать',
     loadingText: 'Расчёт...',
+
+    tabs: {
+      pythagoras: 'Психоматрица',
+      compatibility: 'Совместимость',
+      numbers: 'Числа'
+    },
 
     back: 'Назад',
     pythagorasTitle: 'Психоматрица',
@@ -30,14 +38,19 @@ const translations: LocaleData = {
     changeLanguage: 'Сменить язык!',
 
     // TOOLTIPS
-    tooltip_weak_character: 'Слабая воля',
-    tooltip_strong_character: 'Лидер от рождения',
+    tooltip_weak_character: 'Слабый характер',
+    tooltip_strong_character: 'Сильный лидер',
     tooltip_weak_energy: 'Нет энергии',
-    tooltip_strong_energy: 'Экстрасенс',
-    tooltip_develop: 'Нужно развивать',
+    tooltip_strong_energy: 'Мощная энергия',
+    tooltip_weak_health: 'Слабое здоровье',
+    tooltip_weak_logic: 'Слабая логика',
+    tooltip_weak_laziness: 'Лень',
+    tooltip_weak_responsibility: 'Беспечность',
+    tooltip_weak_memory: 'Плохая память',
+    tooltip_develop: 'Развивать!',
     tooltip_superpower: 'Суперсила!',
-    tooltip_genius: 'Гениальность',
-    tooltip_godlike: 'Божественный дар',
+    tooltip_genius: 'Гений!',
+    tooltip_godlike: 'Божественно!',
 
     // ADDITIONAL NUMBERS
     working1_title: '1-е Рабочее Число',
@@ -153,19 +166,31 @@ const translations: LocaleData = {
     buttonText: 'Calculate',
     loadingText: 'Calculating...',
 
+    tabs: {
+      pythagoras: 'Psychomatrix',
+      compatibility: 'Compatibility',
+      numbers: 'Numbers'
+    },
+
     errorEmpty: 'Enter a date',
     errorFormat: 'Format: DD.MM.YYYY',
     errorInvalid: 'Invalid date',
 
     // TOOLTIPS
     tooltip_weak_character: 'Weak will',
-    tooltip_strong_character: 'Born leader',
+    tooltip_strong_character: 'Strong leader',
     tooltip_weak_energy: 'No energy',
-    tooltip_strong_energy: 'Psychic',
-    tooltip_develop: 'Needs development',
+    tooltip_strong_energy: 'High energy',
+    tooltip_weak_health: 'Poor health',
+    tooltip_weak_logic: 'Weak logic',
+    tooltip_weak_laziness: 'Lazy',
+    tooltip_weak_responsibility: 'Carelessness',
+    tooltip_weak_memory: 'Poor memory',
+
+    tooltip_develop: 'Develop!',
     tooltip_superpower: 'Superpower!',
-    tooltip_genius: 'Genius',
-    tooltip_godlike: 'Godlike',
+    tooltip_genius: 'Genius!',
+    tooltip_godlike: 'Godlike!',
 
     // ADDITIONAL NUMBERS
     working1_title: '1st Working Number',
@@ -281,12 +306,20 @@ const translations: LocaleData = {
   },
 };
 
-let currentLocale: Locale = 'ru';
+let currentLocale: Locale = 'en';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;
 };
 
-export const t = (key: keyof typeof translations.ru): string => {
-  return translations[currentLocale][key] as string;
+export const t = (path: string, lang: string = 'ru'): string => {
+  const keys = path.split('.');
+  let result: any = translations[lang];
+
+  for (const key of keys) {
+    result = result?.[key];
+    if (result === undefined) return path; // fallback
+  }
+
+  return typeof result === 'string' ? result : path;
 };

@@ -3,6 +3,7 @@ import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageButton } from '@/components/ui/LanguageButton';
 import { COLORS, FONTS } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 
 export default function TabLayout() {
@@ -39,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="pythagoras"
         options={{
-          title: 'Психоматрица',
+          title: t('tabs.pythagoras'),
           tabBarIcon: ({ color }) => (
             <Ionicons name="grid-outline" size={24} color={color} />
           ),
@@ -48,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="compatibility"
         options={{
-          title: 'Совместимость',
+          title: t('tabs.compatibility'),
           tabBarIcon: ({ color }) => (
             <Ionicons name="heart-outline" size={24} color={color} />
           ),
@@ -57,7 +58,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="numbers"
         options={{
-          title: 'Числа',
+          title: t('tabs.numbers'),
           tabBarIcon: ({ color }) => (
             <Ionicons name="keypad-outline" size={24} color={color} />
           ),

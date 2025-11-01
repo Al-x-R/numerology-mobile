@@ -5,7 +5,8 @@ import { t } from '@/lib/constants/locales';
 export const getTooltipText = (id: string, value: string): string => {
   const v = value || '';
   const highlight = getHighlightType(id, v);
-
+  console.log('getTooltipText id', id);
+  console.log('getTooltipText value', value);
   if (highlight === 'weak') {
     const weakTooltips: Record<string, string> = {
       '1': t('tooltip_weak_character'),
