@@ -204,6 +204,9 @@ const translations: LocaleData = {
     compatibilityPartner2: 'Партнер 2',
     compatibilityPercentage: '{pct}%',
 
+    compatibilityBasic: 'Общая совместимость',
+    compatibilityFull: 'Полная совместимость',
+
     // NUMBERS SCREEN
     numbersScreenTitle: 'Числа Судьбы',
     numbersDescription: 'Здесь будет расчет номера телефона и номера автомобиля. (PRO-функция)',
@@ -211,9 +214,13 @@ const translations: LocaleData = {
     // LANGUAGE BUTTON
     changeLanguageAlert: 'Сменить язык!',
 
-    premiumTeaserTitle: 'Полная совместимость',
-    premiumTeaserText: 'Узнай карму, семью, талант и духовность',
-    premiumTeaserCTA: 'Купить премиум →',
+    recEnergyLow: 'Вам стоит работать над энергией: больше движения, спорта, отдыха.',
+    recCharacterDiff: 'Различия в характере — учитесь терпению и компромиссам.',
+    recFindHobby: 'Найдите общие хобби — это укрепит связь.',
+    recKarmaHigh: 'Вы — кармические партнёры. Это связь на всю жизнь.',
+    recFamilyStrong: 'Отличный потенциал для семьи и стабильности.',
+    recTalentSynergy: 'Вместе вы можете достичь больших высот в творчестве.',
+    recHarmony: 'Совместимость гармоничная. Продолжайте в том же духе!',
 
   },
   en: {
@@ -406,18 +413,34 @@ const translations: LocaleData = {
     compatibilityPartner1: 'Partner 1',
     compatibilityPartner2: 'Partner 2',
     compatibilityPercentage: '{pct}%',
+    compatibilityBasic: 'Basic Compatibility',
+    compatibilityFull: 'Full Compatibility',
+
+    // RECOMMENDATIONS
+    recEnergyLow: 'You should work on energy: more movement, sports, rest.',
+    recCharacterDiff: 'Differences in character — learn patience and compromise.',
+    recFindHobby: 'Find shared hobbies — it will strengthen your bond.',
+    recKarmaHigh: 'You are karmic partners. This is a connection for life.',
+    recFamilyStrong: 'Great potential for family and stability.',
+    recTalentSynergy: 'Together you can achieve great heights in creativity.',
+    recHarmony: 'Compatibility is harmonious. Keep it up!',
+
+    // LANGUAGE BUTTON
+    changeLanguageAlert: 'Change language!',
+
+    // PREMIUM TEASER
+    premiumTeaserTitle: 'Full Compatibility',
+    premiumTeaserText: 'Unlock karma, family, talent, and spiritual connection',
+    premiumTeaserCTA: 'Get Premium →',
+    later: 'Later',
 
     // NUMBERS SCREEN
     numbersScreenTitle: 'Destiny Numbers',
     numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
-
-    premiumTeaserTitle: 'Full Compatibility',
-    premiumTeaserText: 'Unlock karma, family, talent, and spiritual connection',
-    premiumTeaserCTA: 'Get Premium →',
   },
 };
 
-let currentLocale: Locale = 'en';
+let currentLocale: Locale = 'ru';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;

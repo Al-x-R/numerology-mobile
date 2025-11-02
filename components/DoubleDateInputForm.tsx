@@ -23,6 +23,7 @@ import {
   SPACING
 } from '@/lib/constants/theme';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
+import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 
 interface DoubleDateInputFormProps {
   onSubmit: () => void;
@@ -363,3 +364,10 @@ const styles = StyleSheet.create({
 });
 
 
+
+
+// <PremiumTeaserModal
+//   visible={showTeaser}
+//   onClose={handleClose}
+//   onUpgrade={handleUpgrade}
+// />
