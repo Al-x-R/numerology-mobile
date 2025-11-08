@@ -3,14 +3,22 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
+import MatrixOfDestiny from '@/components/MatrixOfDestiny'
 
 export default function NumbersScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('numbersScreenTitle')}</Text>
-      <Text style={styles.subtitle}>
-        {t('numbersDescription')}
-      </Text>
+      {/*<Text style={styles.title}>{t('numbersScreenTitle')}</Text>*/}
+      {/*<Text style={styles.subtitle}>*/}
+      {/*  {t('numbersDescription')}*/}
+      {/*</Text>*/}
+      <MatrixOfDestiny
+        day={2}
+        month={7}
+        year={1985}
+        name="Александр"
+        gender="male"
+      />
     </View>
   );
 }

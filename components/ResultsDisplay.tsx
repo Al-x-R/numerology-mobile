@@ -15,11 +15,12 @@ import Animated, {
 import { GridCellAnimated } from '@/components/GridCellAnimated';
 import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDisplayAnimated';
 
-import { CalculationResult, Interpretation } from '@/lib/types';
+import { CalculationResult, Interpretation } from '@/lib/types/calculation';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
 import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
+import { useProfile } from '@/contexts/ProfileContext';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -37,6 +38,12 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   const cellSize = (gridWidth - (GAP * 2)) / 3;
 
   const [selected, setSelected] = useState<Interpretation | null>(null);
+
+  const { saveProfile } = useProfile();
+
+  const handleSave = () => {
+    saveProfile('Мой профиль', date, results);
+  };
 
   const handlePress = (interpretationData: Interpretation) => {
     if (selected) {

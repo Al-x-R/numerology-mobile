@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCUbg-FGKf-ZqOMB_DmPVGpCpCK6gosfow</string>
+	<key>GCM_SENDER_ID</key>
+	<string>654109542106</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.destinycode.app</string>
+	<key>PROJECT_ID</key>
+	<string>destiny-code-cc093</string>
+	<key>STORAGE_BUCKET</key>
+	<string>destiny-code-cc093.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:654109542106:ios:8e641e51f5a06b958ec7e3</string>
+</dict>
+</plist>

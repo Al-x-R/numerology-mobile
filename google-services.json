@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654109542106",
+    "project_id": "destiny-code-cc093",
+    "storage_bucket": "destiny-code-cc093.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654109542106:android:3fabea3a715d08138ec7e3",
+        "android_client_info": {
+          "package_name": "com.destinycode.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY-IM2BXPhv0wJnkYdhSkce7DLg5I5mqg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { DateInputForm } from '@/components/DateInputForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
-import { CalculationResult } from '@/lib/types';
+import { CalculationResult } from '@/lib/types/calculation';
 import { LanguageButton } from '@/components/ui/LanguageButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';

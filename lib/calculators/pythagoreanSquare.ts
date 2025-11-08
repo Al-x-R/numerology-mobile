@@ -1,5 +1,5 @@
 // lib/calculators/pythagoreanSquare.ts
-import { CalculationResult, MatrixData, AdditionalParams } from '@/lib/types';
+import { CalculationResult, MatrixData, AdditionalParams } from '@/lib/types/calculation';
 
 function sumDigits(n: number | string): number {
   return String(n)

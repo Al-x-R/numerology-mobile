@@ -1,47 +1,29 @@
 // app/index.tsx
-import { Redirect } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { Href, useRouter } from 'expo-router';
 import LoadingScreen from '@/components/ui/LoadingScreen';
-import { useAppFonts } from '@/hooks/useFonts';
-
-SplashScreen.preventAutoHideAsync();
+import { useEffect, useState } from 'react';
+import { useProfile } from '@/contexts/ProfileContext';
 
 export default function InitialLoadScreen() {
-  const [isReady, setIsReady] = useState(false);
-  const [fontsLoaded, fontError] = useAppFonts();
+  const router = useRouter();
+  const { user, isLoading } = useProfile();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    async function prepare() {
-      try {
-        if (!fontsLoaded) return;
+    const t = setTimeout(() => setReady(true), 800);
+    return () => clearTimeout(t);
+  }, []);
 
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-      } catch (e) {
-        console.warn('Prepare error:', e);
-      } finally {
-        setIsReady(true);
-        await SplashScreen.hideAsync();
-      }
+  useEffect(() => {
+    if (ready && !isLoading) {
+      const targetRoute: Href = user ? '/(tabs)/profiles' : '/(auth)/onboarding';
+      router.replace(targetRoute);
     }
+  }, [ready, isLoading, user, router]);
 
-    if (fontsLoaded || fontError) {
-      prepare();
-    }
-  }, [fontsLoaded, fontError]);
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
-
-  if (fontError) {
+  if (!ready || isLoading) {
     return <LoadingScreen />;
   }
 
-  if (isReady) {
-    return <Redirect href="/pythagoras" />;
-  }
-
-  return <LoadingScreen />;
+  return null;
 }

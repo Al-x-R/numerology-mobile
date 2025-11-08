@@ -181,31 +181,8 @@ const translations: LocaleData = {
     loadingNumerology: 'Загрузка нумерологии...',
 
     // COMPATIBILITY SCREEN
-    compatibilitySubtitle: 'Рассчитайте нумерологическую совместимость с партнером',
-    partner1Label: 'Партнер 1',
-    partner2Label: 'Партнер 2',
-    partner1Placeholder: 'Дата рождения партнера 1 (ДД.ММ.ГГГГ)',
-    partner2Placeholder: 'Дата рождения партнера 2 (ДД.ММ.ГГГГ)',
-    compatibilityButtonText: 'Рассчитать совместимость',
-    compatibilityLoadingText: 'Расчёт совместимости...',
-    compatibilityResultsTitle: 'Совместимость',
-    // COMPATIBILITY PARAMETERS
-    compatibilityEnergy: 'Энергия',
-    compatibilityCharacter: 'Характер',
-    compatibilityInterest: 'Интерес',
-    compatibilityKarma: 'Карма',
-    compatibilityFamily: 'Семья',
-    compatibilityTalent: 'Талант',
-    compatibilitySpirituality: 'Духовность',
-    compatibilityTotal: 'Общая совместимость',
-    compatibilityFullTotal: 'Полная совместимость',
-    compatibilityRecommendations: 'Рекомендации',
-    compatibilityPartner1: 'Партнер 1',
-    compatibilityPartner2: 'Партнер 2',
-    compatibilityPercentage: '{pct}%',
-
-    compatibilityBasic: 'Общая совместимость',
-    compatibilityFull: 'Полная совместимость',
+    compatibilityComingSoon: 'Скоро: Совместимость',
+    compatibilityDescription: 'Проверка нумерологической совместимости с партнером.',
 
     // NUMBERS SCREEN
     numbersScreenTitle: 'Числа Судьбы',
@@ -214,13 +191,20 @@ const translations: LocaleData = {
     // LANGUAGE BUTTON
     changeLanguageAlert: 'Сменить язык!',
 
-    recEnergyLow: 'Вам стоит работать над энергией: больше движения, спорта, отдыха.',
-    recCharacterDiff: 'Различия в характере — учитесь терпению и компромиссам.',
-    recFindHobby: 'Найдите общие хобби — это укрепит связь.',
-    recKarmaHigh: 'Вы — кармические партнёры. Это связь на всю жизнь.',
-    recFamilyStrong: 'Отличный потенциал для семьи и стабильности.',
-    recTalentSynergy: 'Вместе вы можете достичь больших высот в творчестве.',
-    recHarmony: 'Совместимость гармоничная. Продолжайте в том же духе!',
+    auth: {
+      welcome: 'Добро пожаловать',
+      google: 'Продолжить с Google',
+      email: 'Email',
+      password: 'Пароль',
+      login: 'Войти',
+      noAccount: 'Нет аккаунта? Зарегистрируйся',
+      emailInvalid: 'Email недействителен',
+      passwordShort: 'Пароль должен быть ≥6 символов',
+
+      register: 'Регистрация',
+      createAccount: 'Создать аккаунт',
+      haveAccount: 'Уже есть аккаунт? Войти',
+    }
 
   },
   en: {
@@ -391,52 +375,27 @@ const translations: LocaleData = {
     loadingNumerology: 'Loading numerology...',
 
     // COMPATIBILITY SCREEN
-    compatibilitySubtitle: 'Calculate numerological compatibility with your partner',
-    partner1Label: 'Partner 1',
-    partner2Label: 'Partner 2',
-    partner1Placeholder: 'Partner 1 birth date (DD.MM.YYYY)',
-    partner2Placeholder: 'Partner 2 birth date (DD.MM.YYYY)',
-    compatibilityButtonText: 'Calculate Compatibility',
-    compatibilityLoadingText: 'Calculating compatibility...',
-    compatibilityResultsTitle: 'Compatibility',
-    // COMPATIBILITY PARAMETERS
-    compatibilityEnergy: 'Energy',
-    compatibilityCharacter: 'Character',
-    compatibilityInterest: 'Interest',
-    compatibilityKarma: 'Karma',
-    compatibilityFamily: 'Family',
-    compatibilityTalent: 'Talent',
-    compatibilitySpirituality: 'Spirituality',
-    compatibilityTotal: 'Total Compatibility',
-    compatibilityFullTotal: 'Full Compatibility',
-    compatibilityRecommendations: 'Recommendations',
-    compatibilityPartner1: 'Partner 1',
-    compatibilityPartner2: 'Partner 2',
-    compatibilityPercentage: '{pct}%',
-    compatibilityBasic: 'Basic Compatibility',
-    compatibilityFull: 'Full Compatibility',
-
-    // RECOMMENDATIONS
-    recEnergyLow: 'You should work on energy: more movement, sports, rest.',
-    recCharacterDiff: 'Differences in character — learn patience and compromise.',
-    recFindHobby: 'Find shared hobbies — it will strengthen your bond.',
-    recKarmaHigh: 'You are karmic partners. This is a connection for life.',
-    recFamilyStrong: 'Great potential for family and stability.',
-    recTalentSynergy: 'Together you can achieve great heights in creativity.',
-    recHarmony: 'Compatibility is harmonious. Keep it up!',
-
-    // LANGUAGE BUTTON
-    changeLanguageAlert: 'Change language!',
-
-    // PREMIUM TEASER
-    premiumTeaserTitle: 'Full Compatibility',
-    premiumTeaserText: 'Unlock karma, family, talent, and spiritual connection',
-    premiumTeaserCTA: 'Get Premium →',
-    later: 'Later',
+    compatibilityComingSoon: 'Coming Soon: Compatibility',
+    compatibilityDescription: 'Check numerological compatibility with a partner.',
 
     // NUMBERS SCREEN
     numbersScreenTitle: 'Destiny Numbers',
     numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
+
+    auth: {
+      welcome: 'Welcome back',
+      google: 'Continue with Google',
+      email: 'Email',
+      password: 'Password',
+      login: 'Log in',
+      noAccount: 'Don’t have an account? Sign up',
+      emailInvalid: 'Invalid email',
+      passwordShort: 'Password must be ≥6 characters',
+
+      register: 'Sign up',
+      createAccount: 'Create account',
+      haveAccount: 'Already have an account? Log in',
+    }
   },
 };
 

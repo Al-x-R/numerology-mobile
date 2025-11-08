@@ -1,6 +1,6 @@
 // lib/data/additionalNumberInterpretations.ts
 import { t } from '@/lib/constants/locales';
-import { Interpretation } from '@/lib/types';
+import { Interpretation } from '@/lib/types/calculation';
 
 export const contextualInterpretations: Record<
   'working1' | 'working2' | 'working3' | 'working4' | 'destiny',

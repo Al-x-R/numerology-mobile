@@ -45,7 +45,7 @@ export default function CompatibilityScreen() {
   const handleCalculate = () => {
     try {
       // calculateCompatibility expects format DD.MM.YYYY
-      const result = calculateCompatibility(dateString1, dateString2);
+      const result = calculateCompatibility(dateString1, dateString2, false);
       setCompatibilityResult(result);
     } catch (e) {
       console.error(e);
@@ -114,7 +114,6 @@ export default function CompatibilityScreen() {
             date1={dateString1}
             date2={dateString2}
             onBack={handleBack}
-            isPremium={false}
           />
         )}
       </View>

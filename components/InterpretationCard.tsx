@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Interpretation } from '@/lib/types';
+import { Interpretation } from '@/lib/types/calculation';
 import { COLORS, SPACING, RADIUS, FONTS, SHADOWS, LAYOUT } from '@/lib/constants/theme';
 import { getCurrentLocale } from '@/lib/constants/locales';
 

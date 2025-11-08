@@ -1,6 +1,6 @@
 // components/CompatibilityResultsDisplay.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -16,9 +16,6 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
-
-
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 
@@ -26,7 +23,6 @@ interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
   date1: string;
   date2: string;
-  isPremium: boolean;
   onBack?: () => void;
 }
 
@@ -93,116 +89,156 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
   );
 }
 
-/**
- * Возвращает ключ локализации для параметра по его индексу
- * @param index — позиция в массиве displayParams
- * @param isPremium — показываем ли премиум-параметры
- */
-const getParamKey = (index: number, isPremium: boolean): string => {
-  if (!isPremium) {
-    const basic = ['compatibilityEnergy', 'compatibilityCharacter', 'compatibilityInterest'];
-    return basic[index]!;
-  }
-
-  const full = [
-    'compatibilityEnergy',
-    'compatibilityCharacter',
-    'compatibilityInterest',
-    'compatibilityKarma',
-    'compatibilityFamily',
-    'compatibilityTalent',
-    'compatibilitySpirituality',
-  ];
-  return full[index]!;
-};
-
-/**
- * Цветовая шкала: красный → оранжевый → золото → зелёный
- */
-const getTotalColor = (pct: number): string => {
-  if (pct >= 80) return COLORS.battery.full;        // #34C759 — зелёный
-  if (pct >= 60) return '#FFD700';                  // золото
-  if (pct >= 40) return '#FFA500';                  // оранжевый
-  return COLORS.error;                              // #FF3B30 — красный
-};
-
-export function CompatibilityResultsDisplay({
-  result,
-  isPremium = false,
+export function CompatibilityResultsDisplay({ 
+  result, 
+  date1, 
+  date2 
 }: CompatibilityResultsDisplayProps) {
-  const displayPct = isPremium ? result.fullCompatibilityPct : result.baseCompatibilityPct;
+  const getTotalColor = (pct: number) => {
+    if (pct >= 80) return COLORS.battery.full;
+    if (pct >= 60) return '#FFD700';
+    if (pct >= 40) return '#FFA500';
+    return COLORS.error;
+  };
 
-  const displayParams = isPremium
-    ? [result.energy, result.character, result.interest, result.karma, result.family, result.talent, result.spirituality]
-    : [result.energy, result.character, result.interest];
+  const totalColor = getTotalColor(result.totalPct);
+  const fullTotalColor = result.fullTotalPct ? getTotalColor(result.fullTotalPct) : null;
 
-  const [showTeaser, setShowTeaser] = useState(false);
+  // Анимации для заголовка
+  const titleOpacity = useSharedValue(0);
+  const titleTranslateY = useSharedValue(-10);
+  const datesOpacity = useSharedValue(0);
+  const datesTranslateY = useSharedValue(10);
 
   useEffect(() => {
-    if (!isPremium) {
-      const timer = setTimeout(() => {
-        setShowTeaser(true);
-      }, 7000); // 7 сек
-      return () => clearTimeout(timer);
-    }
-  }, [isPremium]);
+    titleOpacity.value = withTiming(1, { duration: 400 });
+    titleTranslateY.value = withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) });
+    datesOpacity.value = withDelay(200, withTiming(1, { duration: 400 }));
+    datesTranslateY.value = withDelay(200, withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) }));
+  }, []);
 
-  const handleUpgrade = () => {
-    setShowTeaser(false);
-    // TODO: открыть покупку
-  };
+  const titleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: titleOpacity.value,
+    transform: [{ translateY: titleTranslateY.value }],
+  }));
 
-  const handleClose = () => {
-    setShowTeaser(false);
-  };
+  const datesAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: datesOpacity.value,
+    transform: [{ translateY: datesTranslateY.value }],
+  }));
 
   return (
-    <>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {t(isPremium ? 'compatibilityFull' : 'compatibilityBasic')}
-          </Text>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <Animated.Text style={[styles.title, titleAnimatedStyle]}>
+        {t('compatibilityResultsTitle')}
+      </Animated.Text>
 
-          {displayParams.map((param, i) => (
-            <CompatibilityParamCard
-              key={i}
-              title={t(getParamKey(i, isPremium))}
-              p1={param.p1}
-              p2={param.p2}
-              pct={param.pct}
-              index={i}
+      <Animated.View style={[styles.datesContainer, datesAnimatedStyle]}>
+        <Text style={styles.dateText}>{date1}</Text>
+        <Text style={styles.ampersand}>&</Text>
+        <Text style={styles.dateText}>{date2}</Text>
+      </Animated.View>
+
+      {/* Basic Compatibility Parameters */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('compatibilityTotal')}</Text>
+        
+        <CompatibilityParamCard
+          title={t('compatibilityEnergy')}
+          p1={result.energy.p1}
+          p2={result.energy.p2}
+          pct={result.energy.pct}
+          index={0}
+        />
+        
+        <CompatibilityParamCard
+          title={t('compatibilityCharacter')}
+          p1={result.character.p1}
+          p2={result.character.p2}
+          pct={result.character.pct}
+          index={1}
+        />
+        
+        <CompatibilityParamCard
+          title={t('compatibilityInterest')}
+          p1={result.interest.p1}
+          p2={result.interest.p2}
+          pct={result.interest.pct}
+          index={2}
+        />
+      </View>
+
+      {/* Total Compatibility */}
+      <AnimatedTotalCard
+        label={t('compatibilityTotal')}
+        value={result.totalPct}
+        color={totalColor}
+        index={3}
+      />
+
+      {/* Premium Parameters */}
+      {result.karma && result.family && result.talent && result.spirituality && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('compatibilityFullTotal')}</Text>
+          
+          <CompatibilityParamCard
+            title={t('compatibilityKarma')}
+            p1={result.karma.p1}
+            p2={result.karma.p2}
+            pct={result.karma.pct}
+            index={4}
+          />
+          
+          <CompatibilityParamCard
+            title={t('compatibilityFamily')}
+            p1={result.family.p1}
+            p2={result.family.p2}
+            pct={result.family.pct}
+            index={5}
+          />
+          
+          <CompatibilityParamCard
+            title={t('compatibilityTalent')}
+            p1={result.talent.p1}
+            p2={result.talent.p2}
+            pct={result.talent.pct}
+            index={6}
+          />
+          
+          <CompatibilityParamCard
+            title={t('compatibilitySpirituality')}
+            p1={result.spirituality.p1}
+            p2={result.spirituality.p2}
+            pct={result.spirituality.pct}
+            index={7}
+          />
+        </View>
+      )}
+
+      {/* Full Total (Premium) */}
+      {result.fullTotalPct && (
+        <AnimatedTotalCard
+          label={t('compatibilityFullTotal')}
+          value={result.fullTotalPct}
+          color={fullTotalColor || COLORS.text}
+          index={8}
+        />
+      )}
+
+      {/* Recommendations (Premium) */}
+      {result.recommendations && result.recommendations.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('compatibilityRecommendations')}</Text>
+          {result.recommendations.map((rec, index) => (
+            <AnimatedRecommendationCard
+              key={index}
+              text={rec}
+              index={9 + index}
             />
           ))}
         </View>
-
-        <AnimatedTotalCard
-          label={t(isPremium ? 'compatibilityFull' : 'compatibilityBasic')}
-          value={displayPct}
-          color={getTotalColor(displayPct)}
-          index={displayParams.length}
-        />
-
-        {/* Замануха */}
-        {!isPremium && (
-          <PremiumTeaserModal
-            visible={showTeaser}
-            onClose={handleClose}
-            onUpgrade={handleUpgrade}
-          />
-        )}
-
-        {/* Рекомендации */}
-        {isPremium && result.recommendations.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('compatibilityRecommendations')}</Text>
-            {result.recommendations.map((rec, i) => (
-              <AnimatedRecommendationCard key={i} text={rec} index={i} />
-            ))}
-          </View>
-        )}
-      </ScrollView>
-    </>
+      )}
+    </ScrollView>
   );
 }
 

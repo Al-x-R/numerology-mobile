@@ -1,15 +1,21 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { LanguageButton } from '@/components/ui/LanguageButton';
 import { COLORS, FONTS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
+import { useProfile } from '@/contexts/ProfileContext';
 
 
 export default function TabLayout() {
   const ACCENT_COLOR = COLORS.accent;
   const INACTIVE_COLOR = COLORS.textSecondary;
   const BG_COLOR = COLORS.background;
+
+  const { user, isLoading } = useProfile();
+
+  if (isLoading) return null;
+  if (!user) return <Redirect href="/(auth)/login" />;
 
   return (
     <Tabs
@@ -37,6 +43,13 @@ export default function TabLayout() {
         headerRight: () => <LanguageButton />,
       }}
     >
+      <Tabs.Screen
+        name="profiles"
+        options={{
+          title: t('tabs.profiles'),
+          tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={24} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="pythagoras"
         options={{

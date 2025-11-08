@@ -1,4 +1,4 @@
-import { Interpretation } from '@/lib/types';
+import { Interpretation } from '@/lib/types/calculation';
 
 type CellKey = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 

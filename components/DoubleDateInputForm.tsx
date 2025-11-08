@@ -364,10 +364,3 @@ const styles = StyleSheet.create({
 });
 
 
-
-
-// <PremiumTeaserModal
-//   visible={showTeaser}
-//   onClose={handleClose}
-//   onUpgrade={handleUpgrade}
-// />

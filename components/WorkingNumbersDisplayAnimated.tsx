@@ -12,7 +12,7 @@ import Animated, {
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
-import { Interpretation } from '@/lib/types';
+import { Interpretation } from '@/lib/types/calculation';
 import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
 import { t, getCurrentLocale } from '@/lib/constants/locales';
 

@@ -1,6 +1,6 @@
 // lib/data/pythagoreanInterpretations.ts
 import { t } from '@/lib/constants/locales';
-import { Interpretation } from '@/lib/types';
+import { Interpretation } from '@/lib/types/calculation';
 
 export const getInterpretation = (
   cellId: string,

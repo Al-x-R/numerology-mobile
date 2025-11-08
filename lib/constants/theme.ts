@@ -29,7 +29,7 @@ export const COLORS = {
   primary: '#A78BFA',
   primaryDark: '#7C3AED',
   error: '#FF6B6B',
-  shadow: '#000',
+  boxShadow: '#000',
   shadowAccent: '#A78BFA', // Дубликат primary, но оставляем для совместимости
   // === НОВЫЕ: ПОДСВЕТКА ЯЧЕЕК ===
   highlightWeak: '#FF9500',
@@ -100,7 +100,7 @@ export const RADIUS = {
 
 export const SHADOWS = {
   card: {
-    shadowColor: COLORS.shadow,
+    shadowColor: COLORS.boxShadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -259,6 +259,19 @@ export const FONTS = {
     fontSize: 30,
     fontWeight: '700' as const,
     color: COLORS.accent,
+  },
+  body: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: COLORS.text,
+    lineHeight: 24,
+  },
+
+  link: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: COLORS.accent,
+    textDecorationLine: 'underline' as const,
   },
 } as const;
 
