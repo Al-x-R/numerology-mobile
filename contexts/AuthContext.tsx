@@ -14,7 +14,6 @@ import { saveUserProfile } from '@/lib/firestore';
 
 let GoogleSignin: any = null;
 if (Platform.OS === 'ios' || Platform.OS === 'android') {
-  console.log('Platform', Platform.OS);
   try {
     GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin;
   } catch (e) {

@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
+  UserCredential
 } from 'firebase/auth';
 import {
   doc,
@@ -20,7 +21,8 @@ import {
 } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Google from 'expo-auth-session/providers/google';
-import { makeRedirectUri } from 'expo-auth-session';
+import { AuthSessionResult, makeRedirectUri } from 'expo-auth-session';
+import { useRouter } from 'expo-router';
 
 interface Profile {
   id: string;
@@ -36,9 +38,9 @@ interface ProfileContextType {
   isPremium: boolean;
   isLoading: boolean;
 
-  loginWithGoogle: () => Promise<void>;
-  loginWithEmail: (email: string, password: string) => Promise<void>;
-  registerWithEmail: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<AuthSessionResult>;
+  loginWithEmail: (email: string, password: string) => Promise<UserCredential>;
+  registerWithEmail: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
 
   saveProfile: (profile: Omit<Profile, 'id'>) => Promise<void>;
@@ -59,12 +61,14 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const router = useRouter();
+
   // Google Sign-In
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID,
+    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    redirectUri: makeRedirectUri({ useProxy: true }),
+    redirectUri: makeRedirectUri({}),
   });
 
   // Авто-вход
@@ -87,9 +91,18 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (response?.type === 'success') {
       const { id_token } = response.params;
       const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential);
+
+      signInWithCredential(auth, credential)
+        .then(() => {
+          router.replace('/(tabs)/profiles');
+        })
+        .catch((error) => {
+          console.error("Firebase Sign-In Error:", error);
+        });
+    } else if (response?.type === 'error') {
+      console.error("Google Auth Session Error:", response.error);
     }
-  }, [response]);
+  }, [response, router]);
 
   // === FIRESTORE ===
   const loadProfilesFromFirestore = async (uid: string) => {
@@ -125,7 +138,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const saveProfile = async (profileData: Omit<Profile, 'id'>) => {
     if (!user) {
-      // Локально
       const id = Date.now().toString();
       const newProfile = { ...profileData, id };
       const updated = [...profiles, newProfile];
@@ -174,16 +186,21 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const loginWithGoogle = () => promptAsync();
+
   const loginWithEmail = (email: string, password: string) =>
     signInWithEmailAndPassword(auth, email, password);
+
   const registerWithEmail = (email: string, password: string) =>
     createUserWithEmailAndPassword(auth, email, password);
+
   const logout = async () => {
     await firebaseSignOut(auth);
     await AsyncStorage.multiRemove([LOCAL_PROFILES_KEY, ACTIVE_PROFILE_KEY]);
     setProfiles([]);
     setActiveProfileState(null);
     setIsPremium(false);
+
+    router.replace('/(auth)/onboarding');
   };
 
   return (
