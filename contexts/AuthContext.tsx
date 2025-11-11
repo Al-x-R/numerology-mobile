@@ -87,6 +87,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
 
+      if (!userInfo || !userInfo.data) {
+        return;
+      }
+
       const idToken = userInfo.data.idToken;
       if (!idToken) throw new Error('No idToken');
 
