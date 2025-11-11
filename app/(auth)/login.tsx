@@ -34,6 +34,19 @@ export default function LoginScreen() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    if (!loginWithGoogle) {
+      Alert.alert(t('common.error'), 'Google Sign-In is not available on this device.');
+      return;
+    }
+
+    try {
+      await loginWithGoogle();
+    } catch (err: any) {
+      Alert.alert(t('common.error'), err.message || t('common.error'));
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
@@ -44,7 +57,7 @@ export default function LoginScreen() {
         <Text style={styles.title}>{t('auth.welcome')}</Text>
 
         {/* Google */}
-        <TouchableOpacity style={styles.googleButton} onPress={loginWithGoogle} disabled={isLoading}>
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={isLoading}>
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (

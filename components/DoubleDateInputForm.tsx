@@ -362,5 +362,3 @@ const styles = StyleSheet.create({
     ...FONTS.loading,
   },
 });
-
-
