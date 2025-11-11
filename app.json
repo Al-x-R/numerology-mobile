@@ -8,9 +8,7 @@
     "scheme": "numerologymobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "splash": {
       "image": "./assets/images/NumericalCompass.png",
       "resizeMode": "contain",
@@ -45,16 +43,14 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#0D0F21",
-          "dark": {
-            "backgroundColor": "#0D0F21"
-          }
+          "dark": { "backgroundColor": "#0D0F21" }
         }
       ],
       "expo-web-browser",
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.654109542106-abcd1234efgh5678ijkl9012mnop3456"
+          "iosUrlScheme": "com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4"
         }
       ]
     ],
@@ -63,19 +59,15 @@
       "reactCompiler": true
     },
     "extra": {
-      "eas": {
-        "projectId": "3426a50d-f107-46d2-9e02-ed6f3c073957"
-      },
+      "eas": { "projectId": "3426a50d-f107-46d2-9e02-ed6f3c073957" },
       "firebaseApiKey": "${EXPO_PUBLIC_FIREBASE_API_KEY}",
       "firebaseAuthDomain": "${EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN}",
       "firebaseProjectId": "${EXPO_PUBLIC_FIREBASE_PROJECT_ID}",
       "firebaseStorageBucket": "${EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET}",
       "firebaseMessagingSenderId": "${EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}",
       "firebaseAppId": "${EXPO_PUBLIC_FIREBASE_APP_ID}",
-      "googleExpoClientId": "${EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID}",
-      "googleIosClientId": "${EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID}",
-      "googleAndroidClientId": "${EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID}",
-      "router": {}
+      "googleWebClientId": "${EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID}",
+      "googleIosClientId": "${EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID}"
     },
     "owner": "al-x-r"
   }
