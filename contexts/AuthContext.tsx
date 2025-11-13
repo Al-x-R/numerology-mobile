@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithCredential,
   GoogleAuthProvider,
+  updateProfile
 } from 'firebase/auth';
 import { saveUserProfile } from '@/lib/firestore';
 
@@ -31,7 +32,7 @@ type AuthContextType = {
   loading: boolean;
   isLoading: boolean;
   loginWithEmail: (email: string, password: string) => Promise<void>;
-  registerWithEmail: (email: string, password: string) => Promise<void>;
+  registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
   loginWithGoogle?: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -65,16 +66,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithEmail = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+
+      await saveUserProfile(result.user);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const registerWithEmail = async (email: string, password: string) => {
+  const registerWithEmail = async (displayName: string ,email: string, password: string) => {
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(userCredential.user, {
+        displayName: displayName
+      });
+
+      await saveUserProfile(userCredential.user);
     } finally {
       setIsLoading(false);
     }

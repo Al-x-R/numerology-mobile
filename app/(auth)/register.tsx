@@ -11,24 +11,38 @@ import { useState } from 'react';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 
 export default function RegisterScreen() {
-  const { registerWithEmail, isLoading } = useAuth();
+  const { registerWithEmail, loginWithGoogle, isLoading } = useAuth();
   const router = useRouter();
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ email: '', password: '', displayName: '' });
 
   const validate = () => {
-    const newErrors = { email: '', password: '' };
+    const newErrors = { email: '', password: '', displayName: '' };
+    if (displayName.length < 3) newErrors.displayName = t('auth.displayNameShort');
     if (!email.includes('@')) newErrors.email = t('auth.emailInvalid');
     if (password.length < 6) newErrors.password = t('auth.passwordShort');
     setErrors(newErrors);
-    return !newErrors.email && !newErrors.password;
+    return !newErrors.email && !newErrors.password && !newErrors.displayName;;
   };
 
   const handleRegister = async () => {
     if (!validate()) return;
     try {
-      await registerWithEmail(email, password);
+      await registerWithEmail(displayName, email, password);
+    } catch (err: any) {
+      Alert.alert(t('common.error'), err.message || t('common.error'));
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    if (!loginWithGoogle) {
+      Alert.alert(t('common.error'), 'Google Sign-In is not available on this device.');
+      return;
+    }
+    try {
+      await loginWithGoogle();
     } catch (err: any) {
       Alert.alert(t('common.error'), err.message || t('common.error'));
     }
@@ -36,14 +50,36 @@ export default function RegisterScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Градиентный фон */}
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
 
-      {/* Контент */}
       <View style={styles.content}>
         <Text style={styles.title}>{t('auth.register')}</Text>
+
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={isLoading}>
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <>
+              <Ionicons name="logo-google" size={20} color="#fff" />
+              <Text style={styles.googleText}>{t('auth.google')}</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        {/* Display name */}
+        <TextInput
+          style={[styles.input, errors.displayName ? styles.inputError : {}]}
+          placeholder={t('auth.displayName')}
+          value={displayName}
+          onChangeText={setDisplayName}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor={COLORS.textSecondary}
+          editable={!isLoading}
+        />
+        {errors.displayName ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
         {/* Email */}
         <TextInput
@@ -58,7 +94,7 @@ export default function RegisterScreen() {
         />
         {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
 
-        {/* Пароль */}
+        {/* Password */}
         <TextInput
           style={[styles.input, errors.password ? styles.inputError : {}]}
           placeholder={t('auth.password')}
@@ -149,5 +185,18 @@ const styles = StyleSheet.create({
     ...FONTS.link,
     textAlign: 'center',
     color: '#fff',
+  },
+  googleButton: {
+    flexDirection: 'row',
+    backgroundColor: '#4285F4',
+    padding: SPACING.md,
+    borderRadius: RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.lg,
+  },
+  googleText: {
+    ...FONTS.button,
+    marginLeft: SPACING.sm,
   },
 });
