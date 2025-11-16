@@ -44,13 +44,6 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="profiles"
-        options={{
-          title: t('tabs.profiles'),
-          tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={24} color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="pythagoras"
         options={{
           title: t('tabs.pythagoras'),

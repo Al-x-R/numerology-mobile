@@ -2,16 +2,16 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, Alert, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
-  const { loginWithGoogle, loginWithEmail, isLoading } = useAuth();
+  const { loginWithGoogle, loginWithEmail, isLoading, sendPasswordReset } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,7 +30,14 @@ export default function LoginScreen() {
     try {
       await loginWithEmail(email, password);
     } catch (err: any) {
-      Alert.alert(t('common.error'), err.message || t('common.error'));
+
+      let errorMessage = t('auth.wrongPasswordOrUserNotFound');
+
+      if (err.code === 'auth/network-request-failed') {
+        errorMessage = t('common.networkError');
+      }
+
+      Alert.alert(t('common.error'), errorMessage);
     }
   };
 
@@ -44,6 +51,29 @@ export default function LoginScreen() {
       await loginWithGoogle();
     } catch (err: any) {
       Alert.alert(t('common.error'), err.message || t('common.error'));
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    const emailRegex = /\S+@\S+\.\S+/;
+
+    if (!email || !emailRegex.test(email)) {
+      Alert.alert(t('auth.resetPassword'), t('auth.enterEmailToReset'));
+      return;
+    }
+
+    try {
+      setErrors({ email: '', password: '' });
+      await sendPasswordReset(email);
+      Alert.alert(t('auth.resetPassword'), t('auth.resetEmailSent'));
+    } catch (err: any) {
+      let errorMessage = err.message || t('common.error');
+
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = t('auth.userNotFound');
+      }
+
+      Alert.alert(t('common.error'), errorMessage);
     }
   };
 
@@ -92,6 +122,14 @@ export default function LoginScreen() {
           editable={!isLoading}
         />
         {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+
+        <TouchableOpacity
+          onPress={handlePasswordReset}
+          disabled={isLoading}
+          style={styles.forgotPasswordContainer}
+        >
+          <Text style={styles.forgotPasswordLink}>{t('auth.forgotPassword')}</Text>
+        </TouchableOpacity>
 
         {/* Entrance */}
         <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
@@ -185,5 +223,14 @@ const styles = StyleSheet.create({
     ...FONTS.link,
     textAlign: 'center',
     color: '#fff',
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
+    marginBottom: SPACING.md,
+  },
+  forgotPasswordLink: {
+    ...FONTS.link,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });

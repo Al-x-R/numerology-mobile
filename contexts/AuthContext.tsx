@@ -9,9 +9,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithCredential,
   GoogleAuthProvider,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { saveUserProfile } from '@/lib/firestore';
+import { useRouter } from 'expo-router';
 
 let GoogleSignin: any = null;
 if (Platform.OS === 'ios' || Platform.OS === 'android') {
@@ -35,11 +37,13 @@ type AuthContextType = {
   registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
   loginWithGoogle?: () => Promise<void>;
   logout: () => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const result = await signInWithEmailAndPassword(auth, email, password);
 
       await saveUserProfile(result.user);
+      router.replace('/(tabs)/pythagoras');
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       await saveUserProfile(userCredential.user);
+      router.replace('/(tabs)/pythagoras');
     } finally {
       setIsLoading(false);
     }
@@ -107,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const result = await signInWithCredential(auth, credential);
 
       await saveUserProfile(result.user, userInfo.data.user);
+      router.replace('/(tabs)/pythagoras');
     } catch (error: any) {
       console.error('Google Sign-In Error:', error);
       throw error;
@@ -124,6 +131,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const sendPasswordReset = async (email: string) => {
+    setIsLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -131,6 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loginWithEmail,
     registerWithEmail,
     logout,
+    sendPasswordReset
   };
 
   if (GoogleSignin) {

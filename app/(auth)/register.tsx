@@ -32,6 +32,24 @@ export default function RegisterScreen() {
     try {
       await registerWithEmail(displayName, email, password);
     } catch (err: any) {
+      if (err.code === 'auth/email-already-in-use') {
+        Alert.alert(
+          t('common.error'),
+          t('auth.emailUsedRedirectLogin'),
+          [
+            {
+              text: t('auth.goToLogin'),
+              onPress: () => router.replace('/(auth)/login'),
+            },
+            {
+              text: t('common.cancel'),
+              style: 'cancel',
+            },
+          ]
+        );
+        return;
+      }
+
       Alert.alert(t('common.error'), err.message || t('common.error'));
     }
   };
@@ -74,12 +92,12 @@ export default function RegisterScreen() {
           placeholder={t('auth.displayName')}
           value={displayName}
           onChangeText={setDisplayName}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          keyboardType="default"
+          autoCapitalize="words"
           placeholderTextColor={COLORS.textSecondary}
           editable={!isLoading}
         />
-        {errors.displayName ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+        {errors.displayName ? <Text style={styles.errorText}>{errors.displayName}</Text> : null}
 
         {/* Email */}
         <TextInput

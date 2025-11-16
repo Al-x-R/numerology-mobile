@@ -204,7 +204,26 @@ const translations: LocaleData = {
       register: 'Регистрация',
       createAccount: 'Создать аккаунт',
       haveAccount: 'Уже есть аккаунт? Войти',
-    }
+
+      forgotPassword: 'Забыли пароль?',
+      resetPassword: 'Сброс пароля',
+      enterEmailToReset: 'Пожалуйста, введите ваш email для сброса пароля.',
+      resetEmailSent: 'Инструкции по сбросу пароля отправлены на ваш email.',
+      userNotFound: 'Пользователь с таким email не найден.',
+      displayName: "Имя пользователя",
+      displayNameShort: 'Имя должно быть длиннее 2 символов',
+
+      emailUsedRedirectLogin: 'Этот email уже зарегистрирован. Желаете войти?',
+      goToLogin: 'Войти',
+
+      wrongPasswordOrUserNotFound: 'Неверный email или пароль.',
+    },
+    common: {
+      error: 'Ошибка',
+      tryAgain: 'Попробовать снова',
+      cancel: 'Отмена',
+      networkError: 'Ошибка сети. Проверьте подключение.',
+    },
 
   },
   en: {
@@ -395,7 +414,25 @@ const translations: LocaleData = {
       register: 'Sign up',
       createAccount: 'Create account',
       haveAccount: 'Already have an account? Log in',
-    }
+
+      forgotPassword: 'Forgot password?',
+      resetPassword: 'Password Reset',
+      enterEmailToReset: 'Please enter your email to reset your password.',
+      resetEmailSent: 'Password reset instructions have been sent to your email.',
+      userNotFound: 'No user found with this email.',
+
+      emailUsedRedirectLogin: 'This email is already registered. Would you like to log in?',
+      goToLogin: 'Log in',
+      displayNameShort: 'Name must be longer than 2 characters',
+
+      wrongPasswordOrUserNotFound: 'Invalid email or password.',
+    },
+    common: {
+      error: 'Error',
+      tryAgain: 'Try Again',
+      cancel: 'Cancel',
+      networkError: 'Network error. Please check your connection.',
+    },
   },
 };
 
