@@ -1,3 +1,4 @@
+// contexts/ProfileContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from '@/lib/firebase';
 import {
@@ -38,6 +39,9 @@ interface ProfileContextType {
   isPremium: boolean;
   isLoading: boolean;
 
+  isDrawerVisible: boolean;
+  setDrawerVisible: (visible: boolean) => void;
+
   loginWithGoogle: () => Promise<AuthSessionResult>;
   loginWithEmail: (email: string, password: string) => Promise<UserCredential>;
   registerWithEmail: (email: string, password: string) => Promise<UserCredential>;
@@ -60,6 +64,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [activeProfile, setActiveProfileState] = useState<Profile | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
 
   const router = useRouter();
 
@@ -211,6 +216,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         activeProfile,
         isPremium,
         isLoading,
+        isDrawerVisible,
+        setDrawerVisible,
         loginWithGoogle,
         loginWithEmail,
         registerWithEmail,

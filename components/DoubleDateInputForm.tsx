@@ -170,15 +170,15 @@ export function DoubleDateInputForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.subtitle}>{t('compatibilitySubtitle')}</Text>
+      <Text style={styles.subtitle}>{t('compatibility.subtitle')}</Text>
 
       {/* Partner 1 */}
       <Animated.View style={[styles.inputContainer, { opacity: input1Opacity, transform: [{ translateY: input1Y }] }]}>
-        <Text style={styles.label}>{t('partner1Label')}</Text>
+        <Text style={styles.label}>{t('compatibility.partner1Label')}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
             style={[styles.input, isFocused1 && styles.inputFocused, localError1 && styles.inputError]}
-            placeholder={t('partner1Placeholder')}
+            placeholder={t('compatibility.partner1Placeholder')}
             placeholderTextColor={COLORS.textSecondary}
             value={date1}
             onChangeText={handleTextChange1}
@@ -206,11 +206,11 @@ export function DoubleDateInputForm({
 
       {/* Partner 2 */}
       <Animated.View style={[styles.inputContainer, { opacity: input2Opacity, transform: [{ translateY: input2Y }] }]}>
-        <Text style={styles.label}>{t('partner2Label')}</Text>
+        <Text style={styles.label}>{t('compatibility.partner2Label')}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
             style={[styles.input, isFocused2 && styles.inputFocused, localError2 && styles.inputError]}
-            placeholder={t('partner2Placeholder')}
+            placeholder={t('compatibility.partner2Placeholder')}
             placeholderTextColor={COLORS.textSecondary}
             value={date2}
             onChangeText={handleTextChange2}
@@ -259,10 +259,10 @@ export function DoubleDateInputForm({
             {isLoading ? (
               <View style={styles.loadingContent}>
                 <ActivityIndicator size="small" color={COLORS.text} />
-                <Text style={styles.loadingText}>{t('compatibilityLoadingText')}</Text>
+                <Text style={styles.loadingText}>{t('compatibility.loadingText')}</Text>
               </View>
             ) : (
-              <Text style={styles.buttonText}>{t('compatibilityButtonText')}</Text>
+              <Text style={styles.buttonText}>{t('compatibility.buttonText')}</Text>
             )}
           </LinearGradient>
         </TouchableOpacity>

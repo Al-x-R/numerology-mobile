@@ -3,8 +3,10 @@ export type Locale = 'ru' | 'en';
 
 type TranslationValue = string | ((...args: any[]) => string);
 
+type TranslationNode = TranslationValue | Translations | any[] | Record<string, any>;
+
 interface Translations {
-  [key: string]: TranslationValue | Translations;
+  [key: string]: TranslationNode;
 }
 
 interface LocaleData {
@@ -164,6 +166,17 @@ const translations: LocaleData = {
 
     interpretation_unavailable: 'Подробное описание пока недоступно.',
 
+    compatibility: {
+      subtitle: 'Проверьте нумерологическую совместимость',
+      partner1Label: 'Дата рождения партнёра 1',
+      partner1Placeholder: 'ДД.ММ.ГГГГ',
+      partner2Label: 'Дата рождения партнёра 2',
+      partner2Placeholder: 'ДД.ММ.ГГГГ',
+      buttonText: 'Рассчитать совместимость',
+      loadingText: 'Анализ совместимости...',
+
+    },
+
     // SECTION TITLES
     section_workingNumbers: 'Дополнительные числа',
     section_psychomatrix: 'Психоматрица (Квадрат Пифагора)',
@@ -223,6 +236,35 @@ const translations: LocaleData = {
       tryAgain: 'Попробовать снова',
       cancel: 'Отмена',
       networkError: 'Ошибка сети. Проверьте подключение.',
+    },
+    profile: {
+      hello: 'Здравствуйте,',
+      editProfile: 'Редактировать профиль',
+      changeBirthDate: 'Изменить дату рождения',
+      changeLanguage: 'Сменить язык',
+      premiumActive: 'Премиум активен',
+      getPremium: 'Оформить Premium',
+      addAccount: 'Добавить аккаунт',
+      logout: 'Выйти из аккаунта',
+      deleteAccount: 'Удалить аккаунт',
+      loginOrRegister: 'Войти / Зарегистрироваться',
+      guest: 'Гость',
+    },
+
+    alerts: {
+      logout: 'Выйти из аккаунта?',
+      deleteAccount: 'Вы уверены? Это действие нельзя отменить.',
+      deleteAccountTitle: 'Удаление аккаунта',
+      cancel: 'Отмена',
+      logoutButton: 'Выйти',
+      deleteButton: 'Удалить',
+    },
+    currentLanguage: 'ru',
+    date: {
+      months: [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+      ],
     },
 
   },
@@ -377,6 +419,16 @@ const translations: LocaleData = {
     compatibilityTitle: 'Compatibility',
     numbersTitle: 'Numbers',
 
+    compatibility: {
+      subtitle: 'Check numerological compatibility',
+      partner1Label: 'Partner 1 birth date',
+      partner1Placeholder: 'DD.MM.YYYY',
+      partner2Label: 'Partner 2 birth date',
+      partner2Placeholder: 'DD.MM.YYYY',
+      buttonText: 'Calculate Compatibility',
+      loadingText: 'Analyzing compatibility...',
+    },
+
     // SECTION TITLES
     section_workingNumbers: 'Additional Numbers',
     section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
@@ -433,10 +485,40 @@ const translations: LocaleData = {
       cancel: 'Cancel',
       networkError: 'Network error. Please check your connection.',
     },
+    profile: {
+      hello: 'Hello,',
+      editProfile: 'Edit Profile',
+      changeBirthDate: 'Change Birth Date',
+      changeLanguage: 'Change Language',
+      premiumActive: 'Premium Active',
+      getPremium: 'Get Premium',
+      addAccount: 'Add Account',
+      logout: 'Log Out',
+      deleteAccount: 'Delete Account',
+      loginOrRegister: 'Log In / Sign Up',
+      guest: 'Guest',
+    },
+    alerts: {
+      logout: 'Log out of account?',
+      deleteAccount: 'Are you sure? This cannot be undone.',
+      deleteAccountTitle: 'Delete Account',
+      cancel: 'Cancel',
+      logoutButton: 'Log Out',
+      deleteButton: 'Delete',
+    },
+
+    currentLanguage: 'en',
+    date: {
+      months: [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ],
+    },
+
   },
 };
 
-let currentLocale: Locale = 'ru';
+let currentLocale: Locale = 'en';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;
@@ -463,4 +545,30 @@ export const t = (path: string, lang?: Locale): string => {
   }
 
   return typeof result === 'string' ? result : path;
+};
+
+export const tArray = (path: string, lang?: Locale): any[] => {
+  const locale = lang || currentLocale;
+  const keys = path.split('.');
+  let result: any = translations[locale];
+
+  for (const key of keys) {
+    result = result?.[key];
+    if (result === undefined) return [];
+  }
+
+  return Array.isArray(result) ? result : [];
+};
+
+export const tObject = (path: string, lang?: Locale): Record<string, any> => {
+  const locale = lang || currentLocale;
+  const keys = path.split('.');
+  let result: any = translations[locale];
+
+  for (const key of keys) {
+    result = result?.[key];
+    if (result === undefined) return {};
+  }
+
+  return typeof result === 'object' && result !== null && !Array.isArray(result) ? result : {};
 };

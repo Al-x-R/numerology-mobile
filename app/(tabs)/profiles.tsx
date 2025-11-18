@@ -39,10 +39,8 @@ export default function ProfilesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Заголовок */}
       <Text style={styles.title}>{t('profiles.title')}</Text>
 
-      {/* Кнопка + */}
       <TouchableOpacity style={styles.addButton} onPress={handleAddProfile}>
         <Ionicons
           name={isPremium || profiles.length === 0 ? "add" : "lock-closed"}
@@ -54,7 +52,6 @@ export default function ProfilesScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Список профилей */}
       <FlatList
         data={profiles}
         keyExtractor={(item) => item.id}
@@ -71,7 +68,6 @@ export default function ProfilesScreen() {
         contentContainerStyle={styles.list}
       />
 
-      {/* Премиум-модал */}
       <PremiumTeaserModal
         visible={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}

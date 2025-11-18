@@ -10,6 +10,7 @@ import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
 import { CalculationResult } from '@/lib/types/calculation';
 import { LanguageButton } from '@/components/ui/LanguageButton';
+import { ProfileButton } from '@/components/ui/ProfileButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
@@ -89,7 +90,7 @@ export default function HomeScreen() {
       navigation.setOptions({
         headerTitle: t('pythagorasTitle'),
         headerLeft: () => null,
-        headerRight: () => <LanguageButton />,
+        headerRight: () => <ProfileButton />,
         tabBarStyle: {
           display: 'flex',
           backgroundColor: COLORS.background,

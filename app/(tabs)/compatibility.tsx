@@ -9,10 +9,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
 import { calculateCompatibility, CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { LanguageButton } from '@/components/ui/LanguageButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
+import { ProfileButton } from '@/components/ui/ProfileButton';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -45,7 +45,7 @@ export default function CompatibilityScreen() {
   const handleCalculate = () => {
     try {
       // calculateCompatibility expects format DD.MM.YYYY
-      const result = calculateCompatibility(dateString1, dateString2, false);
+      const result = calculateCompatibility(dateString1, dateString2);
       setCompatibilityResult(result);
     } catch (e) {
       console.error(e);
@@ -83,7 +83,7 @@ export default function CompatibilityScreen() {
       navigation.setOptions({
         headerTitle: t('compatibilityTitle'),
         headerLeft: () => null,
-        headerRight: () => <LanguageButton />,
+        headerRight: () => <ProfileButton />,
         tabBarStyle: {
           display: 'flex',
           backgroundColor: COLORS.background,
