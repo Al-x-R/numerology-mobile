@@ -6,99 +6,57 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Alert,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { t } from '@/lib/constants/locales'; // ← у тебя уже есть
+import { t } from '@/lib/constants/locales';
+import { formatBirthDate } from '@/lib/utils/date';
+import { useRouter } from 'expo-router';
 
-// const formatBirthDate = (dateString: string | null | undefined): string => {
-//   if (!dateString) return '';
-//   const date = new Date(dateString);
-//   if (isNaN(date.getTime())) return '';
-//   const monthsRu = [
-//     'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-//     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-//   ];
-//   const monthsEn = [
-//     'January', 'February', 'March', 'April', 'May', 'June',
-//     'July', 'August', 'September', 'October', 'November', 'December'
-//   ];
-//   const months = t('currentLanguage') === "ru" ? monthsRu : monthsEn');
-//
-//   // Лучше — вынести в локали:
-//   // return t('dateFormat', { day: date.getDate(), month: months[date.getMonth()], year: date.getFullYear() })
-//   const day = date.getDate();
-//   const month = months[date.getMonth()];
-//   const year = date.getFullYear();
-//   return `${day} ${month} ${year} г.`;
-// };
-
-const formatBirthDate = (dateString: string | null | undefined): string => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
-
-  const months = [
-    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-  ];
-
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-
-  return `${day} ${month} ${year} г.`;
+type Props = {
+  onClose: () => void;
 };
 
-export default function ProfileDrawer({ onClose }: { onClose: () => void }) {
+export default function ProfileDrawer({ onClose }: Props) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { user, logout, isPremium, activeProfile } = useProfile();
 
-  const displayName = user?.displayName || t('profile.guest');
+  const isGuest = !user;
+  const displayName = isGuest
+    ? t('profile.guest')
+    : (user?.displayName || activeProfile?.name || t('profile.guest'));
+
   const photoURL = user?.photoURL;
   const birthDate = activeProfile?.date || null;
 
   const handleLogout = () => {
-    Alert.alert(
-      t('alerts.logout'),
-      '',
-      [
-        { text: t('alerts.cancel'), style: 'cancel' },
-        {
-          text: t('alerts.logoutButton'),
-          style: 'destructive',
-          onPress: () => {
-            onClose();
-            logout();
-          },
+    Alert.alert(t('alerts.logout'), '', [
+      { text: t('alerts.cancel'), style: 'cancel' },
+      {
+        text: t('alerts.logoutButton'),
+        style: 'destructive',
+        onPress: async () => {
+          onClose();
+          await logout();
         },
-      ]
-    );
+      },
+    ]);
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert(
-      t('alerts.deleteAccountTitle'),
-      t('alerts.deleteAccount'),
-      [
-        { text: t('alerts.cancel'), style: 'cancel' },
-        { text: t('alerts.deleteButton'), style: 'destructive', onPress: () => {} },
-      ]
-    );
+  const handleLogin = () => {
+    onClose();
+    router.push('/(auth)/login');
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.closeButtonWrapper}>
-        <TouchableOpacity
-          onPress={onClose}
-          style={styles.closeButtonTouchable}
-          hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
-        >
+        <TouchableOpacity onPress={onClose} style={styles.closeButtonTouchable}>
           <Ionicons name="close" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -106,7 +64,7 @@ export default function ProfileDrawer({ onClose }: { onClose: () => void }) {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + 60 }
+          { paddingBottom: insets.bottom + 60 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -173,38 +131,41 @@ export default function ProfileDrawer({ onClose }: { onClose: () => void }) {
         <View style={styles.divider} />
 
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="add-circle-outline" size={24} color={COLORS.accent} />
-            <Text style={[styles.menuText, styles.accentText]}>
-              {t('profile.addAccount')}
-            </Text>
-          </TouchableOpacity>
+          {isGuest && (
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogin}>
+              <Ionicons name="log-in-outline" size={24} color={COLORS.accent} />
+              <Text style={[styles.menuText, styles.accentText]}>
+                {t('profile.loginOrRegister')}
+              </Text>
+              <Ionicons name="chevron-forward" size={22} color="#666" />
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
-            <Text style={[styles.menuText, { color: '#FF3B30' }]}>
-              {t('profile.logout')}
-            </Text>
-          </TouchableOpacity>
+          {!isGuest && (
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+              <Text style={[styles.menuText, { color: '#FF3B30' }]}>
+                {t('profile.logout')}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <TouchableOpacity style={styles.deleteItem} onPress={handleDeleteAccount}>
-          <Text style={styles.deleteText}>{t('profile.deleteAccount')}</Text>
-        </TouchableOpacity>
+        {!isGuest && (
+          <TouchableOpacity style={styles.deleteItem}>
+            <Text style={styles.deleteText}>{t('profile.deleteAccount')}</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#121212',
-  },
-
+  container: { flex: 1, backgroundColor: '#121212' },
   closeButtonWrapper: {
     position: 'absolute',
-    top: 15,
+    top: 25,
     left: 0,
     right: 0,
     height: 80,
@@ -220,20 +181,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
     borderRadius: 22,
   },
-
-  scrollContent: {
-    paddingTop: 90,
-    paddingHorizontal: SPACING.xl,
-  },
-
-  header: {
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
-  },
-  photoContainer: {
-    position: 'relative',
-    marginBottom: SPACING.lg,
-  },
+  scrollContent: { paddingTop: 90, paddingHorizontal: SPACING.xl },
+  header: { alignItems: 'center', marginBottom: SPACING.xl },
+  photoContainer: { position: 'relative', marginBottom: SPACING.lg },
   photo: {
     width: 110,
     height: 110,
@@ -258,22 +208,9 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#121212',
   },
-  greeting: {
-    ...FONTS.body,
-    color: '#BBBBBB',
-    marginBottom: 4,
-    fontSize: 16,
-  },
-  nameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  name: {
-    ...FONTS.title,
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 26,
-  },
+  greeting: { ...FONTS.body, color: '#BBBBBB', marginBottom: 4, fontSize: 16 },
+  nameContainer: { flexDirection: 'row', alignItems: 'center' },
+  name: { ...FONTS.title, color: '#FFFFFF', fontWeight: '700', fontSize: 26 },
   premiumBadge: {
     color: COLORS.accent,
     fontWeight: '700',
@@ -284,15 +221,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 12,
   },
-  birthDate: {
-    ...FONTS.body,
-    color: '#888888',
-    marginTop: SPACING.sm,
-    fontSize: 15,
-  },
-  menu: {
-    marginBottom: SPACING.lg,
-  },
+  birthDate: { ...FONTS.body, color: '#888888', marginTop: SPACING.sm, fontSize: 15 },
+  menu: { marginBottom: SPACING.lg },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -307,26 +237,9 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.md,
     fontSize: 16,
   },
-  premiumActive: {
-    color: COLORS.accent,
-    fontWeight: '600',
-  },
-  accentText: {
-    color: COLORS.accent,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#333333',
-    marginVertical: SPACING.xl,
-  },
-  deleteItem: {
-    alignItems: 'center',
-    marginTop: SPACING.xl,
-    paddingVertical: SPACING.lg,
-  },
-  deleteText: {
-    color: '#FF3B30',
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  premiumActive: { color: COLORS.accent, fontWeight: '600' },
+  accentText: { color: COLORS.accent },
+  divider: { height: 1, backgroundColor: '#333333', marginVertical: SPACING.xl },
+  deleteItem: { alignItems: 'center', marginTop: SPACING.xl, paddingVertical: SPACING.lg },
+  deleteText: { color: '#FF3B30', fontSize: 15, fontWeight: '600' },
 });

@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, Image, StatusBar } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { useFonts } from 'expo-font'; // ← напрямую
+import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 
 import LOGO_IMAGE from '../assets/images/NumericalCompass.png';

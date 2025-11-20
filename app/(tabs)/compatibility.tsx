@@ -13,6 +13,7 @@ import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
 import { ProfileButton } from '@/components/ui/ProfileButton';
+import { useProfile } from '@/contexts/ProfileContext';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -41,6 +42,7 @@ export default function CompatibilityScreen() {
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
 
   const navigation = useNavigation();
+  const { openDrawer } = useProfile();
 
   const handleCalculate = () => {
     try {
@@ -83,7 +85,7 @@ export default function CompatibilityScreen() {
       navigation.setOptions({
         headerTitle: t('compatibilityTitle'),
         headerLeft: () => null,
-        headerRight: () => <ProfileButton />,
+        headerRight: () => <ProfileButton onPress={openDrawer} />,
         tabBarStyle: {
           display: 'flex',
           backgroundColor: COLORS.background,

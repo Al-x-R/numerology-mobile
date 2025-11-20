@@ -1,46 +1,65 @@
 // components/ui/ProfileButton.tsx
 import React from 'react';
-import { TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  TouchableOpacity,
+  Image,
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING } from '@/lib/constants/theme';
+import { COLORS } from '@/lib/constants/theme';
 
-export const ProfileButton = () => {
-  const { user, setDrawerVisible } = useProfile();
+type Props = {
+  onPress?: () => void;
+};
+
+export const ProfileButton = ({ onPress }: Props) => {
+  const { activeProfile, user } = useProfile();
+
+  const displayName = user?.displayName || activeProfile?.name || 'Гость';
   const photoURL = user?.photoURL;
 
   return (
-    <TouchableOpacity
-      onPress={() => setDrawerVisible(true)}
-      style={styles.headerButton}
-    >
+    <TouchableOpacity onPress={onPress} style={styles.container} activeOpacity={0.7}>
       {photoURL ? (
-        <Image source={{ uri: photoURL }} style={styles.headerAvatar} />
+        <Image source={{ uri: photoURL }} style={styles.avatar} />
       ) : (
-        <Ionicons
-          name="person-circle-outline"
-          size={32}
-          color={COLORS.accent}
-        />
+        <View style={styles.avatarFallback}>
+          <Text style={styles.initial}>
+            {displayName.charAt(0).toUpperCase()}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  headerButton: {
-    marginRight: SPACING.md,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+  container: {
+    marginRight: 16,
+    padding: 4, // ← важно для кликабельности
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: COLORS.accent,
+  },
+  avatarFallback: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  headerAvatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: COLORS.accent,
+  },
+  initial: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

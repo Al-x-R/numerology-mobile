@@ -1,23 +1,22 @@
 // app/(auth)/_layout.tsx
 import { Stack } from 'expo-router';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { ProfileProvider } from '@/contexts/ProfileContext';
 import { COLORS } from '@/lib/constants/theme';
 
 export default function AuthLayout() {
   return (
-    <AuthProvider>
+    <ProfileProvider>
       <Stack
         screenOptions={{
           headerShown: false,
-          headerTitle: '',
           contentStyle: { backgroundColor: COLORS.transparent },
           animation: 'slide_from_right',
         }}
       >
-        <Stack.Screen name="login"      options={{ headerTitle: '' }} />
-        <Stack.Screen name="register"   options={{ title: '' }} />
-        <Stack.Screen name="onboarding" options={{ title: '' }} />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="onboarding" />
       </Stack>
-    </AuthProvider>
+    </ProfileProvider>
   );
 }
