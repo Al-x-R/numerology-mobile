@@ -1,4 +1,4 @@
-// app/(tabs)/_layout.tsx — ФИНАЛЬНАЯ ВЕРСИЯ
+// app/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,7 +6,7 @@ import { COLORS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 import { useProfile } from '@/contexts/ProfileContext';
 import { ProfileButton } from '@/components/ui/ProfileButton';
-import DrawerOverlay from '@/components/ui/DrawerOverlay'; // ← новый компонент
+import DrawerOverlay from '@/components/ui/DrawerOverlay';
 
 export default function TabLayout() {
   const { openDrawer } = useProfile();

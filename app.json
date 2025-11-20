@@ -17,7 +17,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.destinycode.app",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "GIDClientID": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -50,7 +53,8 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4"
+          "iosUrlScheme": "com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4",
+          "iosClientId": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com"
         }
       ]
     ],

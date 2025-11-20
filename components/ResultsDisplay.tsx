@@ -41,9 +41,9 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
 
   const { saveProfile } = useProfile();
 
-  const handleSave = () => {
-    saveProfile('Мой профиль', date, results);
-  };
+  // const handleSave = () => {
+  //   saveProfile('Мой профиль', date, results);
+  // };
 
   const handlePress = (interpretationData: Interpretation) => {
     if (selected) {

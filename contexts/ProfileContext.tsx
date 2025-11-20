@@ -8,9 +8,9 @@ import {
   createUserWithEmailAndPassword,
   signInWithCredential,
   GoogleAuthProvider,
-  updateProfile,
   signOut,
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
+  updateProfile,
 } from 'firebase/auth';
 import {
   doc,
@@ -21,14 +21,16 @@ import {
   Unsubscribe,
 } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { useRouter, useSegments } from 'expo-router';
 import { Platform } from 'react-native';
 
 let GoogleSignin: any = null;
 if (Platform.OS !== 'web') {
   try {
     GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin;
-  } catch (e) {}
+  } catch (e) {
+    console.log('Google Sign-In not initialized (web or setup missing)');
+  }
 }
 
 const LAST_KNOWN_AUTH = '@last_known_auth';
@@ -54,7 +56,6 @@ interface ProfileContextType {
   closeDrawer: () => void;
 
   sendPasswordResetEmail: (email: string) => Promise<void>;
-
   loginWithEmail: (email: string, password: string) => Promise<void>;
   registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -76,16 +77,14 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [authInitialized, setAuthInitialized] = useState(false);
   const [isDrawerVisible, setDrawerVisible] = useState(false);
 
-  const openDrawer = () => {
-    setDrawerVisible(true);
-  };
-
-  const closeDrawer = () => {
-    setDrawerVisible(false);
-  };
-
   const router = useRouter();
+  const segments = useSegments();
+
   const prevUserRef = useRef<User | null>(null);
+
+  const openDrawer = () => setDrawerVisible(true);
+  const closeDrawer = () => setDrawerVisible(false);
+
 
   useEffect(() => {
     let unsubProfiles: Unsubscribe | null = null;
@@ -97,6 +96,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (firebaseUser) {
         await AsyncStorage.setItem(LAST_KNOWN_AUTH, 'user_' + firebaseUser.uid);
         await AsyncStorage.removeItem(GUEST_PROFILE_KEY);
+
         setUser(firebaseUser);
 
         unsubProfiles?.();
@@ -105,57 +105,35 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
           (snap) => {
             const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() } as Profile));
             setProfiles(loaded);
+
             if (loaded.length > 0 && !activeProfile) {
               setActiveProfile(loaded[0]);
             }
+          },
+          (error) => {
+            console.error("Error fetching profiles snapshot:", error);
           }
         );
 
-        const premiumSnap = await getDoc(doc(db, 'users', firebaseUser.uid, 'subscription', 'premium'));
-        setIsPremium(premiumSnap.exists() && premiumSnap.data()?.active === true);
-
-        if (!wasLoggedIn && isNowLoggedIn) {
-          router.replace('/(tabs)/pythagoras');
+        try {
+          const premiumSnap = await getDoc(doc(db, 'users', firebaseUser.uid, 'subscription', 'premium'));
+          setIsPremium(premiumSnap.exists() && premiumSnap.data()?.active === true);
+        } catch (e) {
+          console.error("Error fetching premium status:", e);
+          setIsPremium(false);
         }
+
+        setAuthInitialized(true);
+        setIsLoading(false);
+
       } else {
-        const lastKnown = await AsyncStorage.getItem(LAST_KNOWN_AUTH);
+        await handleGuestOrLogout(wasLoggedIn, isNowLoggedIn);
 
-        if (lastKnown?.startsWith('user_')) {
-          // Firebase потерял сессию — но мы доверяем AsyncStorage
-          const uid = lastKnown.slice(5);
-          setUser({ uid } as User);
-
-          unsubProfiles = onSnapshot(
-            collection(db, 'users', uid, 'profiles'),
-            (snap) => {
-              const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() } as Profile));
-              setProfiles(loaded);
-              if (loaded.length > 0) setActiveProfile(loaded[0]);
-            }
-          );
-        } else if (lastKnown === 'guest') {
-          const json = await AsyncStorage.getItem(GUEST_PROFILE_KEY);
-          if (json) {
-            const guest = JSON.parse(json);
-            setProfiles([guest]);
-            setActiveProfile(guest);
-          }
-        } else {
-          setProfiles([]);
-          setActiveProfile(null);
-        }
-
-        setUser(null);
-        setIsPremium(false);
-
-        if (wasLoggedIn && !isNowLoggedIn) {
-          router.replace('/(auth)/onboarding');
-        }
+        setAuthInitialized(true);
+        setIsLoading(false);
       }
 
       prevUserRef.current = firebaseUser;
-      setAuthInitialized(true);
-      setIsLoading(false);
     });
 
     return () => {
@@ -163,6 +141,46 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       unsubProfiles?.();
     };
   }, []);
+
+
+  const handleGuestOrLogout = async (wasLoggedIn: boolean, isNowLoggedIn: boolean) => {
+    const lastKnown = await AsyncStorage.getItem(LAST_KNOWN_AUTH);
+
+    if (lastKnown === 'guest') {
+      const json = await AsyncStorage.getItem(GUEST_PROFILE_KEY);
+      if (json) {
+        try {
+          const guest = JSON.parse(json);
+          setProfiles([guest]);
+          setActiveProfile(guest);
+        } catch (e) {
+          console.error("Error parsing guest profile:", e);
+          setProfiles([]);
+          setActiveProfile(null);
+        }
+      }
+    } else {
+      setProfiles([]);
+      setActiveProfile(null);
+    }
+
+    setUser(null);
+    setIsPremium(false);
+
+    if (wasLoggedIn && !isNowLoggedIn && authInitialized) {
+      router.replace('/(auth)/onboarding');
+    }
+  }
+
+  useEffect(() => {
+    if (isLoading || !authInitialized) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (user && inAuthGroup) {
+      router.replace('/(tabs)/pythagoras');
+    }
+  }, [user, segments, isLoading, authInitialized]);
 
   const completeOnboarding = async () => {
     const guest: Profile = { id: 'guest_1', name: 'Гость', date: '' };
@@ -172,6 +190,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     ]);
     setProfiles([guest]);
     setActiveProfile(guest);
+
     router.replace('/(tabs)/pythagoras');
   };
 
@@ -183,18 +202,40 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setActiveProfile(profile);
     } else {
       const id = Date.now().toString();
-      await setDoc(doc(db, 'users', user.uid, 'profiles', id), { id, name, date });
+      try {
+        await setDoc(doc(db, 'users', user.uid, 'profiles', id), { id, name, date });
+      } catch (e) {
+        console.error("Error saving profile to Firestore:", e);
+        throw e;
+      }
     }
   };
 
   const loginWithGoogle = async () => {
-    if (!GoogleSignin) throw new Error('Google Sign-In недоступен');
-    await GoogleSignin.hasPlayServices();
-    const userInfo = await GoogleSignin.signIn();
-    const idToken = userInfo.idToken || userInfo.data?.idToken;
-    if (!idToken) throw new Error('Нет токена');
-    const credential = GoogleAuthProvider.credential(idToken);
-    await signInWithCredential(auth, credential);
+    console.log("Attempting Google Sign-In...");
+
+    if (!GoogleSignin) {
+      throw new Error('Google Sign-In недоступен на этом устройстве');
+    }
+
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      const userInfo = await GoogleSignin.signIn();
+
+      const idToken = userInfo.idToken || userInfo.data?.idToken;
+      if (!idToken) {
+        throw new Error('Не удалось получить ID token от Google (токен отсутствует)');
+      }
+
+      const credential = GoogleAuthProvider.credential(idToken);
+
+      const userCredential = await signInWithCredential(auth, credential);
+
+    } catch (error: any) {
+      console.error("Google Sign-In Error:", error);
+      throw error;
+    }
   };
 
   const loginWithEmail = async (email: string, password: string) => {
@@ -207,25 +248,33 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const logout = async () => {
-    await signOut(auth);
     await AsyncStorage.multiRemove([LAST_KNOWN_AUTH, GUEST_PROFILE_KEY]);
-    router.replace('/(auth)/onboarding');
+    await signOut(auth);
   };
 
   const unlockPremium = async () => {
-    if (!user) return setIsPremium(true);
-    await setDoc(doc(db, 'users', user.uid, 'subscription', 'premium'), {
-      active: true,
-      unlockedAt: new Date(),
-    });
-    setIsPremium(true);
+    if (!user) {
+      setIsPremium(true); // Для гостя просто включаем в стейте (до перезагрузки)
+      return;
+    }
+    try {
+      await setDoc(doc(db, 'users', user.uid, 'subscription', 'premium'), {
+        active: true,
+        unlockedAt: new Date(),
+      });
+      setIsPremium(true);
+    } catch (e) {
+      console.error("Error unlocking premium:", e);
+      throw e;
+    }
   };
 
   const sendPasswordResetEmail = async (email: string) => {
     try {
       await firebaseSendPasswordResetEmail(auth, email);
     } catch (error: any) {
-      throw error; // пробрасываем ошибку дальше — в компоненте обработаем
+      console.error("Error sending reset email:", error);
+      throw error;
     }
   };
 
@@ -259,6 +308,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
+// Hook для использования контекста
 export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) {

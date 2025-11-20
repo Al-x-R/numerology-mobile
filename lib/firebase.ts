@@ -1,7 +1,15 @@
 // lib/firebase.ts
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import {
+  initializeAuth,
+  getAuth,
+  getReactNativePersistence,
+  Auth,
+  GoogleAuthProvider
+} from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+// Importing a React Native Store
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
 const firebaseConfig = {
@@ -13,11 +21,41 @@ const firebaseConfig = {
   appId: Constants.expoConfig?.extra?.firebaseAppId,
 };
 
-const app = initializeApp(firebaseConfig);
+// Explicitly specifying variable types for TypeScript
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+// Check if the application has already been initialized
+if (getApps().length === 0) {
+  // --- FIRST INITIALIZATION ---
+  console.log('Firebase: Initializing app for the first time with Async Storage persistence');
+  app = initializeApp(firebaseConfig);
 
+  // Initialize Auth by explicitly specifying the storage.
+  // This is what makes the session persist across application restarts.
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  });
+
+  db = getFirestore(app);
+} else {
+  // --- REUSE ---
+  console.log('Firebase: App already initialized, getting existing instances');
+  app = getApp();
+
+  // Get an existing, configured Auth instance.
+  // It remembers the persistence settings from the first block.
+  auth = getAuth(app);
+
+  db = getFirestore(app);
+}
+
+const googleProvider = new GoogleAuthProvider();
+
+// Export ready-to-use instances
+export { app, auth, db, googleProvider };
+
+// Exporting keys for Google Sign-In
 export const googleWebClientId = Constants.expoConfig?.extra?.googleWebClientId;
 export const googleIosClientId = Constants.expoConfig?.extra?.googleIosClientId;

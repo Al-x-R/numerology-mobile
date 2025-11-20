@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useProfile } from '@/contexts/ProfileContext'; // ← Только это!
+import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
