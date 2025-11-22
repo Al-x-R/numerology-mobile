@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS, SPACING, FONT_SIZES, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
-import MatrixOfDestiny from '@/components/MatrixOfDestiny'
+import MatrixOfDestiny from '@/components/Matrix/MatrixOfDestiny'
 
 export default function NumbersScreen() {
   return (
@@ -17,7 +17,6 @@ export default function NumbersScreen() {
         month={7}
         year={1985}
         name="Александр"
-        gender="male"
       />
     </View>
   );

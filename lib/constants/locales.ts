@@ -233,8 +233,12 @@ const translations: LocaleData = {
     },
     common: {
       error: 'Ошибка',
-      tryAgain: 'Попробовать снова',
+      success: 'Успех',
+      tryAgain: 'Попробуйте снова',
       cancel: 'Отмена',
+      done: 'Готово',
+      save: 'Сохранить',
+      back: 'Назад',
       networkError: 'Ошибка сети. Проверьте подключение.',
     },
     profile: {
@@ -481,9 +485,13 @@ const translations: LocaleData = {
     },
     common: {
       error: 'Error',
-      tryAgain: 'Try Again',
+      success: 'Success',
+      tryAgain: 'Try again',
       cancel: 'Cancel',
-      networkError: 'Network error. Please check your connection.',
+      done: 'Done',
+      save: 'Save',
+      back: 'Back',
+      networkError: 'Network error. Check your connection.',
     },
     profile: {
       hello: 'Hello,',

@@ -1,15 +1,13 @@
 // app/(tabs)/_layout.tsx
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
-import { useProfile } from '@/contexts/ProfileContext';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import DrawerOverlay from '@/components/ui/DrawerOverlay';
 
 export default function TabLayout() {
-  const { openDrawer } = useProfile();
 
   return (
     <>
@@ -26,7 +24,7 @@ export default function TabLayout() {
           headerStyle: { backgroundColor: COLORS.headerBackground },
           headerTintColor: COLORS.accent,
           headerTitleAlign: 'center',
-          headerRight: () => <ProfileButton onPress={openDrawer} />,
+          headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
         }}
       >
         <Tabs.Screen
@@ -52,7 +50,7 @@ export default function TabLayout() {
         />
       </Tabs>
 
-      <DrawerOverlay />
+      {/*<DrawerOverlay />*/}
     </>
   );
 }

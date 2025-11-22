@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DateInputForm } from '@/components/DateInputForm';
@@ -41,7 +41,7 @@ export default function HomeScreen() {
   const [results, setResults] = useState<CalculationResult | null>(null);
 
   const navigation = useNavigation();
-  const { openDrawer } = useProfile();
+  // const { openDrawer } = useProfile();
 
   const handleCalculate = () => {
     // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
@@ -91,7 +91,7 @@ export default function HomeScreen() {
       navigation.setOptions({
         headerTitle: t('pythagorasTitle'),
         headerLeft: () => null,
-        headerRight: () => <ProfileButton onPress={openDrawer} />,
+        headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
         tabBarStyle: {
           display: 'flex',
           backgroundColor: COLORS.background,

@@ -39,12 +39,6 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
 
   const [selected, setSelected] = useState<Interpretation | null>(null);
 
-  const { saveProfile } = useProfile();
-
-  // const handleSave = () => {
-  //   saveProfile('Мой профиль', date, results);
-  // };
-
   const handlePress = (interpretationData: Interpretation) => {
     if (selected) {
       return;

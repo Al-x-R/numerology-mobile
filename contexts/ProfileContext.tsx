@@ -51,10 +51,6 @@ interface ProfileContextType {
   isLoading: boolean;
   authInitialized: boolean;
 
-  isDrawerVisible: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-
   sendPasswordResetEmail: (email: string) => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
   registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
@@ -64,6 +60,11 @@ interface ProfileContextType {
   setActiveProfile: (profile: Profile) => void;
   completeOnboarding: () => Promise<void>;
   unlockPremium: () => Promise<void>;
+  updateUserProfile: (data: {
+    displayName?: string;
+    birthDate?: string;
+    photoURL?: string | null | undefined;
+  }) => Promise<void>;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -75,15 +76,11 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
-  const [isDrawerVisible, setDrawerVisible] = useState(false);
 
   const router = useRouter();
   const segments = useSegments();
 
   const prevUserRef = useRef<User | null>(null);
-
-  const openDrawer = () => setDrawerVisible(true);
-  const closeDrawer = () => setDrawerVisible(false);
 
 
   useEffect(() => {
@@ -97,7 +94,15 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         await AsyncStorage.setItem(LAST_KNOWN_AUTH, 'user_' + firebaseUser.uid);
         await AsyncStorage.removeItem(GUEST_PROFILE_KEY);
 
-        setUser(firebaseUser);
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        const customData = userDocSnap.exists() ? userDocSnap.data() : {};
+
+        setUser({
+          ...firebaseUser,
+          birthDate: customData.birthDate ?? null,
+          isPremium: customData.isPremium ?? false,
+        } as User & { birthDate?: string | null; isPremium?: boolean });
 
         unsubProfiles?.();
         unsubProfiles = onSnapshot(
@@ -114,14 +119,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
             console.error("Error fetching profiles snapshot:", error);
           }
         );
-
-        try {
-          const premiumSnap = await getDoc(doc(db, 'users', firebaseUser.uid, 'subscription', 'premium'));
-          setIsPremium(premiumSnap.exists() && premiumSnap.data()?.active === true);
-        } catch (e) {
-          console.error("Error fetching premium status:", e);
-          setIsPremium(false);
-        }
 
         setAuthInitialized(true);
         setIsLoading(false);
@@ -278,6 +275,44 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+
+  const updateUserProfile = async (data: {
+    displayName?: string;
+    birthDate?: string | undefined;
+  }): Promise<void> => {
+    if (!user) return;
+
+    const updates: Record<string, any> = {};
+
+    if (data.displayName !== undefined) {
+      updates.displayName = data.displayName.trim();
+    }
+    if (data.birthDate !== undefined) {
+      updates.birthDate = data.birthDate;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    try {
+      await setDoc(doc(db, 'users', user.uid), updates, { merge: true });
+
+      setUser(prev => prev ? { ...prev, ...updates } : null);
+
+      if (data.displayName !== undefined) {
+        try {
+          await updateProfile(auth.currentUser!, { displayName: data.displayName });
+          await auth.currentUser?.reload();
+        } catch (err) {
+          console.log('Auth displayName update failed — но это не страшно');
+        }
+      }
+    } catch (error) {
+      console.error('updateUserProfile error:', error);
+      throw error;
+    }
+  };
+
+
   return (
     <ProfileContext.Provider
       value={{
@@ -288,9 +323,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         isLoading,
         authInitialized,
 
-        isDrawerVisible,
-        openDrawer,
-        closeDrawer,
         sendPasswordResetEmail,
 
         loginWithEmail,
@@ -301,6 +333,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setActiveProfile,
         completeOnboarding,
         unlockPremium,
+        updateUserProfile
       }}
     >
       {children}
@@ -308,7 +341,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
-// Hook для использования контекста
+
 export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) {

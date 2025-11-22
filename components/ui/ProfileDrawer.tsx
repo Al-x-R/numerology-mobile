@@ -94,15 +94,15 @@ export default function ProfileDrawer({ onClose }: Props) {
         </View>
 
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/profile/edit');
+            }}
+          >
             <Ionicons name="person-outline" size={22} color={COLORS.accent} />
             <Text style={styles.menuText}>{t('profile.editProfile')}</Text>
-            <Ionicons name="chevron-forward" size={22} color="#666" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="calendar-outline" size={22} color={COLORS.accent} />
-            <Text style={styles.menuText}>{t('profile.changeBirthDate')}</Text>
             <Ionicons name="chevron-forward" size={22} color="#666" />
           </TouchableOpacity>
 

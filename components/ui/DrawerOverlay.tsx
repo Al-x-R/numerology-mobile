@@ -14,7 +14,7 @@ import ProfileDrawer from './ProfileDrawer';
 const { width } = Dimensions.get('window');
 
 export default function DrawerOverlay() {
-  const { isDrawerVisible, closeDrawer } = useProfile();
+  // const { isDrawerVisible, closeDrawer } = useProfile();
 
   const translateX = React.useRef(new Animated.Value(width)).current;
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
@@ -53,7 +53,6 @@ export default function DrawerOverlay() {
 
   return (
     <View style={styles.container} pointerEvents={isDrawerVisible ? 'box-none' : 'none'}>
-      {/* Тёмный оверлей */}
       <TouchableWithoutFeedback onPress={closeDrawer}>
         <Animated.View
           style={[
