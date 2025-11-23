@@ -24,12 +24,13 @@ type Props = {
 export default function ProfileDrawer({ onClose }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout, isPremium, activeProfile } = useProfile();
+  const { user, logout, activeProfile } = useProfile();
 
   const isGuest = !user;
   const displayName = isGuest
     ? t('profile.guest')
     : (user?.displayName || activeProfile?.name || t('profile.guest'));
+  const isPremium = user?.isPremium;
 
   const photoURL = user?.photoURL;
   const birthDate = activeProfile?.date || null;
@@ -41,7 +42,6 @@ export default function ProfileDrawer({ onClose }: Props) {
         text: t('alerts.logoutButton'),
         style: 'destructive',
         onPress: async () => {
-          onClose();
           await logout();
         },
       },
@@ -49,7 +49,6 @@ export default function ProfileDrawer({ onClose }: Props) {
   };
 
   const handleLogin = () => {
-    onClose();
     router.push('/(auth)/login');
   };
 
@@ -97,7 +96,6 @@ export default function ProfileDrawer({ onClose }: Props) {
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => {
-              onClose();
               router.push('/profile/edit');
             }}
           >

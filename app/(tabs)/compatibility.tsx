@@ -43,7 +43,7 @@ export default function CompatibilityScreen() {
 
   const navigation = useNavigation();
   const { user } = useProfile();
-  console.log('isPremium => ', user?.isPremium);
+
   const handleCalculate = () => {
     try {
       // calculateCompatibility expects format DD.MM.YYYY

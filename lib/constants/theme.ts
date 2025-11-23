@@ -127,7 +127,7 @@ export const LAYOUT = {
   formWidth: '100%' as DimensionValue,
   containerPadding: 50,
   // Размеры из компонентов
-  logoSmall: 120,
+  logoSmall: 200,
   logoMedium: 600,
   logoLarge: 700,
   modalMaxWidth: 550,

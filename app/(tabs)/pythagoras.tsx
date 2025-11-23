@@ -13,7 +13,6 @@ import { ProfileButton } from '@/components/ui/ProfileButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
-import { useProfile } from '@/contexts/ProfileContext';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -41,7 +40,6 @@ export default function HomeScreen() {
   const [results, setResults] = useState<CalculationResult | null>(null);
 
   const navigation = useNavigation();
-  // const { openDrawer } = useProfile();
 
   const handleCalculate = () => {
     // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD

@@ -47,7 +47,6 @@ interface ProfileContextType {
   user: User | null;
   profiles: Profile[];
   activeProfile: Profile | null;
-  // isPremium: boolean;
   isLoading: boolean;
   authInitialized: boolean;
 
@@ -73,7 +72,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [user, setUser] = useState<User | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  // const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -162,7 +160,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     setUser(null);
-    // setIsPremium(false);
 
     if (wasLoggedIn && !isNowLoggedIn && authInitialized) {
       router.replace('/(auth)/onboarding');
@@ -251,7 +248,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const unlockPremium = async () => {
     if (!user) {
-      // setIsPremium(true); // Для гостя просто включаем в стейте (до перезагрузки)
+      // setIsPremium(true);
       return;
     }
     try {
@@ -259,7 +256,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         active: true,
         unlockedAt: new Date(),
       });
-      // setIsPremium(true);
     } catch (e) {
       console.error("Error unlocking premium:", e);
       throw e;
@@ -319,7 +315,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         user,
         profiles,
         activeProfile,
-        // isPremium,
         isLoading,
         authInitialized,
 

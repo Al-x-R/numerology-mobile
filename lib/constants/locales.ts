@@ -16,6 +16,14 @@ interface LocaleData {
 const translations: LocaleData = {
   ru: {
     title: 'Код Даты',
+
+    onboarding: {
+      subtitle: 'Узнайте свою матрицу судьбы\nи раскройте потенциал',
+      guestButton: 'Продолжить как гость',
+      loginButton: 'У меня уже есть аккаунт',
+      legal: 'Нажимая «Продолжить», вы соглашаетесь\nс условиями использования',
+    },
+
     subtitle: 'Рассчитайте свой Квадрат Пифагора',
     inputPlaceholder: 'Введите дату рождения (ДД.ММ.ГГГГ)',
     buttonText: 'Рассчитать',
@@ -312,6 +320,14 @@ const translations: LocaleData = {
   },
   en: {
     title: 'Date Code',
+
+    onboarding: {
+      subtitle: 'Discover your Destiny Matrix\nand unlock your potential',
+      guestButton: 'Continue as Guest',
+      loginButton: 'I already have an account',
+      legal: 'By tapping "Continue", you agree\nto our Terms of Use',
+    },
+
     subtitle: 'Calculate your Pythagorean Square',
     inputPlaceholder: 'Enter birth date (DD.MM.YYYY)',
     buttonText: 'Calculate',
