@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
@@ -42,12 +42,12 @@ export default function CompatibilityScreen() {
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
 
   const navigation = useNavigation();
-  const { openDrawer } = useProfile();
-
+  const { user } = useProfile();
+  console.log('isPremium => ', user?.isPremium);
   const handleCalculate = () => {
     try {
       // calculateCompatibility expects format DD.MM.YYYY
-      const result = calculateCompatibility(dateString1, dateString2);
+      const result = calculateCompatibility(dateString1, dateString2, user?.isPremium);
       setCompatibilityResult(result);
     } catch (e) {
       console.error(e);
@@ -71,8 +71,8 @@ export default function CompatibilityScreen() {
       navigation.setOptions({
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
-            <Text style={FONTS.headerTitle}>{t('compatibilityResultsTitle')}</Text>
-            <Text style={FONTS.headerSubtitle}>{dateString1} & {dateString2}</Text>
+            <Text style={FONTS.headerTitle}>{t('compatibility.compatibilityResultsTitle')}</Text>
+            {/*<Text style={FONTS.headerSubtitle}>{dateString1} & {dateString2}</Text>*/}
           </View>
         ),
         headerLeft: () => <HeaderBackButton onPress={handleBack} />,
@@ -85,7 +85,7 @@ export default function CompatibilityScreen() {
       navigation.setOptions({
         headerTitle: t('compatibilityTitle'),
         headerLeft: () => null,
-        headerRight: () => <ProfileButton onPress={openDrawer} />,
+        headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
         tabBarStyle: {
           display: 'flex',
           backgroundColor: COLORS.background,

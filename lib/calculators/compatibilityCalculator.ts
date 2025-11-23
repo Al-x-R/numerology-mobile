@@ -1,158 +1,215 @@
-// compatibilityCalculator.ts
-import { t } from '@/lib/constants/locales';
+// lib/calculators/compatibilityCalculator.ts
 
-export interface PythagoreanSquare {
-  1: number; 2: number; 3: number;
-  4: number; 5: number; 6: number;
-  7: number; 8: number; 9: number;
-}
+import { RU_NUMEROLOGY_CONTENT, EN_NUMEROLOGY_CONTENT, CompatibilityTexts } from '@/lib/constants/numerologyTexts';
+import { getCurrentLocale } from '@/lib/constants/locales';
 
-type Param = {
+const getNumerologyContent = (): CompatibilityTexts => {
+  const locale = getCurrentLocale();
+  return locale === 'ru' ? RU_NUMEROLOGY_CONTENT : EN_NUMEROLOGY_CONTENT;
+};
+
+export type NumerologyPair = {
   p1: number;
   p2: number;
-  pct: number
+  pct: number;
 };
 
 export interface CompatibilityResult {
-  energy: Param;
-  character: Param;
-  interest: Param;
-  karma: Param;
-  family: Param;
-  talent: Param;
-  spirituality: Param;
+  lifePath1: number;
+  lifePath2: number;
+  destinyNumber: number; // Число союза
+  totalPct: number;
 
-  baseCompatibilityPct: number;  // ← 3 параметра
-  fullCompatibilityPct: number;  // ← 7 параметров
-  recommendations: string[];
+  // Текстовые данные
+  generalAnalysis: string;
+  destinyInfo: {           // <--- НОВОЕ: Объект с текстом миссии
+    mission: string;
+    purpose: string;
+  };
+
+  // Параметры психоматрицы
+  energy: NumerologyPair;
+  character: NumerologyPair;
+  interest: NumerologyPair;
+
+  // Премиум параметры
+  karma?: NumerologyPair;
+  family?: NumerologyPair;
+  talent?: NumerologyPair;
+  spirituality?: NumerologyPair;
+
+  fullTotalPct?: number;
+  recommendations?: string[];
 }
 
-// Вспомогательная: сумма цифр в строке/столбце
-const sumLine = (square: PythagoreanSquare, cells: number[]): number => {
-  return cells.reduce((sum, cell) => sum + (square[cell as keyof PythagoreanSquare] || 0), 0);
+const reduceToSingleDigit = (num: number): number => {
+  if (num === 11 || num === 22 || num === 33) return num;
+  while (num > 9) {
+    num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+  }
+  return num;
 };
 
-// Процент совместимости: min / max * 100 (избегаем деления на 0)
-const calcPct = (a: number, b: number): number => {
-  if (a === 0 && b === 0) return 100;
-  if (a === 0 || b === 0) return 0;
-  return Math.round((Math.min(a, b) / Math.max(a, b)) * 100);
+export const calculateLifePath = (dateString: string): number => {
+  if (!dateString || dateString.length !== 10) return 0;
+  const parts = dateString.split('.');
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+
+  const monthReduced = reduceToSingleDigit(month);
+  const dayReduced = reduceToSingleDigit(day);
+  const yearSum = String(year).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+  const yearReduced = reduceToSingleDigit(yearSum);
+
+  return reduceToSingleDigit(dayReduced + monthReduced + yearReduced);
+};
+
+// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+
+const calculateWorkingNumbers = (dateString: string, lp: number): number[] => {
+  const dateNum = dateString.replace(/\./g, '');
+  const numSum = dateNum.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+  const day = parseInt(dateString.split('.')[0]);
+
+  const P1 = numSum;
+  const P2 = reduceToSingleDigit(P1);
+  const firstDigitOfDay = day >= 10 ? parseInt(String(day)[0]) : day;
+  const P3 = P1 - 2 * firstDigitOfDay;
+  const P4 = reduceToSingleDigit(P3);
+
+  return [P1, P2, P3, P4];
+}
+
+const calculatePsychomatrix = (dateString: string): { [key: number]: number } => {
+  const lifePath = calculateLifePath(dateString);
+  const [P1, P2, P3, P4] = calculateWorkingNumbers(dateString, lifePath);
+  let allDigits = dateString.replace(/\./g, '') + String(P1) + String(P2) + String(P3) + String(P4);
+
+  const matrix: { [key: number]: number } = {};
+  for (let i = 1; i <= 9; i++) {
+    matrix[i] = 0;
+  }
+
+  allDigits.split('').forEach(digitChar => {
+    const digit = parseInt(digitChar);
+    if (digit >= 1 && digit <= 9) {
+      matrix[digit] = (matrix[digit] || 0) + 1;
+    }
+  });
+
+  return matrix;
+};
+
+const calculatePct = (val1: number, val2: number): number => {
+  const diff = Math.abs(val1 - val2);
+  let basePct: number;
+  if (diff === 0) basePct = 95;
+  else if (diff === 1) basePct = 85;
+  else if (diff === 2) basePct = 70;
+  else if (diff >= 3) basePct = 40;
+  else basePct = 20;
+
+  if (val1 > 0 && val2 > 0) basePct += 5;
+  return Math.min(100, Math.max(10, basePct));
+};
+
+// --- ПОЛУЧЕНИЕ ТЕКСТОВ ---
+
+const getLifePathCompatibilityAnalysis = (lp1: number, lp2: number): string => {
+  const content = getNumerologyContent();
+  const [numA, numB] = lp1 < lp2 ? [lp1, lp2] : [lp2, lp1];
+  const key = `${numA}-${numB}`;
+  const analysis = content.lpAnalysis[key];
+
+  if (analysis) {
+    return `${analysis.title}\n\n` +
+      `✅ ${analysis.strengths}\n\n` +
+      `⚠️ ${analysis.challenges}\n\n` +
+      `💡 ${analysis.focus}`;
+  }
+  return `Совместимость чисел ${numA} и ${numB} — анализ пока недоступен.`;
+};
+
+const getCompatibilityRecommendations = (lp1: number, lp2: number): string[] => {
+  const content = getNumerologyContent();
+  const [numA, numB] = lp1 < lp2 ? [lp1, lp2] : [lp2, lp1];
+  const key = `${numA}-${numB}`;
+  return content.recommendations[key] || content.recommendations["default"] || [];
+};
+
+// Получение текста Миссии Союза
+const getDestinyInfo = (destinyNum: number): { mission: string, purpose: string } => {
+  const content = getNumerologyContent();
+  // В numerologyTexts ключи могут быть строками ("1"), поэтому приводим к строке
+  const info = content.destinyAnalysis[String(destinyNum)];
+
+  if (info) return info;
+
+  return {
+    mission: "Информация о миссии союза формируется...",
+    purpose: "Цели уточняются."
+  };
 };
 
 /**
- * Рассчитывает совместимость двух дат
- * Всегда возвращает полный результат
+ * ГЛАВНЫЙ РАСЧЕТ
  */
 export const calculateCompatibility = (
-  date1: string, // "12.12.2022"
-  date2: string
+  date1: string,
+  date2: string,
+  isPremium: boolean = false
 ): CompatibilityResult => {
-  // 1. Получаем квадраты Пифагора
-  const sq1 = calculatePythagoreanSquare(date1);
-  const sq2 = calculatePythagoreanSquare(date2);
+  const lifePath1 = calculateLifePath(date1);
+  const lifePath2 = calculateLifePath(date2);
 
-  // 2. Базовые параметры
-  const energy1 = sumLine(sq1, [2, 5, 8]);
-  const energy2 = sumLine(sq2, [2, 5, 8]);
-  const char1 = sumLine(sq1, [1, 4, 7]);
-  const char2 = sumLine(sq2, [1, 4, 7]);
-  const interest1 = sumLine(sq1, [3, 6, 9]);
-  const interest2 = sumLine(sq2, [3, 6, 9]);
+  // 1. Считаем Число Союза
+  const destinyNumber = reduceToSingleDigit(lifePath1 + lifePath2);
 
-  // 3. Премиум параметры
-  const karma1 = sumLine(sq1, [4, 5, 6]);
-  const karma2 = sumLine(sq2, [4, 5, 6]);
-  const family1 = sumLine(sq1, [4, 5, 6, 7, 8, 9]);
-  const family2 = sumLine(sq2, [4, 5, 6, 7, 8, 9]);
-  const talent1 = sumLine(sq1, [3, 6, 9]);
-  const talent2 = sumLine(sq2, [3, 6, 9]);
-  const spirit1 = sumLine(sq1, [7, 8, 9]);
-  const spirit2 = sumLine(sq2, [7, 8, 9]);
+  const matrix1 = calculatePsychomatrix(date1);
+  const matrix2 = calculatePsychomatrix(date2);
 
-  // 4. Формируем результат
-  const result: CompatibilityResult = {
-    energy: { p1: energy1, p2: energy2, pct: calcPct(energy1, energy2) },
-    character: { p1: char1, p2: char2, pct: calcPct(char1, char2) },
-    interest: { p1: interest1, p2: interest2, pct: calcPct(interest1, interest2) },
-    karma: { p1: karma1, p2: karma2, pct: calcPct(karma1, karma2) },
-    family: { p1: family1, p2: family2, pct: calcPct(family1, family2) },
-    talent: { p1: talent1, p2: talent2, pct: calcPct(talent1, talent2) },
-    spirituality: { p1: spirit1, p2: spirit2, pct: calcPct(spirit1, spirit2) },
+  const characterPct = calculatePct(matrix1[1], matrix2[1]);
+  const energyPct = calculatePct(matrix1[2], matrix2[2]);
+  const interestPct = calculatePct(matrix1[3], matrix2[3]);
 
-    baseCompatibilityPct: 0,
-    fullCompatibilityPct: 0,
-    recommendations: [],
+  const basicAvgPct = Math.round((energyPct + characterPct + interestPct) / 3);
+
+  let result: CompatibilityResult = {
+    lifePath1,
+    lifePath2,
+    destinyNumber,
+    totalPct: basicAvgPct,
+
+    // 2. Заполняем тексты из базы данных
+    generalAnalysis: getLifePathCompatibilityAnalysis(lifePath1, lifePath2),
+    destinyInfo: getDestinyInfo(destinyNumber), // <--- Текст берется отсюда
+
+    energy: { p1: matrix1[2], p2: matrix2[2], pct: energyPct },
+    character: { p1: matrix1[1], p2: matrix2[1], pct: characterPct },
+    interest: { p1: matrix1[3], p2: matrix2[3], pct: interestPct },
   };
 
-  // 5. Рассчитываем проценты
-  result.baseCompatibilityPct = Math.round(
-    (result.energy.pct + result.character.pct + result.interest.pct) / 3
-  );
+  if (isPremium) {
+    const karmaPct = calculatePct(matrix1[6], matrix2[6]);
+    const familyPct = calculatePct(matrix1[5], matrix2[5]);
+    const talentPct = calculatePct(matrix1[4], matrix2[4]);
+    const spiritualityPct = calculatePct(matrix1[7], matrix2[7]);
 
-  result.fullCompatibilityPct = Math.round(
-    (result.energy.pct +
-      result.character.pct +
-      result.interest.pct +
-      result.karma.pct +
-      result.family.pct +
-      result.talent.pct +
-      result.spirituality.pct) / 7
-  );
+    const fullAvgPct = Math.round(
+      (basicAvgPct * 3 + karmaPct + familyPct + talentPct + spiritualityPct) / 7
+    );
 
-  // 6. Генерируем рекомендации (всегда, но показываем только в премиум)
-  result.recommendations = generateRecommendations(result);
+    result = {
+      ...result,
+      karma: { p1: matrix1[6], p2: matrix2[6], pct: karmaPct },
+      family: { p1: matrix1[5], p2: matrix2[5], pct: familyPct },
+      talent: { p1: matrix1[4], p2: matrix2[4], pct: talentPct },
+      spirituality: { p1: matrix1[7], p2: matrix2[7], pct: spiritualityPct },
+      fullTotalPct: fullAvgPct,
+      recommendations: getCompatibilityRecommendations(lifePath1, lifePath2),
+    };
+  }
 
   return result;
-};
-
-export const calculatePythagoreanSquare = (dateStr: string): PythagoreanSquare => {
-  const cleaned = dateStr.replace(/\D/g, '');
-  if (cleaned.length !== 8) throw new Error('Invalid date format');
-
-  const day = parseInt(cleaned.slice(0, 2), 10);
-  const month = parseInt(cleaned.slice(2, 4), 10);
-  const year = parseInt(cleaned.slice(4, 8), 10);
-
-  const numbers = [day, month, year];
-  // Рабочие числа
-  const work1 = numbers.reduce((a, b) => a + b, 0);
-  const work2 = work1
-    .toString()
-    .split('')
-    .reduce((a, b) => a + parseInt(b, 10), 0);
-  const work3 = Math.abs(work1 - 2 * day);
-  const work4 = work3
-    .toString()
-    .split('')
-    .reduce((a, b) => a + parseInt(b, 10), 0);
-
-  const allDigits = [
-    ...numbers,
-    ...work1.toString().split('').map(Number),
-    ...work2.toString().split('').map(Number),
-    ...work3.toString().split('').map(Number),
-    ...work4.toString().split('').map(Number),
-  ].filter(d => d !== 0);
-
-  const square: PythagoreanSquare = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-  allDigits.forEach(d => {
-    if (d >= 1 && d <= 9) square[d as keyof PythagoreanSquare]++;
-  });
-
-  return square;
-};
-
-const generateRecommendations = (result: CompatibilityResult): string[] => {
-  const recs: string[] = [];
-
-  if (result.energy.pct < 50) recs.push(t('recEnergyLow'));
-  if (result.character.pct < 50) recs.push(t('recCharacterDiff'));
-  if (result.interest.pct < 50) recs.push(t('recFindHobby'));
-  if (result.karma.pct > 80) recs.push(t('recKarmaHigh'));
-  if (result.family.pct > 70) recs.push(t('recFamilyStrong'));
-  if (result.talent.pct > 80) recs.push(t('recTalentSynergy'));
-
-  return recs.length > 0
-    ? recs
-    : [t('recHarmony')];
 };

@@ -167,6 +167,7 @@ const translations: LocaleData = {
     interpretation_unavailable: 'Подробное описание пока недоступно.',
 
     compatibility: {
+      // Основные заголовки экрана
       subtitle: 'Проверьте нумерологическую совместимость',
       partner1Label: 'Дата рождения партнёра 1',
       partner1Placeholder: 'ДД.ММ.ГГГГ',
@@ -175,6 +176,43 @@ const translations: LocaleData = {
       buttonText: 'Рассчитать совместимость',
       loadingText: 'Анализ совместимости...',
 
+      compatibilityResultsTitle: 'Совместимость',
+
+      // Секции результатов
+      lpAnalysisSection: 'Анализ Чисел Жизненного Пути',
+      baseParamsSection: 'Базовая совместимость',
+      premiumParamsSection: 'Глубинная совместимость',
+      baseTotal: 'Базовая совместимость',
+      fullTotal: 'Полная совместимость',
+      recommendations: 'Рекомендации для пары',
+
+      // Заголовки в карточке анализа
+      lpTitle: 'Числа Жизненного Пути',
+      destinyTitle: 'Число Союза',
+
+      // Миссия по Числу Союза (1–9)
+      destinyMission_1: 'Вместе вы — лидеры и первопроходцы. Ваша сила в инициативе и смелости начинать новое.',
+      destinyMission_2: 'Вы учителя гармонии, дипломатии и настоящей близости. Ваша миссия — исцелять отношения.',
+      destinyMission_3: 'Вы несёте в мир радость, творчество и вдохновение. Вместе вы — источник света и красоты.',
+      destinyMission_4: 'Вы строите надёжные фундаменты: дом, бизнес, традиции. Ваша сила — в стабильности и труде.',
+      destinyMission_5: 'Вы — катализаторы свободы и перемен. Ваша пара разрушает старое и открывает новые горизонты.',
+      destinyMission_6: 'Вы исцеляете через любовь, заботу и красоту. Ваша миссия — создавать гармонию и уют.',
+      destinyMission_7: 'Вы ищете и передаёте высшую истину. Вместе вы — духовные проводники и исследователи.',
+      destinyMission_8: 'Вы овладеваете властью и ресурсами, чтобы служить большому делу. Сила через ответственность.',
+      destinyMission_9: 'Вы завершаете старые циклы и служите человечеству. Ваша любовь — глобальна и бескорыстна.',
+
+      // Параметры совместимости
+      energy: 'Энергия и жизненная сила',
+      character: 'Характер и воля',
+      interest: 'Интересы и творчество',
+      karma: 'Кармическая связь',
+      family: 'Семья и быт',
+      talent: 'Таланты и самореализация',
+      spirituality: 'Духовность и смысл',
+
+      // Подписи партнёров
+      partner1: 'Партнёр 1',
+      partner2: 'Партнёр 2',
     },
 
     // SECTION TITLES
@@ -424,13 +462,47 @@ const translations: LocaleData = {
     numbersTitle: 'Numbers',
 
     compatibility: {
-      subtitle: 'Check numerological compatibility',
+      subtitle: 'Check your numerological compatibility',
       partner1Label: 'Partner 1 birth date',
       partner1Placeholder: 'DD.MM.YYYY',
       partner2Label: 'Partner 2 birth date',
       partner2Placeholder: 'DD.MM.YYYY',
       buttonText: 'Calculate Compatibility',
       loadingText: 'Analyzing compatibility...',
+
+      compatibilityResultsTitle: 'Compatibility',
+
+      lpAnalysisSection: 'Life Path Numbers Analysis',
+      baseParamsSection: 'Core Compatibility',
+      premiumParamsSection: 'Deep Compatibility',
+      baseTotal: 'Core Compatibility',
+      fullTotal: 'Full Compatibility',
+      recommendations: 'Recommendations for the Couple',
+
+      lpTitle: 'Life Path Numbers',
+      destinyTitle: 'Union Number',
+
+      // Destiny Mission (1–9)
+      destinyMission_1: 'Together you are leaders and trailblazers. Your strength lies in initiative and courage.',
+      destinyMission_2: 'You are teachers of harmony, diplomacy, and true intimacy. Your mission is to heal relationships.',
+      destinyMission_3: 'You bring joy, creativity, and inspiration to the world. Together you are a source of light.',
+      destinyMission_4: 'You build strong foundations: home, business, traditions. Your power is in stability and work.',
+      destinyMission_5: 'You are catalysts of freedom and change. Your couple breaks the old and opens new horizons.',
+      destinyMission_6: 'You heal through love, care, and beauty. Your mission is to create harmony and comfort.',
+      destinyMission_7: 'You seek and transmit higher truth. Together you are spiritual guides and explorers.',
+      destinyMission_8: 'You master power and resources to serve a greater cause. Strength through responsibility.',
+      destinyMission_9: 'You complete old cycles and serve humanity. Your love is global and selfless.',
+
+      energy: 'Energy & Vitality',
+      character: 'Character & Willpower',
+      interest: 'Interests & Creativity',
+      karma: 'Karmic Connection',
+      family: 'Family & Home Life',
+      talent: 'Talents & Self-Realization',
+      spirituality: 'Spirituality & Purpose',
+
+      partner1: 'Partner 1',
+      partner2: 'Partner 2',
     },
 
     // SECTION TITLES

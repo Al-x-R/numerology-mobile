@@ -1,4 +1,5 @@
 // components/CompatibilityResultsDisplay.tsx
+
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
 import {
@@ -17,13 +18,76 @@ import Animated, {
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
 import { t } from '@/lib/constants/locales';
-import { COLORS, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 
 interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
   date1: string;
   date2: string;
   onBack?: () => void;
+}
+
+interface GeneralAnalysisCardProps {
+  lifePath1: number;
+  lifePath2: number;
+  destinyNumber: number;
+  destinyInfo: {
+    mission: string;
+    purpose: string;
+  };
+  generalAnalysis: string;
+  date1: string;
+  date2: string;
+  index: number;
+}
+
+function GeneralAnalysisCard({
+  lifePath1,
+  lifePath2,
+  destinyNumber,
+  destinyInfo,
+  generalAnalysis,
+  date1,
+  date2,
+  index,
+}: GeneralAnalysisCardProps) {
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(30);
+
+  useEffect(() => {
+    const delay = index * 120;
+    opacity.value = withDelay(delay, withTiming(1, { duration: 600 }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 650, easing: Easing.out(Easing.quad) }));
+  }, [index]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.View style={[styles.analysisCard, animatedStyle]}>
+      <Text style={styles.datesText}>
+        {date1}  ↔  {date2}
+      </Text>
+
+      <Text style={styles.analysisTitle}>
+        {t('compatibility.lpTitle')} {lifePath1} + {lifePath2}
+      </Text>
+
+      <Text style={styles.destinyTitle}>
+        {t('compatibility.destinyTitle')} {destinyNumber}
+      </Text>
+
+      <Text style={styles.destinyMission}>
+        {destinyInfo.mission}
+      </Text>
+
+      <View style={styles.separator} />
+
+      <Text style={styles.analysisText}>{generalAnalysis}</Text>
+    </Animated.View>
+  );
 }
 
 interface CompatibilityParamCardProps {
@@ -37,20 +101,13 @@ interface CompatibilityParamCardProps {
 function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityParamCardProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
-  const scale = useSharedValue(0.9);
+  const scale = useSharedValue(0.95);
 
   useEffect(() => {
-    const delay = index * 100; // Каждая карточка появляется с задержкой
-
-    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
-    translateY.value = withDelay(
-      delay,
-      withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) })
-    );
-    scale.value = withDelay(
-      delay,
-      withTiming(1, { duration: 450, easing: Easing.out(Easing.quad) })
-    );
+    const delay = index * 90;
+    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 550, easing: Easing.out(Easing.quad) }));
+    scale.value = withDelay(delay, withTiming(1, { duration: 550, easing: Easing.out(Easing.quad) }));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -59,9 +116,9 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
   }));
 
   const getColorForPercentage = (pct: number) => {
-    if (pct >= 80) return COLORS.battery.full;
-    if (pct >= 60) return '#FFD700'; // gold
-    if (pct >= 40) return '#FFA500'; // orange
+    if (pct >= 85) return COLORS.battery.full;
+    if (pct >= 70) return '#FFD700';
+    if (pct >= 50) return '#FFA500';
     return COLORS.error;
   };
 
@@ -72,16 +129,18 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
       <Text style={styles.paramTitle}>{title}</Text>
       <View style={styles.paramValues}>
         <View style={styles.partnerValue}>
-          <Text style={styles.partnerLabel}>{t('compatibilityPartner1')}</Text>
+          <Text style={styles.partnerLabel}>{t('compatibility.partner1')}</Text>
           <Text style={styles.partnerNumber}>{p1}</Text>
         </View>
+
         <View style={styles.percentageContainer}>
           <Text style={[styles.percentage, { color: percentageColor }]}>
             {pct}%
           </Text>
         </View>
+
         <View style={styles.partnerValue}>
-          <Text style={styles.partnerLabel}>{t('compatibilityPartner2')}</Text>
+          <Text style={styles.partnerLabel}>{t('compatibility.partner2')}</Text>
           <Text style={styles.partnerNumber}>{p2}</Text>
         </View>
       </View>
@@ -89,160 +148,6 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
   );
 }
 
-export function CompatibilityResultsDisplay({ 
-  result, 
-  date1, 
-  date2 
-}: CompatibilityResultsDisplayProps) {
-  const getTotalColor = (pct: number) => {
-    if (pct >= 80) return COLORS.battery.full;
-    if (pct >= 60) return '#FFD700';
-    if (pct >= 40) return '#FFA500';
-    return COLORS.error;
-  };
-
-  const totalColor = getTotalColor(result.totalPct);
-  const fullTotalColor = result.fullTotalPct ? getTotalColor(result.fullTotalPct) : null;
-
-  // Анимации для заголовка
-  const titleOpacity = useSharedValue(0);
-  const titleTranslateY = useSharedValue(-10);
-  const datesOpacity = useSharedValue(0);
-  const datesTranslateY = useSharedValue(10);
-
-  useEffect(() => {
-    titleOpacity.value = withTiming(1, { duration: 400 });
-    titleTranslateY.value = withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) });
-    datesOpacity.value = withDelay(200, withTiming(1, { duration: 400 }));
-    datesTranslateY.value = withDelay(200, withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) }));
-  }, []);
-
-  const titleAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: titleOpacity.value,
-    transform: [{ translateY: titleTranslateY.value }],
-  }));
-
-  const datesAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: datesOpacity.value,
-    transform: [{ translateY: datesTranslateY.value }],
-  }));
-
-  return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
-      <Animated.Text style={[styles.title, titleAnimatedStyle]}>
-        {t('compatibilityResultsTitle')}
-      </Animated.Text>
-
-      <Animated.View style={[styles.datesContainer, datesAnimatedStyle]}>
-        <Text style={styles.dateText}>{date1}</Text>
-        <Text style={styles.ampersand}>&</Text>
-        <Text style={styles.dateText}>{date2}</Text>
-      </Animated.View>
-
-      {/* Basic Compatibility Parameters */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('compatibilityTotal')}</Text>
-        
-        <CompatibilityParamCard
-          title={t('compatibilityEnergy')}
-          p1={result.energy.p1}
-          p2={result.energy.p2}
-          pct={result.energy.pct}
-          index={0}
-        />
-        
-        <CompatibilityParamCard
-          title={t('compatibilityCharacter')}
-          p1={result.character.p1}
-          p2={result.character.p2}
-          pct={result.character.pct}
-          index={1}
-        />
-        
-        <CompatibilityParamCard
-          title={t('compatibilityInterest')}
-          p1={result.interest.p1}
-          p2={result.interest.p2}
-          pct={result.interest.pct}
-          index={2}
-        />
-      </View>
-
-      {/* Total Compatibility */}
-      <AnimatedTotalCard
-        label={t('compatibilityTotal')}
-        value={result.totalPct}
-        color={totalColor}
-        index={3}
-      />
-
-      {/* Premium Parameters */}
-      {result.karma && result.family && result.talent && result.spirituality && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('compatibilityFullTotal')}</Text>
-          
-          <CompatibilityParamCard
-            title={t('compatibilityKarma')}
-            p1={result.karma.p1}
-            p2={result.karma.p2}
-            pct={result.karma.pct}
-            index={4}
-          />
-          
-          <CompatibilityParamCard
-            title={t('compatibilityFamily')}
-            p1={result.family.p1}
-            p2={result.family.p2}
-            pct={result.family.pct}
-            index={5}
-          />
-          
-          <CompatibilityParamCard
-            title={t('compatibilityTalent')}
-            p1={result.talent.p1}
-            p2={result.talent.p2}
-            pct={result.talent.pct}
-            index={6}
-          />
-          
-          <CompatibilityParamCard
-            title={t('compatibilitySpirituality')}
-            p1={result.spirituality.p1}
-            p2={result.spirituality.p2}
-            pct={result.spirituality.pct}
-            index={7}
-          />
-        </View>
-      )}
-
-      {/* Full Total (Premium) */}
-      {result.fullTotalPct && (
-        <AnimatedTotalCard
-          label={t('compatibilityFullTotal')}
-          value={result.fullTotalPct}
-          color={fullTotalColor || COLORS.text}
-          index={8}
-        />
-      )}
-
-      {/* Recommendations (Premium) */}
-      {result.recommendations && result.recommendations.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('compatibilityRecommendations')}</Text>
-          {result.recommendations.map((rec, index) => (
-            <AnimatedRecommendationCard
-              key={index}
-              text={rec}
-              index={9 + index}
-            />
-          ))}
-        </View>
-      )}
-    </ScrollView>
-  );
-}
-
-// Анимированная карточка общей совместимости
 interface AnimatedTotalCardProps {
   label: string;
   value: number;
@@ -252,21 +157,14 @@ interface AnimatedTotalCardProps {
 
 function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProps) {
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(30);
+  const translateY = useSharedValue(40);
   const scale = useSharedValue(0.9);
 
   useEffect(() => {
-    const delay = index * 100;
-
-    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
-    translateY.value = withDelay(
-      delay,
-      withTiming(0, { duration: 600, easing: Easing.out(Easing.quad) })
-    );
-    scale.value = withDelay(
-      delay,
-      withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) })
-    );
+    const delay = index * 120;
+    opacity.value = withDelay(delay, withTiming(1, { duration: 600 }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 700, easing: Easing.out(Easing.quad) }));
+    scale.value = withDelay(delay, withTiming(1, { duration: 700, easing: Easing.out(Easing.quad) }));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -278,15 +176,12 @@ function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProp
     <Animated.View style={[styles.totalContainer, animatedStyle]}>
       <LinearGradient colors={GRADIENTS.button} style={styles.totalCard}>
         <Text style={styles.totalLabel}>{label}</Text>
-        <Text style={[styles.totalValue, { color }]}>
-          {value}%
-        </Text>
+        <Text style={[styles.totalValue, { color }]}>{value}%</Text>
       </LinearGradient>
     </Animated.View>
   );
 }
 
-// Анимированная карточка рекомендации
 interface AnimatedRecommendationCardProps {
   text: string;
   index: number;
@@ -294,16 +189,12 @@ interface AnimatedRecommendationCardProps {
 
 function AnimatedRecommendationCard({ text, index }: AnimatedRecommendationCardProps) {
   const opacity = useSharedValue(0);
-  const translateX = useSharedValue(-20);
+  const translateX = useSharedValue(-30);
 
   useEffect(() => {
-    const delay = index * 100;
-
-    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
-    translateX.value = withDelay(
-      delay,
-      withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) })
-    );
+    const delay = index * 80;
+    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
+    translateX.value = withDelay(delay, withTiming(0, { duration: 550, easing: Easing.out(Easing.quad) }));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -313,126 +204,241 @@ function AnimatedRecommendationCard({ text, index }: AnimatedRecommendationCardP
 
   return (
     <Animated.View style={[styles.recommendationCard, animatedStyle]}>
-      <Text style={styles.recommendationText}>{text}</Text>
+      <Text style={styles.recommendationText}>• {text}</Text>
     </Animated.View>
   );
 }
 
+export function CompatibilityResultsDisplay({
+  result,
+  date1,
+  date2,
+}: CompatibilityResultsDisplayProps) {
+  const getTotalColor = (pct: number) => {
+    if (pct >= 85) return COLORS.battery.full;
+    if (pct >= 70) return '#FFD700';
+    if (pct >= 50) return '#FFA500';
+    return COLORS.error;
+  };
+
+  const totalColor = getTotalColor(result.totalPct);
+  const fullTotalColor = result.fullTotalPct ? getTotalColor(result.fullTotalPct) : COLORS.text;
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      {/* Главный анализ */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('compatibility.lpAnalysisSection')}</Text>
+        <GeneralAnalysisCard
+          lifePath1={result.lifePath1}
+          lifePath2={result.lifePath2}
+          destinyNumber={result.destinyNumber}
+          destinyInfo={result.destinyInfo}
+          generalAnalysis={result.generalAnalysis}
+          date1={date1}
+          date2={date2}
+          index={0}
+        />
+      </View>
+
+      {/* Базовые параметры */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('compatibility.baseParamsSection')}</Text>
+
+        <CompatibilityParamCard title={t('compatibility.energy')}   p1={result.energy.p1}    p2={result.energy.p2}    pct={result.energy.pct}    index={1} />
+        <CompatibilityParamCard title={t('compatibility.character')} p1={result.character.p1} p2={result.character.p2} pct={result.character.pct} index={2} />
+        <CompatibilityParamCard title={t('compatibility.interest')}  p1={result.interest.p1}  p2={result.interest.p2}  pct={result.interest.pct}  index={3} />
+      </View>
+
+      <AnimatedTotalCard label={t('compatibility.baseTotal')} value={result.totalPct} color={totalColor} index={4} />
+
+      {/* Премиум-параметры */}
+      {result.karma && result.family && result.talent && result.spirituality &&  (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('compatibility.premiumParamsSection')}</Text>
+          <CompatibilityParamCard title={t('compatibility.karma')}       p1={result.karma.p1}       p2={result.karma.p2}       pct={result.karma.pct}       index={5} />
+          <CompatibilityParamCard title={t('compatibility.family')}      p1={result.family.p1}      p2={result.family.p2}      pct={result.family.pct}      index={6} />
+          <CompatibilityParamCard title={t('compatibility.talent')}      p1={result.talent.p1}      p2={result.talent.p2}      pct={result.talent.pct}      index={7} />
+          <CompatibilityParamCard title={t('compatibility.spirituality')} p1={result.spirituality.p1} p2={result.spirituality.p2} pct={result.spirituality.pct} index={8} />
+        </View>
+      )}
+
+      {result.fullTotalPct && (
+        <AnimatedTotalCard label={t('compatibility.fullTotal')} value={result.fullTotalPct} color={fullTotalColor} index={9} />
+      )}
+
+      {/* Рекомендации */}
+      {result.recommendations && result.recommendations.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('compatibility.recommendations')}</Text>
+          {result.recommendations.map((rec, i) => (
+            <AnimatedRecommendationCard key={i} text={rec} index={10 + i} />
+          ))}
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
 const styles = StyleSheet.create({
-  scrollContent: {
-    width: '100%',
-    paddingBottom: SPACING.xl,
-    paddingHorizontal: SPACING.md,
-  },
-  title: {
-    ...FONTS.sectionTitle,
-    fontSize: 24,
-    marginBottom: SPACING.md,
-    textAlign: 'center',
-    color: COLORS.accent,
-  },
-  datesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.xl,
-    gap: SPACING.sm,
-  },
-  dateText: {
-    ...FONTS.button,
-    fontSize: 16,
-    color: COLORS.textSecondary,
-  },
-  ampersand: {
-    ...FONTS.button,
-    fontSize: 18,
-    color: COLORS.accent,
-  },
-  section: {
-    marginBottom: SPACING.lg,
-  },
+  scrollContent: { padding: SPACING.xs, paddingBottom: SPACING.xl },
+  section: { marginBottom: SPACING.xl },
   sectionTitle: {
     ...FONTS.sectionTitle,
     fontSize: 20,
     marginBottom: SPACING.md,
-    color: COLORS.accent,
   },
-  paramCard: {
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
+
+  analysisCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    ...SHADOWS.card,
   },
-  paramTitle: {
-    ...FONTS.sectionTitle,
-    fontSize: 16,
+
+  datesText: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
     marginBottom: SPACING.sm,
-    color: COLORS.text,
   },
+
+  analysisTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 22,
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
+
+  destinyTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 28,
+    color: COLORS.accent,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
+
+  destinyMission: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontStyle: 'italic',
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.lg,
+    lineHeight: 24,
+  },
+
+  separator: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: SPACING.lg,
+  },
+
+  analysisText: {
+    ...FONTS.body,
+    lineHeight: 26,
+  },
+
+  paramCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    ...SHADOWS.card,
+  },
+
+  paramTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 17,
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+
   paramValues: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   partnerValue: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
   },
+
   partnerLabel: {
-    ...FONTS.batteryLabel,
-    fontSize: 12,
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
+    marginBottom: 4,
   },
+
   partnerNumber: {
-    ...FONTS.workingValue,
-    fontSize: 20,
-    color: COLORS.text,
-  },
-  percentageContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  percentage: {
-    ...FONTS.fateValue,
+    fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 28,
-    fontWeight: '700',
+    color: COLORS.primary,
   },
-  totalContainer: {
-    marginBottom: SPACING.md,
-    marginHorizontal: SPACING.xs,
-  },
-  totalCard: {
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
+
+  percentageContainer: {
     alignItems: 'center',
+    minWidth: 90,
+  },
+
+  percentage: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 40,
+    fontWeight: '800',
+  },
+
+  // === Итоговая карточка ===
+  totalContainer: {
+    alignItems: 'center',
+    marginVertical: SPACING.md,
+  },
+
+  totalCard: {
+    width: '100%',
+    alignItems: 'center',
+    borderRadius: RADIUS.xl,
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
     ...SHADOWS.button,
   },
+
   totalLabel: {
-    ...FONTS.sectionTitle,
+    fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 18,
     color: COLORS.text,
-    marginBottom: SPACING.sm,
+    textAlign: 'center',
+    opacity: 0.9,
   },
+
   totalValue: {
-    ...FONTS.fateValue,
-    fontSize: 48,
-    fontWeight: '700',
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 52,
+    fontWeight: '900',
+    color: COLORS.text,
+    marginTop: 6,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
+
+  // === Рекомендации ===
   recommendationCard: {
-    backgroundColor: COLORS.cardBackground,
+    backgroundColor: COLORS.card,
     borderRadius: RADIUS.md,
-    padding: SPACING.md,
+    padding: SPACING.lg,
     marginBottom: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
+    ...SHADOWS.card,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.accent,
   },
+
   recommendationText: {
-    ...FONTS.cardDescription,
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
+    ...FONTS.body,
+    lineHeight: 24,
+    color: COLORS.text,
   },
 });
