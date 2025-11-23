@@ -27,14 +27,18 @@ interface CompatibilityResultsDisplayProps {
   onBack?: () => void;
 }
 
+interface DestinyInfo {
+  overview: string;
+  mission: string;
+  purpose: string;
+  summary: string;
+}
+
 interface GeneralAnalysisCardProps {
   lifePath1: number;
   lifePath2: number;
   destinyNumber: number;
-  destinyInfo: {
-    mission: string;
-    purpose: string;
-  };
+  destinyInfo: DestinyInfo;
   generalAnalysis: string;
   date1: string;
   date2: string;
@@ -71,21 +75,39 @@ function GeneralAnalysisCard({
         {date1}  ↔  {date2}
       </Text>
 
+      {/* 1. Заголовок ЧЖП */}
       <Text style={styles.analysisTitle}>
         {t('compatibility.lpTitle')} {lifePath1} + {lifePath2}
       </Text>
 
+      {/* 2. Число Союза */}
       <Text style={styles.destinyTitle}>
         {t('compatibility.destinyTitle')} {destinyNumber}
       </Text>
 
-      <Text style={styles.destinyMission}>
-        {destinyInfo.mission}
+      {/* 3. Общая характеристика Союза (Overview) */}
+      <Text style={styles.destinyOverviewText}>
+        {destinyInfo.overview}
       </Text>
+
+      {/* 4. Миссия Пары */}
+      <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
+      <Text style={styles.destinyMission}>{destinyInfo.mission}</Text>
+
+      {/* 5. Цель/Вызов (Purpose) - опционально можно добавить сюда или в общий вывод */}
 
       <View style={styles.separator} />
 
+      {/* 6. Общий анализ совместимости ЧЖП (Берем из LP Analysis) */}
       <Text style={styles.analysisText}>{generalAnalysis}</Text>
+
+      {/* 7. Общий Вывод по Союзу (Summary) */}
+      {destinyInfo.summary && (
+        <View style={styles.summaryContainer}>
+          <Text style={styles.summaryLabel}>{t('compatibility.summaryLabel')}:</Text>
+          <Text style={styles.summaryText}>{destinyInfo.summary}</Text>
+        </View>
+      )}
     </Animated.View>
   );
 }
@@ -329,6 +351,39 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     lineHeight: 24,
   },
+  destinyOverviewText: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 16,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginTop: SPACING.md,
+    lineHeight: 24,
+  },
+  destinyMissionLabel: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 14,
+    color: COLORS.accent,
+    marginTop: SPACING.lg,
+    textAlign: 'center',
+  },
+  summaryContainer: {
+    marginTop: SPACING.lg,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  summaryLabel: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 16,
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
+  },
+  summaryText: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+  },
 
   separator: {
     height: 1,
@@ -394,14 +449,14 @@ const styles = StyleSheet.create({
   // === Итоговая карточка ===
   totalContainer: {
     alignItems: 'center',
-    marginVertical: SPACING.md,
+    marginBottom: SPACING.xl,
   },
 
   totalCard: {
     width: '100%',
     alignItems: 'center',
     borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.xl,
+    paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.xl,
     ...SHADOWS.button,
   },

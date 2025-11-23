@@ -8,8 +8,10 @@ export interface CompatibilityTexts {
     focus: string;
   }>;
   destinyAnalysis: Record<string, {
+    overview: string;
     mission: string;
     purpose: string;
+    summary: string;
   }>;
   cellDescriptions: Record<string, string>;
   recommendations: Record<string, string[]>;
@@ -73,15 +75,60 @@ export const RU_NUMEROLOGY_CONTENT: CompatibilityTexts = {
   },
 
   destinyAnalysis: {
-    "1": { mission: "Вместе вы пришли стать лидерами и первопроходцами. Ваша задача — начинать новое, вдохновлять других своим примером.", purpose: "Создавать проекты, бизнесы, движения, которые меняют правила игры." },
-    "2": { mission: "Ваша совместная миссия — учить мир сотрудничеству, дипломатии и настоящей близости.", purpose: "Быть примером гармоничных отношений и помогать людям мириться." },
-    "3": { mission: "Вы здесь, чтобы нести радость, творчество и красоту в мир.", purpose: "Вдохновлять людей через искусство, слово, юмор и лёгкость." },
-    "4": { mission: "Ваша кармическая задача — строить надёжные системы, которые служат поколениям.", purpose: "Создавать стабильные бизнесы, дома, традиции." },
-    "5": { mission: "Вы — катализаторы перемен и свободы. Задача — разрушать устаревшее и открывать новые пути.", purpose: "Путешествовать, учить людей гибкости и смелости." },
-    "6": { mission: "Ваша миссия — исцелять через любовь, красоту и заботу.", purpose: "Создавать семьи, сообщества, пространства гармонии и красоты." },
-    "7": { mission: "Вместе вы ищете и передаёте высшую истину.", purpose: "Стать учителями, исследователями, духовными проводниками." },
-    "8": { mission: "Кармическая задача — овладеть материей и властью, чтобы служить большому делу.", purpose: "Строить крупный бизнес, управлять ресурсами мудро и этично." },
-    "9": { mission: "Вы пришли завершить старые циклы и служить человечеству без эго.", purpose: "Помогать тысячам людей, завершать глобальные задачи." }
+    "1": {
+      overview: "Число 1 как Число Союза — это союз двух первопроходцев. Вы созданы начинать новое, быть лидерами и вдохновлять мир своим примером.",
+      mission: "Вместе вы пришли стать лидерами и первопроходцами. Ваша задача — начинать новое, вдохновлять других своим примером.",
+      purpose: "Создавать проекты, бизнесы, движения, которые меняют правила игры и задают тренды.",
+      summary: "Вы — мощная стартап-пара. Там, где другие боятся, вы действуете. Главное — не соревноваться друг с другом, а идти плечом к плечу."
+    },
+    "2": {
+      overview: "Число 2 — это союз гармонии, дипломатии и глубокой эмоциональной близости. Вы учитесь друг у друга терпению, эмпатии и настоящему партнёрству.",
+      mission: "Ваша совместная миссия — учить мир сотрудничеству, дипломатии и настоящей близости.",
+      purpose: "Быть примером идеальных отношений, помогать людям мириться, создавать мир и баланс вокруг себя.",
+      summary: "Один из самых гармоничных союзов. Вы исцеляете друг друга и мир своей любовью. Главное — не растворяться полностью друг в друге."
+    },
+    "3": {
+      overview: "Число 3 — это союз радости, творчества и лёгкости. Ваши отношения полны смеха, вдохновения и детской искры.",
+      mission: "Вы здесь, чтобы нести радость, творчество и красоту в мир.",
+      purpose: "Вдохновлять людей через искусство, слово, юмор, музыку и просто своим существованием.",
+      summary: "Вы — пара, от которой светится всё вокруг. Ваша задача — не терять эту искру даже в трудные времена и делиться ею щедро."
+    },
+    "4": {
+      overview: "Число 4 — это фундамент, стабильность и долгосрочные достижения. Ваш союз построен на надёжности, труде и общих целях.",
+      mission: "Ваша кармическая задача — строить надёжные системы, которые служат поколениям.",
+      purpose: "Создавать стабильные бизнесы, крепкие семьи, дома и традиции, которые останутся после вас.",
+      summary: "Вы способны построить настоящую империю — семью, бизнес, наследие. Главное — не забывать отдыхать и радоваться процессу."
+    },
+    "5": {
+      overview: "Число 5 — это свобода, приключения и постоянное развитие. Ваши отношения никогда не стоят на месте — вы вечно в движении.",
+      mission: "Вы — катализаторы перемен и свободы. Задача — разрушать устаревшее и открывать новые пути.",
+      purpose: "Путешествовать, экспериментировать, учить людей гибкости, смелости и умению отпускать старое.",
+      summary: "Самый свободолюбивый союз. Вы не даёте друг другу застаиваться. Главное — научиться возвращаться домой друг к другу."
+    },
+    "6": {
+      overview: "Число 6 — это союз любви, красоты, заботы и служения. Ваши отношения — это настоящее искусство быть вместе.",
+      mission: "Ваша миссия — исцелять через любовь, красоту и заботу.",
+      purpose: "Создавать идеальные семьи, уютные дома, гармоничные сообщества и пространства любви.",
+      summary: "Один из самых тёплых и душевных союзов. Вы лечите друг друга прикосновением. Главное — не забывать о себе, отдавая всё окружающим."
+    },
+    "7": {
+      overview: "Число 7 — это духовный союз, поиск истины и глубокое внутреннее развитие. Вы встретились не случайно — это кармическая связь.",
+      mission: "Вместе вы ищете и передаёте высшую истину.",
+      purpose: "Стать духовными учителями, исследователями, мистиками или просто очень глубокими людьми.",
+      summary: "Вы понимаете друг друга без слов. Ваша любовь — тихая, но невероятно мощная. Главное — не уходить в мир иллюзий и оставаться на земле."
+    },
+    "8": {
+      overview: "Число 8 в качестве Числа Союза означает, что ваши отношения в первую очередь ориентированы на достижение материального успеха, статуса, власти и признания.",
+      mission: "Кармическая задача — овладеть материей и властью, чтобы служить большому делу.",
+      purpose: "Строить крупный бизнес, управлять ресурсами мудро и этично, создавать богатство для будущего.",
+      summary: "Ваш союз — яркая, сильная и амбициозная пара. Потенциал для больших совместных достижений огромен. Просто помните: деньги и статус — не цель, а инструмент. Не теряйте душу в погоне за успехом."
+    },
+    "9": {
+      overview: "Число 9 — это глобальная миссия и завершение кармических циклов. Ваша пара пришла в мир, чтобы нести мудрость и служение.",
+      mission: "Вы пришли завершить старые циклы и служить человечеству без эго. Ваша любовь — глобальна и бескорыстна.",
+      purpose: "Помогать тысячам людей, заниматься благотворительностью, менять мир к лучшему на большом масштабе.",
+      summary: "Это один из самых благородных союзов. Вы способны изменить мир. Главное — не забывать о своих личных потребностях и не приносить отношения в жертву бесконечному служению."
+    }
   },
 
   cellDescriptions: {
@@ -262,15 +309,60 @@ export const EN_NUMEROLOGY_CONTENT: CompatibilityTexts = {
   },
 
   destinyAnalysis: {
-    "1": { mission: "Together you came to be pioneers and leaders. Your task is to initiate and inspire.", purpose: "Create projects, businesses, movements that change the rules." },
-    "2": { mission: "Your joint mission is to teach the world cooperation and true intimacy.", purpose: "Be a model of harmonious relationship and help people reconcile." },
-    "3": { mission: "You are here to bring joy, creativity, and beauty to the world.", purpose: "Inspire through art, words, humor, and lightness." },
-    "4": { mission: "Your karmic task is to build lasting systems that serve generations.", purpose: "Create stable businesses, homes, traditions." },
-    "5": { mission: "You are catalysts of freedom and change. Your job is to break the old and open new paths.", purpose: "Travel, teach flexibility and courage." },
-    "6": { mission: "Your mission is to heal through love, beauty, and care.", purpose: "Create families, communities, spaces of harmony." },
-    "7": { mission: "Together you seek and transmit higher truth.", purpose: "Become teachers, researchers, spiritual guides." },
-    "8": { mission: "Your karmic task is to master matter and power to serve a greater cause.", purpose: "Build large ethical businesses and manage resources wisely." },
-    "9": { mission: "You came to complete old cycles and serve humanity selflessly.", purpose: "Help thousands, complete global tasks." }
+    "1": {
+      overview: "Union Number 1 means you are both pioneers. You were born to lead, initiate, and inspire the world with your example.",
+      mission: "Together you came to be leaders and trailblazers. Your task is to start new things and inspire others.",
+      purpose: "Create projects, businesses, and movements that change the rules of the game.",
+      summary: "You are a true power couple. Where others hesitate — you act. Just don’t compete with each other — walk side by side."
+    },
+    "2": {
+      overview: "Number 2 is the union of harmony, diplomacy, and deep emotional connection. You teach each other patience and true partnership.",
+      mission: "Your joint mission is to teach the world cooperation, diplomacy, and genuine intimacy.",
+      purpose: "Be a role model of perfect relationships and help people reconcile.",
+      summary: "One of the most harmonious unions. You heal each other and the world with your love. Just don’t lose yourself completely in the other."
+    },
+    "3": {
+      overview: "Number 3 is joy, creativity, and lightness. Your relationship is full of laughter, inspiration, and childlike spark.",
+      mission: "You are here to bring joy, creativity, and beauty into the world.",
+      purpose: "Inspire people through art, words, humor, and simply by being yourselves.",
+      summary: "You are the couple that lights up any room. Your task is to never lose that spark — and share it generously."
+    },
+    "4": {
+      overview: "Number 4 is foundation, stability, and long-term achievement. Your union is built on reliability and shared goals.",
+      mission: "Your karmic task is to build lasting systems that serve generations.",
+      purpose: "Create stable businesses, strong families, homes, and traditions that endure.",
+      summary: "You can build a real empire — family, legacy, wealth. Just remember to rest and enjoy the journey."
+    },
+    "5": {
+      overview: "Number 5 is freedom, adventure, and constant growth. Your relationship is always in motion — you never stand still.",
+      mission: "You are catalysts of change and freedom. Your task is to break the old and open new paths.",
+      purpose: "Travel, experiment, teach people flexibility, courage, and the art of letting go.",
+      summary: "The most freedom-loving union. You never let each other stagnate. Just learn to always come back home — to each other."
+    },
+    "6": {
+      overview: "Number 6 is love, beauty, care, and service. Your relationship is a true art of being together.",
+      mission: "Your mission is to heal through love, beauty, and care.",
+      purpose: "Create perfect families, cozy homes, harmonious communities, and spaces of love.",
+      summary: "One of the warmest and most soulful unions. You heal each other with a touch. Just don’t forget about yourself while giving everything to others."
+    },
+    "7": {
+      overview: "Number 7 is a spiritual union, a quest for truth, and deep inner growth. You didn’t meet by chance — this is a karmic connection.",
+      mission: "Together you seek and transmit higher truth.",
+      purpose: "Become spiritual teachers, researchers, mystics — or simply very deep individuals.",
+      summary: "You understand each other without words. Your love is quiet but incredibly powerful. Just don’t escape into illusions — stay grounded."
+    },
+    "8": {
+      overview: "Union Number 8 means your relationship is primarily focused on achieving material success, status, power, and recognition.",
+      mission: "Your karmic task is to master matter and power in order to serve a greater cause.",
+      purpose: "Build big business, manage resources wisely and ethically, create wealth for the future.",
+      summary: "You are a bright, strong, and ambitious couple. The potential for massive joint achievements is enormous. Just remember: money and status are tools, not the goal. Don’t lose your soul in the pursuit of success."
+    },
+    "9": {
+      overview: "Number 9 is a global mission and completion of karmic cycles. Your couple came into the world to carry wisdom and service.",
+      mission: "You came to complete old cycles and serve humanity selflessly. Your love is global and unconditional.",
+      purpose: "Help thousands of people, engage in philanthropy, change the world on a large scale.",
+      summary: "One of the noblest unions. You are capable of changing the world. Just don’t forget your own needs and don’t sacrifice your relationship for endless service."
+    }
   },
 
   cellDescriptions: {

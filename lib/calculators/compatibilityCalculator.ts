@@ -1,7 +1,7 @@
 // lib/calculators/compatibilityCalculator.ts
 
 import { RU_NUMEROLOGY_CONTENT, EN_NUMEROLOGY_CONTENT, CompatibilityTexts } from '@/lib/constants/numerologyTexts';
-import { getCurrentLocale } from '@/lib/constants/locales';
+import { getCurrentLocale, t } from '@/lib/constants/locales';
 
 const getNumerologyContent = (): CompatibilityTexts => {
   const locale = getCurrentLocale();
@@ -22,9 +22,11 @@ export interface CompatibilityResult {
 
   // Текстовые данные
   generalAnalysis: string;
-  destinyInfo: {           // <--- НОВОЕ: Объект с текстом миссии
+  destinyInfo: {
+    overview: string;
     mission: string;
     purpose: string;
+    summary: string;
   };
 
   // Параметры психоматрицы
@@ -138,17 +140,25 @@ const getCompatibilityRecommendations = (lp1: number, lp2: number): string[] => 
   return content.recommendations[key] || content.recommendations["default"] || [];
 };
 
-// Получение текста Миссии Союза
-const getDestinyInfo = (destinyNum: number): { mission: string, purpose: string } => {
+const DESTINY_FALLBACK_KEYS = {
+  overview: 'compatibility.destinyFallback.overview',
+  mission: 'compatibility.destinyFallback.mission',
+  purpose: 'compatibility.destinyFallback.purpose',
+  summary: 'compatibility.destinyFallback.summary',
+};
+
+const getDestinyInfo = (destinyNum: number): CompatibilityResult['destinyInfo'] => {
   const content = getNumerologyContent();
-  // В numerologyTexts ключи могут быть строками ("1"), поэтому приводим к строке
+
   const info = content.destinyAnalysis[String(destinyNum)];
 
   if (info) return info;
 
   return {
-    mission: "Информация о миссии союза формируется...",
-    purpose: "Цели уточняются."
+    overview: t(DESTINY_FALLBACK_KEYS.overview),
+    mission: t(DESTINY_FALLBACK_KEYS.mission),
+    purpose: t(DESTINY_FALLBACK_KEYS.purpose),
+    summary: t(DESTINY_FALLBACK_KEYS.summary)
   };
 };
 

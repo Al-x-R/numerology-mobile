@@ -197,6 +197,8 @@ const translations: LocaleData = {
       // Заголовки в карточке анализа
       lpTitle: 'Числа Жизненного Пути',
       destinyTitle: 'Число Союза',
+      missionLabel: 'Миссия Пары',
+      summaryLabel: 'Общий Вывод',
 
       // Миссия по Числу Союза (1–9)
       destinyMission_1: 'Вместе вы — лидеры и первопроходцы. Ваша сила в инициативе и смелости начинать новое.',
@@ -221,6 +223,13 @@ const translations: LocaleData = {
       // Подписи партнёров
       partner1: 'Партнёр 1',
       partner2: 'Партнёр 2',
+
+      destinyFallback: {
+        overview: "Анализ пока недоступен.",
+        mission: "Информация о миссии союза пока недоступна.",
+        purpose: "Цели уточняются.",
+        summary: "Вывод не сформирован."
+      },
     },
 
     // SECTION TITLES
@@ -497,6 +506,8 @@ const translations: LocaleData = {
 
       lpTitle: 'Life Path Numbers',
       destinyTitle: 'Union Number',
+      missionLabel: 'Union Mission',
+      summaryLabel: 'General Conclusion',
 
       // Destiny Mission (1–9)
       destinyMission_1: 'Together you are leaders and trailblazers. Your strength lies in initiative and courage.',
@@ -519,6 +530,13 @@ const translations: LocaleData = {
 
       partner1: 'Partner 1',
       partner2: 'Partner 2',
+
+      destinyFallback: {
+        overview: "Analysis currently unavailable.",
+        mission: "Union mission details are unavailable.",
+        purpose: "Goals are being defined.",
+        summary: "Conclusion could not be generated."
+      },
     },
 
     // SECTION TITLES
