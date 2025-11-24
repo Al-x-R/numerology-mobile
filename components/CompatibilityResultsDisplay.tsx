@@ -1,7 +1,7 @@
 // components/CompatibilityResultsDisplay.tsx
 
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -19,6 +19,7 @@ import Animated, {
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
+import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 
 interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
@@ -32,6 +33,8 @@ interface DestinyInfo {
   mission: string;
   purpose: string;
   summary: string;
+  challenges: string[];
+  advice: string;
 }
 
 interface GeneralAnalysisCardProps {
@@ -39,7 +42,6 @@ interface GeneralAnalysisCardProps {
   lifePath2: number;
   destinyNumber: number;
   destinyInfo: DestinyInfo;
-  generalAnalysis: string;
   date1: string;
   date2: string;
   index: number;
@@ -50,7 +52,6 @@ function GeneralAnalysisCard({
   lifePath2,
   destinyNumber,
   destinyInfo,
-  generalAnalysis,
   date1,
   date2,
   index,
@@ -75,39 +76,26 @@ function GeneralAnalysisCard({
         {date1}  ↔  {date2}
       </Text>
 
-      {/* 1. Заголовок ЧЖП */}
-      <Text style={styles.analysisTitle}>
-        {t('compatibility.lpTitle')} {lifePath1} + {lifePath2}
+      <Text style={styles.analysisTitleLabel}>
+        {t('compatibility.lpTitle')}
+      </Text>
+      <Text style={styles.analysisTitleValues}>
+        {lifePath1} + {lifePath2}
       </Text>
 
-      {/* 2. Число Союза */}
+
       <Text style={styles.destinyTitle}>
         {t('compatibility.destinyTitle')} {destinyNumber}
       </Text>
 
-      {/* 3. Общая характеристика Союза (Overview) */}
       <Text style={styles.destinyOverviewText}>
         {destinyInfo.overview}
       </Text>
 
-      {/* 4. Миссия Пары */}
-      <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
-      <Text style={styles.destinyMission}>{destinyInfo.mission}</Text>
 
-      {/* 5. Цель/Вызов (Purpose) - опционально можно добавить сюда или в общий вывод */}
+      {/*<View style={styles.separator} />*/}
 
-      <View style={styles.separator} />
 
-      {/* 6. Общий анализ совместимости ЧЖП (Берем из LP Analysis) */}
-      <Text style={styles.analysisText}>{generalAnalysis}</Text>
-
-      {/* 7. Общий Вывод по Союзу (Summary) */}
-      {destinyInfo.summary && (
-        <View style={styles.summaryContainer}>
-          <Text style={styles.summaryLabel}>{t('compatibility.summaryLabel')}:</Text>
-          <Text style={styles.summaryText}>{destinyInfo.summary}</Text>
-        </View>
-      )}
     </Animated.View>
   );
 }
@@ -204,32 +192,61 @@ function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProp
   );
 }
 
-interface AnimatedRecommendationCardProps {
-  text: string;
-  index: number;
+interface PremiumConclusionCardProps {
+  destinyInfo: DestinyInfo;
+  recommendations: string[];
 }
 
-function AnimatedRecommendationCard({ text, index }: AnimatedRecommendationCardProps) {
-  const opacity = useSharedValue(0);
-  const translateX = useSharedValue(-30);
-
-  useEffect(() => {
-    const delay = index * 80;
-    opacity.value = withDelay(delay, withTiming(1, { duration: 500 }));
-    translateX.value = withDelay(delay, withTiming(0, { duration: 550, easing: Easing.out(Easing.quad) }));
-  }, [index]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateX: translateX.value }],
-  }));
-
+function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusionCardProps) {
   return (
-    <Animated.View style={[styles.recommendationCard, animatedStyle]}>
-      <Text style={styles.recommendationText}>• {text}</Text>
-    </Animated.View>
+    <View style={[styles.section, styles.premiumConclusionSection]}>
+      <Text style={styles.sectionTitle}>{t('compatibility.conclusionTitle')}</Text>
+
+      <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
+      <Text style={styles.missionText}>{destinyInfo.mission}</Text>
+
+      {destinyInfo.purpose && (
+        <View>
+          <Text style={styles.destinyPurposeLabel}>{t('compatibility.purposeLabel')}</Text>
+          <Text style={styles.purposeTextBody}>{destinyInfo.purpose}</Text>
+        </View>
+      )}
+
+      {destinyInfo.challenges && destinyInfo.challenges.length > 0 && (
+        <View style={styles.challengesList}>
+          <Text style={styles.challengesListTitle}>{t('compatibility.challengesLabel')}</Text>
+          {destinyInfo.challenges.map((challenge, i) => (
+            <View key={i} style={styles.challengeItem}>
+              <Text style={styles.challengeItemText}>{challenge}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      <Text style={styles.destinyMissionLabel}>{t('compatibility.summaryLabel')}</Text>
+      <Text style={styles.summaryTextBody}>{destinyInfo.summary}</Text>
+
+      {destinyInfo.advice && (
+        <View style={styles.adviceContainer}>
+          <Text style={styles.adviceMotto}>{destinyInfo.advice}</Text>
+        </View>
+      )}
+
+      {recommendations.length > 0 && (
+        <View style={styles.recommendationsList}>
+          <Text style={styles.recommendationsListTitle}>{t('compatibility.recommendations')}:</Text>
+          {recommendations.map((rec, i) => (
+            <View key={i} style={styles.recommendationItem}>
+              <Text style={styles.recommendationBullet}>•</Text>
+              <Text style={styles.recommendationItemText}>{rec}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
   );
 }
+
 
 export function CompatibilityResultsDisplay({
   result,
@@ -243,12 +260,37 @@ export function CompatibilityResultsDisplay({
     return COLORS.error;
   };
 
-  const totalColor = getTotalColor(result.totalPct);
-  const fullTotalColor = result.fullTotalPct ? getTotalColor(result.fullTotalPct) : COLORS.text;
+  const showFullTotal = result.fullTotalPct !== undefined;
+  const finalTotal = result.fullTotalPct ?? result.totalPct;
+  const finalTotalLabel = showFullTotal ? t('compatibility.fullTotal') : t('compatibility.baseTotal');
+  const finalTotalColor = getTotalColor(finalTotal);
+
+  const paramSectionTitle = t('compatibility.paramsSectionTitle');
+
+  const [isTeaserVisible, setIsTeaserVisible] = useState(false);
+
+  useEffect(() => {
+
+    if (!showFullTotal) {
+
+      const timer = setTimeout(() => {
+        setIsTeaserVisible(true);
+      }, 8000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showFullTotal]);
+
+  const handleUpgrade = () => {
+    setIsTeaserVisible(false);
+    // TODO: логика навигации на экран оплаты
+    // router.push('/premium/upgrade');
+    console.log("Navigating to Premium Upgrade Screen");
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-      {/* Главный анализ */}
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('compatibility.lpAnalysisSection')}</Text>
         <GeneralAnalysisCard
@@ -256,60 +298,70 @@ export function CompatibilityResultsDisplay({
           lifePath2={result.lifePath2}
           destinyNumber={result.destinyNumber}
           destinyInfo={result.destinyInfo}
-          generalAnalysis={result.generalAnalysis}
           date1={date1}
           date2={date2}
           index={0}
         />
       </View>
 
-      {/* Базовые параметры */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('compatibility.baseParamsSection')}</Text>
+        <Text style={styles.sectionTitle}>{paramSectionTitle}</Text>
 
         <CompatibilityParamCard title={t('compatibility.energy')}   p1={result.energy.p1}    p2={result.energy.p2}    pct={result.energy.pct}    index={1} />
         <CompatibilityParamCard title={t('compatibility.character')} p1={result.character.p1} p2={result.character.p2} pct={result.character.pct} index={2} />
         <CompatibilityParamCard title={t('compatibility.interest')}  p1={result.interest.p1}  p2={result.interest.p2}  pct={result.interest.pct}  index={3} />
+
+        {showFullTotal && result.karma && result.family && result.talent && result.spirituality && (
+          <>
+            <CompatibilityParamCard title={t('compatibility.karma')}       p1={result.karma.p1}       p2={result.karma.p2}       pct={result.karma.pct}       index={5} />
+            <CompatibilityParamCard title={t('compatibility.family')}      p1={result.family.p1}      p2={result.family.p2}      pct={result.family.pct}      index={6} />
+            <CompatibilityParamCard title={t('compatibility.talent')}      p1={result.talent.p1}      p2={result.talent.p2}      pct={result.talent.pct}      index={7} />
+            <CompatibilityParamCard title={t('compatibility.spirituality')} p1={result.spirituality.p1} p2={result.spirituality.p2} pct={result.spirituality.pct} index={8} />
+          </>
+        )}
       </View>
 
-      <AnimatedTotalCard label={t('compatibility.baseTotal')} value={result.totalPct} color={totalColor} index={4} />
+      <AnimatedTotalCard
+        label={finalTotalLabel}
+        value={finalTotal}
+        color={finalTotalColor}
+        index={showFullTotal ? 9 : 4}
+      />
 
-      {/* Премиум-параметры */}
-      {result.karma && result.family && result.talent && result.spirituality &&  (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('compatibility.premiumParamsSection')}</Text>
-          <CompatibilityParamCard title={t('compatibility.karma')}       p1={result.karma.p1}       p2={result.karma.p2}       pct={result.karma.pct}       index={5} />
-          <CompatibilityParamCard title={t('compatibility.family')}      p1={result.family.p1}      p2={result.family.p2}      pct={result.family.pct}      index={6} />
-          <CompatibilityParamCard title={t('compatibility.talent')}      p1={result.talent.p1}      p2={result.talent.p2}      pct={result.talent.pct}      index={7} />
-          <CompatibilityParamCard title={t('compatibility.spirituality')} p1={result.spirituality.p1} p2={result.spirituality.p2} pct={result.spirituality.pct} index={8} />
+      {!showFullTotal && (
+        <View style={[styles.section, styles.lpAnalysisTextSection]}>
+          <Text style={styles.analysisTextTitle}>{t('compatibility.conclusionTitle')}</Text>
+          <Text style={styles.analysisTextBody}>{result.generalAnalysis}</Text>
         </View>
       )}
 
-      {result.fullTotalPct && (
-        <AnimatedTotalCard label={t('compatibility.fullTotal')} value={result.fullTotalPct} color={fullTotalColor} index={9} />
+
+      {showFullTotal && result.recommendations && (
+        <PremiumConclusionCard
+          destinyInfo={result.destinyInfo}
+          recommendations={result.recommendations}
+        />
       )}
 
-      {/* Рекомендации */}
-      {result.recommendations && result.recommendations.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('compatibility.recommendations')}</Text>
-          {result.recommendations.map((rec, i) => (
-            <AnimatedRecommendationCard key={i} text={rec} index={10 + i} />
-          ))}
-        </View>
-      )}
+      <PremiumTeaserModal
+        visible={isTeaserVisible}
+        onClose={() => setIsTeaserVisible(false)}
+        onUpgrade={handleUpgrade}
+      />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContent: { padding: SPACING.xs, paddingBottom: SPACING.xl },
+  scrollContent: { padding: SPACING.xs, paddingBottom: SPACING.xl * 2 },
   section: { marginBottom: SPACING.xl },
   sectionTitle: {
     ...FONTS.sectionTitle,
     fontSize: 20,
     marginBottom: SPACING.md,
   },
+
+  // --- GENERAL ANALYSIS CARD STYLES ---
 
   analysisCard: {
     backgroundColor: COLORS.card,
@@ -326,12 +378,19 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
 
-  analysisTitle: {
+  analysisTitleLabel: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 22,
     color: COLORS.primary,
     textAlign: 'center',
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs * 0.5,
+  },
+  analysisTitleValues: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 26,
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: SPACING.md,
   },
 
   destinyTitle: {
@@ -342,15 +401,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
 
-  destinyMission: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontStyle: 'italic',
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.lg,
-    lineHeight: 24,
-  },
   destinyOverviewText: {
     fontFamily: FONT_FAMILY.manrope.regular,
     fontSize: 16,
@@ -359,31 +409,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     lineHeight: 24,
   },
-  destinyMissionLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 14,
-    color: COLORS.accent,
-    marginTop: SPACING.lg,
-    textAlign: 'center',
-  },
-  summaryContainer: {
-    marginTop: SPACING.lg,
-    paddingTop: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
-  },
-  summaryLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 16,
-    color: COLORS.primary,
-    marginBottom: SPACING.xs,
-  },
-  summaryText: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
-  },
 
   separator: {
     height: 1,
@@ -391,10 +416,153 @@ const styles = StyleSheet.create({
     marginVertical: SPACING.lg,
   },
 
-  analysisText: {
+  // --- LP ANALYSIS TEXT SECTION (NEW BLOCK) ---
+
+  lpAnalysisTextSection: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    marginBottom: SPACING.xl,
+    ...SHADOWS.card,
+  },
+  analysisTextTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 18,
+    color: COLORS.primary,
+    marginBottom: SPACING.sm,
+  },
+  analysisTextBody: {
     ...FONTS.body,
     lineHeight: 26,
   },
+
+  // --- PREMIUM CONCLUSION STYLES ---
+  premiumConclusionSection: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    marginBottom: SPACING.xl,
+    ...SHADOWS.card,
+  },
+  destinyMissionLabel: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 16,
+    color: COLORS.accent,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.xs,
+    textAlign: 'left',
+  },
+  destinyPurposeLabel: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 16,
+    color: COLORS.accent,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.xs,
+    textAlign: 'left',
+  },
+  missionText: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontStyle: 'italic',
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginBottom: SPACING.md,
+  },
+  purposeTextBody: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontStyle: 'italic',
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginBottom: SPACING.md,
+  },
+  summaryTextBody: {
+    fontFamily: FONT_FAMILY.manrope.regular,
+    fontSize: 15,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginBottom: SPACING.md,
+  },
+  recommendationsList: {
+    marginTop: SPACING.lg,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+    paddingTop: SPACING.md,
+  },
+  recommendationsListTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 18,
+    color: COLORS.primary,
+    marginBottom: SPACING.sm,
+  },
+  recommendationItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.xs,
+  },
+  recommendationBullet: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    color: COLORS.accent,
+    marginRight: SPACING.xs,
+    fontSize: 18,
+    lineHeight: 22,
+  },
+  recommendationItemText: {
+    ...FONTS.body,
+    flex: 1,
+    color: COLORS.text,
+    lineHeight: 22,
+  },
+
+  challengesList: {
+    marginTop: SPACING.xl,
+    paddingTop: SPACING.md,
+    // Используем тонкую линию сверху для отделения
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  challengesListTitle: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 18,
+    color: COLORS.error,
+    marginBottom: SPACING.md,
+  },
+  challengeItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.md,
+  },
+  challengeItemText: {
+    ...FONTS.body,
+    flex: 1,
+    color: COLORS.text,
+    lineHeight: 22,
+    marginLeft: SPACING.sm,
+  },
+
+  // --- 5. ADVICE/MOTTO STYLES ---
+  adviceContainer: {
+    marginTop: SPACING.xl,
+    marginBottom: SPACING.lg,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.md,
+
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderRadius: RADIUS.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.accent,
+    ...SHADOWS.card,
+  },
+  adviceMotto: {
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontStyle: 'italic',
+    fontSize: 18,
+    color: COLORS.accent,
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+
+  // --- PARAMETER CARD STYLES ---
 
   paramCard: {
     backgroundColor: COLORS.card,
@@ -446,9 +614,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // === Итоговая карточка ===
+  // --- TOTAL CARD STYLES (Adjusted) ---
+
   totalContainer: {
-    alignItems: 'center',
     marginBottom: SPACING.xl,
   },
 
@@ -456,7 +624,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.xl,
     ...SHADOWS.button,
   },
@@ -478,22 +646,5 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
-  },
-
-  // === Рекомендации ===
-  recommendationCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.md,
-    padding: SPACING.lg,
-    marginBottom: SPACING.sm,
-    ...SHADOWS.card,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.accent,
-  },
-
-  recommendationText: {
-    ...FONTS.body,
-    lineHeight: 24,
-    color: COLORS.text,
   },
 });

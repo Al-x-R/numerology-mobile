@@ -185,6 +185,14 @@ const translations: LocaleData = {
       loadingText: 'Анализ совместимости...',
 
       compatibilityResultsTitle: 'Совместимость',
+      lpAnalysisTextTitle: 'Глубинный анализ Чисел Жизненного Пути',
+
+      purposeLabel: 'Цель Пары',
+      conclusionTitle: 'Выводы и Рекомендации',
+
+      challengesLabel: 'Главные Вызовы Союза',
+
+      paramsSectionTitle: 'Параметры совместимости',
 
       // Секции результатов
       lpAnalysisSection: 'Анализ Чисел Жизненного Пути',
@@ -496,6 +504,12 @@ const translations: LocaleData = {
       loadingText: 'Analyzing compatibility...',
 
       compatibilityResultsTitle: 'Compatibility',
+      lpAnalysisTextTitle: 'Deep Life Path Analysis',
+      purposeLabel: 'Union Purpose',
+      premiumConclusionTitle: 'Deep Conclusions & Recommendations',
+      challengesLabel: 'Core Union Challenges',
+
+      paramsSectionTitle: 'Compatibility Parameters',
 
       lpAnalysisSection: 'Life Path Numbers Analysis',
       baseParamsSection: 'Core Compatibility',
@@ -632,7 +646,7 @@ const translations: LocaleData = {
   },
 };
 
-let currentLocale: Locale = 'en';
+let currentLocale: Locale = 'ru';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;

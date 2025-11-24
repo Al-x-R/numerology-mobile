@@ -27,6 +27,8 @@ export interface CompatibilityResult {
     mission: string;
     purpose: string;
     summary: string;
+    challenges: string[];
+    advice: string;
   };
 
   // Параметры психоматрицы
@@ -145,6 +147,8 @@ const DESTINY_FALLBACK_KEYS = {
   mission: 'compatibility.destinyFallback.mission',
   purpose: 'compatibility.destinyFallback.purpose',
   summary: 'compatibility.destinyFallback.summary',
+  challenges: 'compatibility.destinyFallback.challenges',
+  advice: 'compatibility.destinyFallback.advice',
 };
 
 const getDestinyInfo = (destinyNum: number): CompatibilityResult['destinyInfo'] => {
@@ -158,7 +162,9 @@ const getDestinyInfo = (destinyNum: number): CompatibilityResult['destinyInfo'] 
     overview: t(DESTINY_FALLBACK_KEYS.overview),
     mission: t(DESTINY_FALLBACK_KEYS.mission),
     purpose: t(DESTINY_FALLBACK_KEYS.purpose),
-    summary: t(DESTINY_FALLBACK_KEYS.summary)
+    summary: t(DESTINY_FALLBACK_KEYS.summary),
+    challenges: [t(DESTINY_FALLBACK_KEYS.challenges)],
+    advice: t(DESTINY_FALLBACK_KEYS.advice)
   };
 };
 
