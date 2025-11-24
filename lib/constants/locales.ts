@@ -188,6 +188,7 @@ const translations: LocaleData = {
       lpAnalysisTextTitle: 'Глубинный анализ Чисел Жизненного Пути',
 
       purposeLabel: 'Цель Пары',
+      premiumConclusionTitle: 'Глубинные Выводы и Рекомендации',
       conclusionTitle: 'Выводы и Рекомендации',
 
       challengesLabel: 'Главные Вызовы Союза',
@@ -238,6 +239,38 @@ const translations: LocaleData = {
         purpose: "Цели уточняются.",
         summary: "Вывод не сформирован."
       },
+    },
+
+    premiumTeaserTitleGeneral: 'Полный Код Судьбы',
+    premiumTeaserTextGeneral: 'Откройте глубинный анализ совместимости, персональные гороскопы и Число Дня без рекламы.',
+
+    premiumTeaserTitleGuest: 'Откройте свою Судьбу',
+    premiumTeaserTextGuest: 'Для получения полного анализа и рекомендаций, пожалуйста, создайте аккаунт.',
+
+    premiumTeaserCTARegister: 'Открыть доступ',
+    premiumTeaserCTAUpgrade: 'Открыть всё',
+
+    later: 'Позже',
+    alreadyHaveAccount: 'У меня уже есть аккаунт',
+
+    premium: {
+      title: 'Premium',
+      subtitle: 'Раскрой все тайны своей судьбы',
+      benefits: {
+        compatibility: 'Полная совместимость по Матрице Судьбы',
+        horoscope: 'Персональный гороскоп на каждый день',
+        karma: 'Расшифровка Кармического хвоста',
+        ads: 'Без рекламы и ограничений',
+      },
+      plans: {
+        year: '1 Год',
+        month: '1 Месяц',
+        priceYear: '2990 ₽ / год', // В будущем это будет приходить из стора
+        priceMonth: '499 ₽ / мес', // В будущем это будет приходить из стора
+        save: 'Выгода 50%',
+      },
+      disclaimer: 'Подписка продлевается автоматически. Отмена в любой момент.',
+      ctaTry: 'Попробовать бесплатно',
     },
 
     // SECTION TITLES
@@ -553,6 +586,38 @@ const translations: LocaleData = {
       },
     },
 
+    premiumTeaserTitleGeneral: 'Full Destiny Code',
+    premiumTeaserTextGeneral: 'Unlock deep compatibility analysis, personal horoscopes, and your Daily Number, all ad-free.',
+
+    premiumTeaserTitleGuest: 'Unlock Your Destiny',
+    premiumTeaserTextGuest: 'To receive the full analysis and recommendations, please create an account.',
+
+    premiumTeaserCTARegister: 'Get Access',
+    premiumTeaserCTAUpgrade: 'Unlock All',
+
+    later: 'Later',
+    alreadyHaveAccount: 'I already have an account',
+
+    premium: {
+      title: 'Premium',
+      subtitle: 'Unlock all secrets of your destiny',
+      benefits: {
+        compatibility: 'Full Matrix of Destiny compatibility',
+        horoscope: 'Personal daily horoscope',
+        karma: 'Karmic Tail deciphering',
+        ads: 'No ads and limits',
+      },
+      plans: {
+        year: '1 Year',
+        month: '1 Month',
+        priceYear: '$29.99 / year',
+        priceMonth: '$4.99 / mo',
+        save: 'Save 50%',
+      },
+      disclaimer: 'Subscription auto-renews. Cancel anytime.',
+      ctaTry: 'Try for Free',
+    },
+
     // SECTION TITLES
     section_workingNumbers: 'Additional Numbers',
     section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
@@ -646,7 +711,7 @@ const translations: LocaleData = {
   },
 };
 
-let currentLocale: Locale = 'ru';
+let currentLocale: Locale = 'en';
 
 export const setLocale = (locale: Locale) => {
   currentLocale = locale;

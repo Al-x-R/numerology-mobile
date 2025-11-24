@@ -52,6 +52,17 @@ export default function ProfileDrawer({ onClose }: Props) {
     router.push('/(auth)/login');
   };
 
+  const handleUpgrade = () => {
+    if (isGuest) {
+      // Если гость хочет купить, сначала логиним его, потом шлем на апгрейд
+      // handleLogin('/(app)/premium/upgrade');
+      router.push('/premium/upgrade');
+    } else {
+      // Если свой, сразу на апгрейд
+      router.push('/premium/upgrade');
+    }
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/*<View style={styles.closeButtonWrapper}>*/}
@@ -118,7 +129,7 @@ export default function ProfileDrawer({ onClose }: Props) {
               </Text>
             </View>
           ) : (
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleUpgrade}>
               <Ionicons name="diamond-outline" size={22} color={COLORS.accent} />
               <Text style={styles.menuText}>{t('profile.getPremium')}</Text>
               <Ionicons name="chevron-forward" size={22} color="#666" />

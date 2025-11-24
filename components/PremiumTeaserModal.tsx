@@ -1,4 +1,3 @@
-// components/PremiumTeaserModal.tsx
 import React, { useEffect } from 'react';
 import {
   View,
@@ -19,15 +18,18 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { t } from '@/lib/constants/locales';
-import { COLORS, FONTS, SPACING, RADIUS, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, FONTS, SPACING, RADIUS, SHADOWS, FONT_FAMILY } from '@/lib/constants/theme';
 
 interface PremiumTeaserModalProps {
   visible: boolean;
   onClose: () => void;
   onUpgrade: () => void;
+  isLoggedIn: boolean;
+  onLogin: () => void;
 }
 
-export function PremiumTeaserModal({ visible, onClose, onUpgrade }: PremiumTeaserModalProps) {
+// ИЗМЕНЕНИЕ: export default function вместо export function
+export function PremiumTeaserModal({ visible, onClose, onUpgrade, isLoggedIn, onLogin }: PremiumTeaserModalProps) {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.95);
   const translateY = useSharedValue(20);
@@ -51,22 +53,40 @@ export function PremiumTeaserModal({ visible, onClose, onUpgrade }: PremiumTease
 
   if (!visible) return null;
 
+  const titleKey = isLoggedIn ? 'premiumTeaserTitle' : 'premiumTeaserTitleGuest';
+  const textKey = isLoggedIn ? 'premiumTeaserText' : 'premiumTeaserTextGuest';
+  const ctaKey = isLoggedIn ? 'premiumTeaserCTAUpgrade' : 'premiumTeaserCTARegister';
+  const secondaryCtaKey = isLoggedIn ? 'later' : 'alreadyHaveAccount';
+
+  const handleMainAction = isLoggedIn ? onUpgrade : onLogin;
+  const handleSecondaryAction = isLoggedIn ? onClose : onLogin;
+
   return (
     <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <Animated.View style={[styles.modal, animatedStyle]}>
-              <LinearGradient colors={['#8B5CF6', '#6D28D9']} style={styles.gradient}>
-                <MaterialIcons name="lock" size={32} color="#FFF" style={styles.lock} />
-                <Text style={styles.title}>{t('premiumTeaserTitle')}</Text>
-                <Text style={styles.text}>{t('premiumTeaserText')}</Text>
-                <TouchableOpacity style={styles.button} onPress={onUpgrade}>
-                  <Text style={styles.buttonText}>{t('premiumTeaserCTA')}</Text>
+
+              <LinearGradient colors={[COLORS.background, '#1A1A1A']} style={styles.gradient}>
+                <MaterialIcons name="lock" size={32} color={COLORS.accent} style={styles.lock} />
+
+                <Text style={styles.title}>{t(titleKey)}</Text>
+                <Text style={styles.text}>{t(textKey)}</Text>
+
+                <TouchableOpacity style={styles.button} onPress={handleMainAction}>
+                  <LinearGradient
+                    colors={['#FFD700', COLORS.primary]}
+                    style={styles.buttonGradient}
+                  >
+                    <Text style={styles.buttonText}>{t(ctaKey)}</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.close} onPress={onClose}>
-                  <Text style={styles.closeText}>{t('later')}</Text>
+
+                <TouchableOpacity style={styles.close} onPress={handleSecondaryAction}>
+                  <Text style={styles.closeText}>{t(secondaryCtaKey)}</Text>
                 </TouchableOpacity>
+
               </LinearGradient>
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -79,7 +99,7 @@ export function PremiumTeaserModal({ visible, onClose, onUpgrade }: PremiumTease
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -88,6 +108,9 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
     ...SHADOWS.card,
+    shadowColor: COLORS.accent,
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
   },
   gradient: {
     padding: SPACING.xl,
@@ -95,39 +118,48 @@ const styles = StyleSheet.create({
   },
   lock: {
     marginBottom: SPACING.sm,
+    color: COLORS.accent,
   },
   title: {
-    ...FONTS.sectionTitle,
-    fontSize: 20,
-    color: '#FFF',
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 22,
+    color: COLORS.text,
     marginBottom: SPACING.xs,
+    textAlign: 'center',
   },
   text: {
-    ...FONTS.cardDescription,
+    ...FONTS.body,
     fontSize: 15,
-    color: '#E0C3FC',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: SPACING.lg,
     lineHeight: 22,
   },
   button: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.sm,
+    width: '100%',
     borderRadius: RADIUS.modal,
     marginBottom: SPACING.sm,
+    ...SHADOWS.button,
+    overflow: 'hidden',
+  },
+  buttonGradient: {
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     ...FONTS.button,
-    color: '#6D28D9',
-    fontWeight: '700',
+    color: '#000',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   close: {
     marginTop: SPACING.xs,
   },
   closeText: {
-    ...FONTS.cardDescription,
-    color: '#E0C3FC',
+    ...FONTS.body,
+    color: COLORS.textSecondary,
     fontSize: 14,
   },
 });
