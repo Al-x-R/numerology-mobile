@@ -13,14 +13,9 @@ export default function ProfileLayout() {
         name="index"
         options={{
           title: t('profile.title'), // "Профиль"
-          headerStyle: {
-            backgroundColor: '#0d0d0d',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: '600',
-            fontSize: 18,
-          },
+          headerStyle: { backgroundColor: COLORS.headerBackground },
+          headerTintColor: COLORS.accent,
+          headerTitleAlign: 'center',
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}

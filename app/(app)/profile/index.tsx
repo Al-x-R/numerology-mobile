@@ -1,4 +1,5 @@
 // components/ui/ProfileDrawer.tsx
+
 import React from 'react';
 import {
   View,
@@ -9,17 +10,27 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '@/lib/constants/locales';
 import { formatBirthDate } from '@/lib/utils/date';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = {
   onClose: () => void;
 };
+
+// Интерфейс для элемента меню
+interface MenuItemProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  text: string;
+  onPress?: () => void;
+  color?: string;
+  isPremiumAction?: boolean;
+}
 
 export default function ProfileDrawer({ onClose }: Props) {
   const insets = useSafeAreaInsets();
@@ -48,28 +59,62 @@ export default function ProfileDrawer({ onClose }: Props) {
     ]);
   };
 
-  const handleLogin = () => {
-    router.push('/(auth)/login');
+  // Логика входа с поддержкой редиректа
+  const handleLogin = (redirectPath?: string) => {
+    if (redirectPath) {
+      // Передаем путь возврата как параметр (нужно обработать в login.tsx)
+      router.push(`/(auth)/login?redirect=${redirectPath}`);
+    } else {
+      router.push('/(auth)/login');
+    }
   };
 
+  // Умная логика покупки
   const handleUpgrade = () => {
     if (isGuest) {
-      // Если гость хочет купить, сначала логиним его, потом шлем на апгрейд
-      // handleLogin('/(app)/premium/upgrade');
-      router.push('/premium/upgrade');
+      // Гость: сначала логин -> потом автоматически на экран покупки
+      handleLogin('/premium/upgrade');
     } else {
-      // Если свой, сразу на апгрейд
+      // Свой: сразу на экран покупки
       router.push('/premium/upgrade');
     }
   };
 
+  // Reusable компонент пункта меню
+  const MenuItem = ({
+    icon,
+    text,
+    onPress,
+    color = COLORS.text,
+    isPremiumAction = false
+  }: MenuItemProps) => (
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={onPress}
+      disabled={!onPress && !isPremiumAction}
+    >
+      <Ionicons name={icon} size={22} color={isPremiumAction ? COLORS.accent : COLORS.accent} />
+
+      <Text style={[styles.menuText, { color }]}>{text}</Text>
+
+      {isPremiumAction ? (
+        <LinearGradient
+          colors={GRADIENTS.button}
+          style={styles.upgradeButton}
+        >
+          {/* Черная иконка на золотом фоне для контраста */}
+          <MaterialCommunityIcons name="crown" size={16} color="#000" />
+        </LinearGradient>
+      ) : (
+        <Ionicons name="chevron-forward" size={22} color={COLORS.textSecondary} />
+      )}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/*<View style={styles.closeButtonWrapper}>*/}
-      {/*  <TouchableOpacity onPress={onClose} style={styles.closeButtonTouchable}>*/}
-      {/*    <Ionicons name="close" size={28} color="#fff" />*/}
-      {/*  </TouchableOpacity>*/}
-      {/*</View>*/}
+      {/* 1. Премиальный фон */}
+      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
 
       <ScrollView
         contentContainerStyle={[
@@ -78,6 +123,7 @@ export default function ProfileDrawer({ onClose }: Props) {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        {/* --- HEADER --- */}
         <View style={styles.header}>
           <View style={styles.photoContainer}>
             {photoURL ? (
@@ -87,15 +133,23 @@ export default function ProfileDrawer({ onClose }: Props) {
                 <Ionicons name="person" size={56} color={COLORS.accent} />
               </View>
             )}
-            <TouchableOpacity style={styles.cameraIcon}>
-              <Ionicons name="camera" size={18} color="#fff" />
-            </TouchableOpacity>
+
+            {!isGuest && (
+              <TouchableOpacity style={styles.cameraIcon}>
+                <Ionicons name="camera" size={16} color="#000" />
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text style={styles.greeting}>{t('profile.hello')}</Text>
+
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{displayName}</Text>
-            {isPremium && <Text style={styles.premiumBadge}> Premium</Text>}
+            {isPremium && (
+              <View style={styles.premiumBadgeContainer}>
+                <Text style={styles.premiumBadgeText}>PRO</Text>
+              </View>
+            )}
           </View>
 
           {birthDate && (
@@ -103,60 +157,57 @@ export default function ProfileDrawer({ onClose }: Props) {
           )}
         </View>
 
+        {/* --- MENU --- */}
         <View style={styles.menu}>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => {
-              router.push('/profile/edit');
-            }}
-          >
-            <Ionicons name="person-outline" size={22} color={COLORS.accent} />
-            <Text style={styles.menuText}>{t('profile.editProfile')}</Text>
-            <Ionicons name="chevron-forward" size={22} color="#666" />
-          </TouchableOpacity>
+          <MenuItem
+            icon="person-outline"
+            text={t('profile.editProfile')}
+            onPress={() => router.push('/profile/edit')}
+          />
 
-          <TouchableOpacity style={styles.menuItem}>
-            <Ionicons name="globe-outline" size={22} color={COLORS.accent} />
-            <Text style={styles.menuText}>{t('profile.changeLanguage')}</Text>
-            <Ionicons name="chevron-forward" size={22} color="#666" />
-          </TouchableOpacity>
+          <MenuItem
+            icon="globe-outline"
+            text={t('profile.changeLanguage')}
+            onPress={() => { /* Логика смены языка */ }}
+          />
 
           {isPremium ? (
-            <View style={styles.menuItem}>
-              <Ionicons name="diamond" size={22} color={COLORS.accent} />
-              <Text style={[styles.menuText, styles.premiumActive]}>
-                {t('profile.premiumActive')}
-              </Text>
-            </View>
+            <MenuItem
+              icon="diamond"
+              text={t('profile.premiumActive')}
+              color={COLORS.accent}
+              onPress={() => { /* Управление подпиской */ }}
+            />
           ) : (
-            <TouchableOpacity style={styles.menuItem} onPress={handleUpgrade}>
-              <Ionicons name="diamond-outline" size={22} color={COLORS.accent} />
-              <Text style={styles.menuText}>{t('profile.getPremium')}</Text>
-              <Ionicons name="chevron-forward" size={22} color="#666" />
-            </TouchableOpacity>
+            <MenuItem
+              icon="diamond-outline"
+              text={t('profile.getPremium')}
+              onPress={handleUpgrade}
+              isPremiumAction={true} // Активируем кнопку-корону
+            />
           )}
         </View>
 
         <View style={styles.divider} />
 
+        {/* --- AUTH ACTIONS --- */}
         <View style={styles.menu}>
           {isGuest && (
-            <TouchableOpacity style={styles.menuItem} onPress={handleLogin}>
-              <Ionicons name="log-in-outline" size={24} color={COLORS.accent} />
-              <Text style={[styles.menuText, styles.accentText]}>
-                {t('profile.loginOrRegister')}
-              </Text>
-              <Ionicons name="chevron-forward" size={22} color="#666" />
-            </TouchableOpacity>
+            <MenuItem
+              icon="log-in-outline"
+              text={t('profile.loginOrRegister')}
+              onPress={() => handleLogin()} // Обычный логин без редиректа
+              color={COLORS.accent}
+            />
           )}
 
           {!isGuest && (
-            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
-              <Text style={[styles.menuText, { color: '#FF3B30' }]}>
-                {t('profile.logout')}
-              </Text>
-            </TouchableOpacity>
+            <MenuItem
+              icon="log-out-outline"
+              text={t('profile.logout')}
+              onPress={handleLogout}
+              color="#FF3B30"
+            />
           )}
         </View>
 
@@ -171,84 +222,84 @@ export default function ProfileDrawer({ onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#121212' },
-  closeButtonWrapper: {
-    position: 'absolute',
-    top: 25,
-    left: 0,
-    right: 0,
-    height: 80,
-    justifyContent: 'center',
-    paddingLeft: SPACING.md,
-    zIndex: 10,
-  },
-  closeButtonTouchable: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 22,
-  },
-  scrollContent: { paddingTop: 90, paddingHorizontal: SPACING.xl },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  scrollContent: { paddingTop: 60, paddingHorizontal: SPACING.xl },
+
+  // --- HEADER ---
   header: { alignItems: 'center', marginBottom: SPACING.xl },
   photoContainer: { position: 'relative', marginBottom: SPACING.lg },
   photo: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 3,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
     borderColor: COLORS.accent,
   },
   photoFallback: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: COLORS.accent,
   },
   cameraIcon: {
     position: 'absolute',
-    bottom: 6,
-    right: 6,
+    bottom: 0,
+    right: 0,
     backgroundColor: COLORS.accent,
-    padding: 8,
+    padding: 6,
     borderRadius: 20,
-    borderWidth: 3,
-    borderColor: '#121212',
+    borderWidth: 2,
+    borderColor: COLORS.background,
   },
-  greeting: { ...FONTS.body, color: '#BBBBBB', marginBottom: 4, fontSize: 16 },
-  nameContainer: { flexDirection: 'row', alignItems: 'center' },
-  name: { ...FONTS.title, color: '#FFFFFF', fontWeight: '700', fontSize: 26 },
-  premiumBadge: {
-    color: COLORS.accent,
-    fontWeight: '700',
-    fontSize: 16,
-    marginLeft: 8,
-    backgroundColor: 'rgba(224, 184, 115, 0.15)',
-    paddingHorizontal: 8,
+  greeting: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 4, fontSize: 14 },
+  nameContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  name: { ...FONTS.title, color: COLORS.text, fontWeight: '700', fontSize: 24 },
+
+  premiumBadgeContainer: {
+    backgroundColor: COLORS.accent,
+    borderRadius: 8,
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 12,
   },
-  birthDate: { ...FONTS.body, color: '#888888', marginTop: SPACING.sm, fontSize: 15 },
+  premiumBadgeText: {
+    color: '#000',
+    fontWeight: '800',
+    fontSize: 10,
+  },
+  birthDate: { ...FONTS.body, color: COLORS.textSecondary, marginTop: SPACING.sm, fontSize: 14 },
+
+  // --- MENU ---
   menu: { marginBottom: SPACING.lg },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)', // Легкая подложка
     paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.lg,
-    marginBottom: SPACING.xs,
+    marginBottom: SPACING.sm,
   },
   menuText: {
     ...FONTS.body,
-    color: '#DDDDDD',
+    color: COLORS.text,
     flex: 1,
     marginLeft: SPACING.md,
     fontSize: 16,
+    fontWeight: '500',
   },
-  premiumActive: { color: COLORS.accent, fontWeight: '600' },
-  accentText: { color: COLORS.accent },
-  divider: { height: 1, backgroundColor: '#333333', marginVertical: SPACING.xl },
-  deleteItem: { alignItems: 'center', marginTop: SPACING.xl, paddingVertical: SPACING.lg },
-  deleteText: { color: '#FF3B30', fontSize: 15, fontWeight: '600' },
+
+  // Кнопка Upgrade (Gradient)
+  upgradeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: SPACING.lg },
+
+  deleteItem: { alignItems: 'center', marginTop: SPACING.md, paddingVertical: SPACING.md },
+  deleteText: { color: '#FF3B30', fontSize: 14, fontWeight: '500', opacity: 0.8 },
 });
