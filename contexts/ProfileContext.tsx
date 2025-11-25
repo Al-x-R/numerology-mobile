@@ -225,6 +225,23 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const credential = GoogleAuthProvider.credential(idToken);
 
       const userCredential = await signInWithCredential(auth, credential);
+      const user = userCredential.user;
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+
+        await setDoc(userDocRef, {
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          createdAt: new Date(),
+          isPremium: false,
+          birthDate: null
+        });
+        console.log("User document created in Firestore via Google Login");
+      }
 
     } catch (error: any) {
       console.error("Google Sign-In Error:", error);

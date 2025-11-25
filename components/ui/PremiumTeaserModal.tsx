@@ -9,10 +9,10 @@ import { t } from '@/lib/constants/locales';
 interface PremiumTeaserModalProps {
   visible: boolean;
   onClose: () => void;
-  onUnlock: () => void;
+  onAction: () => void;
 }
 
-export default function PremiumTeaserModal({ visible, onClose, onUnlock }: PremiumTeaserModalProps) {
+export default function PremiumTeaserModal({ visible, onClose, onAction }: PremiumTeaserModalProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.overlay}>

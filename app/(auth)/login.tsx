@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useProfile } from '@/contexts/ProfileContext';
@@ -29,6 +29,7 @@ export default function LoginScreen() {
   } = useProfile();
 
   const router = useRouter();
+  const { redirect } = useLocalSearchParams<{ redirect: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
@@ -41,11 +42,20 @@ export default function LoginScreen() {
     return !newErrors.email && !newErrors.password;
   };
 
+  const handleLoginSuccess = () => {
+    if (redirect) {
+      router.replace(redirect as Href);
+    } else {
+      router.replace('/(tabs)/pythagoras');
+    }
+  };
+
   const handleLogin = async () => {
     if (!validate()) return;
 
     try {
       await loginWithEmail(email.trim(), password);
+      handleLoginSuccess();
     } catch (err: any) {
       let message = t('auth.wrongPasswordOrUserNotFound');
 
@@ -62,8 +72,17 @@ export default function LoginScreen() {
   const handleGoogleLogin = async () => {
     try {
       await loginWithGoogle();
+      handleLoginSuccess();
     } catch (err: any) {
       Alert.alert(t('common.error'), err.message || t('common.error'));
+    }
+  };
+
+  const goToRegister = () => {
+    if (redirect) {
+      router.push(`/(auth)/register?redirect=${redirect}`);
+    } else {
+      router.push('/(auth)/register');
     }
   };
 
@@ -141,7 +160,7 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         {/* Register Link */}
-        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+        <TouchableOpacity onPress={goToRegister}>
           <Text style={styles.link}>{t('auth.noAccount')}</Text>
         </TouchableOpacity>
       </View>

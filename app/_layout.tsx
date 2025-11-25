@@ -69,7 +69,16 @@ export default function RootLayout() {
             >
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(app)" options={{ headerShown: false }} />
+              {/*<Stack.Screen name="(app)" options={{ headerShown: false }} />*/}
+              <Stack.Screen
+                name="premium/upgrade"
+                options={{
+                  presentation: 'fullScreenModal', // Красивое открытие снизу вверх
+                  headerShown: false,
+                  gestureEnabled: true // Можно смахнуть вниз, если это modal
+                }}
+              />
+              <Stack.Screen name="profile" options={{ headerShown: false }} />
             </Stack>
           </View>
         </View>

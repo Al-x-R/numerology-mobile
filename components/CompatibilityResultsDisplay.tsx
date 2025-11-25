@@ -20,6 +20,8 @@ import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
+import { router } from 'expo-router';
+import { useProfile } from '@/contexts/ProfileContext';
 
 interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
@@ -266,6 +268,7 @@ export function CompatibilityResultsDisplay({
   const finalTotalColor = getTotalColor(finalTotal);
 
   const paramSectionTitle = t('compatibility.paramsSectionTitle');
+  const { user } = useProfile();
 
   const [isTeaserVisible, setIsTeaserVisible] = useState(false);
 
@@ -283,9 +286,15 @@ export function CompatibilityResultsDisplay({
 
   const handleUpgrade = () => {
     setIsTeaserVisible(false);
-    // TODO: логика навигации на экран оплаты
-    // router.push('/premium/upgrade');
-    console.log("Navigating to Premium Upgrade Screen");
+
+    if (user) {
+      // 1. Если юзер залогинен (но без према) -> Сразу на оплату
+      router.push('/premium/upgrade');
+    } else {
+      // 2. Если Гость -> На регистрацию, но с параметром redirect
+      // Мы говорим: "После успеха вернись на /premium/upgrade"
+      router.push('/(auth)/register?redirect=/premium/upgrade');
+    }
   }
 
   return (
@@ -346,7 +355,7 @@ export function CompatibilityResultsDisplay({
       <PremiumTeaserModal
         visible={isTeaserVisible}
         onClose={() => setIsTeaserVisible(false)}
-        onUpgrade={handleUpgrade}
+        onAction={handleUpgrade}
       />
     </ScrollView>
   );

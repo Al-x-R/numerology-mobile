@@ -661,6 +661,7 @@ const translations: LocaleData = {
       enterEmailToReset: 'Please enter your email to reset your password.',
       resetEmailSent: 'Password reset instructions have been sent to your email.',
       userNotFound: 'No user found with this email.',
+      displayName: "Username",
 
       emailUsedRedirectLogin: 'This email is already registered. Would you like to log in?',
       goToLogin: 'Log in',

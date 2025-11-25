@@ -1,3 +1,5 @@
+// components/PremiumTeaserModal.tsx
+
 import React, { useEffect } from 'react';
 import {
   View,
@@ -16,20 +18,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-
 import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS, FONT_FAMILY } from '@/lib/constants/theme';
 
 interface PremiumTeaserModalProps {
   visible: boolean;
   onClose: () => void;
-  onUpgrade: () => void;
-  isLoggedIn: boolean;
-  onLogin: () => void;
+  onAction: () => void;
 }
 
-// ИЗМЕНЕНИЕ: export default function вместо export function
-export function PremiumTeaserModal({ visible, onClose, onUpgrade, isLoggedIn, onLogin }: PremiumTeaserModalProps) {
+export function PremiumTeaserModal({ visible, onClose, onAction }: PremiumTeaserModalProps) {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.95);
   const translateY = useSharedValue(20);
@@ -53,38 +51,29 @@ export function PremiumTeaserModal({ visible, onClose, onUpgrade, isLoggedIn, on
 
   if (!visible) return null;
 
-  const titleKey = isLoggedIn ? 'premiumTeaserTitle' : 'premiumTeaserTitleGuest';
-  const textKey = isLoggedIn ? 'premiumTeaserText' : 'premiumTeaserTextGuest';
-  const ctaKey = isLoggedIn ? 'premiumTeaserCTAUpgrade' : 'premiumTeaserCTARegister';
-  const secondaryCtaKey = isLoggedIn ? 'later' : 'alreadyHaveAccount';
-
-  const handleMainAction = isLoggedIn ? onUpgrade : onLogin;
-  const handleSecondaryAction = isLoggedIn ? onClose : onLogin;
-
   return (
     <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <Animated.View style={[styles.modal, animatedStyle]}>
-
               <LinearGradient colors={[COLORS.background, '#1A1A1A']} style={styles.gradient}>
                 <MaterialIcons name="lock" size={32} color={COLORS.accent} style={styles.lock} />
 
-                <Text style={styles.title}>{t(titleKey)}</Text>
-                <Text style={styles.text}>{t(textKey)}</Text>
+                <Text style={styles.title}>{t('premiumTeaserTitleGuest')}</Text>
+                <Text style={styles.text}>{t('premiumTeaserTextGuest')}</Text>
 
-                <TouchableOpacity style={styles.button} onPress={handleMainAction}>
+                <TouchableOpacity style={styles.button} onPress={onAction}>
                   <LinearGradient
                     colors={['#FFD700', COLORS.primary]}
                     style={styles.buttonGradient}
                   >
-                    <Text style={styles.buttonText}>{t(ctaKey)}</Text>
+                    <Text style={styles.buttonText}>{t('premiumTeaserCTARegister')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.close} onPress={handleSecondaryAction}>
-                  <Text style={styles.closeText}>{t(secondaryCtaKey)}</Text>
+                <TouchableOpacity style={styles.close} onPress={onClose}>
+                  <Text style={styles.closeText}>{t('later')}</Text>
                 </TouchableOpacity>
 
               </LinearGradient>
@@ -156,6 +145,7 @@ const styles = StyleSheet.create({
   },
   close: {
     marginTop: SPACING.xs,
+    padding: SPACING.sm,
   },
   closeText: {
     ...FONTS.body,

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useProfile } from '@/contexts/ProfileContext'; // ← Только это!
@@ -23,6 +23,7 @@ import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 export default function RegisterScreen() {
   const { registerWithEmail, loginWithGoogle, isLoading } = useProfile();
   const router = useRouter();
+  const { redirect } = useLocalSearchParams<{ redirect: string }>();
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,11 +39,20 @@ export default function RegisterScreen() {
     return Object.values(newErrors).every(x => x === '');
   };
 
+  const handleLoginSuccess = () => {
+    if (redirect) {
+      router.replace(redirect as Href);
+    } else {
+      router.replace('/(tabs)/pythagoras');
+    }
+  };
+
   const handleRegister = async () => {
     if (!validate()) return;
 
     try {
       await registerWithEmail(displayName.trim(), email.trim(), password);
+      handleLoginSuccess();
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
         Alert.alert(
@@ -62,8 +72,17 @@ export default function RegisterScreen() {
   const handleGoogleRegister = async () => {
     try {
       await loginWithGoogle();
+      handleLoginSuccess();
     } catch (err: any) {
       Alert.alert(t('common.error'), err.message || t('common.error'));
+    }
+  };
+
+  const goToLogin = () => {
+    if (redirect) {
+      router.push(`/(auth)/login?redirect=${redirect}` as Href);
+    } else {
+      router.push('/(auth)/login');
     }
   };
 
@@ -129,7 +148,7 @@ export default function RegisterScreen() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+        <TouchableOpacity onPress={goToLogin}>
           <Text style={styles.link}>{t('auth.haveAccount')}</Text>
         </TouchableOpacity>
       </View>
