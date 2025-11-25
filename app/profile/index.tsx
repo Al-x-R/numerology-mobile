@@ -1,4 +1,4 @@
-// components/ui/ProfileDrawer.tsx
+// app/profile/index.tsx
 
 import React from 'react';
 import {
@@ -23,7 +23,6 @@ type Props = {
   onClose: () => void;
 };
 
-// Интерфейс для элемента меню
 interface MenuItemProps {
   icon: keyof typeof Ionicons.glyphMap;
   text: string;
@@ -59,28 +58,22 @@ export default function ProfileDrawer({ onClose }: Props) {
     ]);
   };
 
-  // Логика входа с поддержкой редиректа
   const handleLogin = (redirectPath?: string) => {
     if (redirectPath) {
-      // Передаем путь возврата как параметр (нужно обработать в login.tsx)
       router.push(`/(auth)/login?redirect=${redirectPath}`);
     } else {
       router.push('/(auth)/login');
     }
   };
 
-  // Умная логика покупки
   const handleUpgrade = () => {
     if (isGuest) {
-      // Гость: сначала логин -> потом автоматически на экран покупки
       handleLogin('/premium/upgrade');
     } else {
-      // Свой: сразу на экран покупки
       router.push('/premium/upgrade');
     }
   };
 
-  // Reusable компонент пункта меню
   const MenuItem = ({
     icon,
     text,
@@ -102,7 +95,7 @@ export default function ProfileDrawer({ onClose }: Props) {
           colors={GRADIENTS.button}
           style={styles.upgradeButton}
         >
-          {/* Черная иконка на золотом фоне для контраста */}
+
           <MaterialCommunityIcons name="crown" size={16} color="#000" />
         </LinearGradient>
       ) : (
@@ -112,8 +105,8 @@ export default function ProfileDrawer({ onClose }: Props) {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* 1. Премиальный фон */}
+    <View style={[styles.container]}>
+
       <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
 
       <ScrollView
@@ -168,7 +161,7 @@ export default function ProfileDrawer({ onClose }: Props) {
           <MenuItem
             icon="globe-outline"
             text={t('profile.changeLanguage')}
-            onPress={() => { /* Логика смены языка */ }}
+            onPress={() => { /* The logic of language change */ }}
           />
 
           {isPremium ? (
@@ -183,7 +176,7 @@ export default function ProfileDrawer({ onClose }: Props) {
               icon="diamond-outline"
               text={t('profile.getPremium')}
               onPress={handleUpgrade}
-              isPremiumAction={true} // Активируем кнопку-корону
+              isPremiumAction={true}
             />
           )}
         </View>
@@ -196,7 +189,7 @@ export default function ProfileDrawer({ onClose }: Props) {
             <MenuItem
               icon="log-in-outline"
               text={t('profile.loginOrRegister')}
-              onPress={() => handleLogin()} // Обычный логин без редиректа
+              onPress={() => handleLogin()}
               color={COLORS.accent}
             />
           )}
@@ -274,7 +267,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)', // Легкая подложка
+    backgroundColor: 'rgba(255,255,255,0.03)',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.lg,
@@ -289,7 +282,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // Кнопка Upgrade (Gradient)
+  // Upgrade button (Gradient)
   upgradeButton: {
     width: 32,
     height: 32,

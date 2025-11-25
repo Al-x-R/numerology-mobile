@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, LAYOUT } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 import { ProfileButton } from '@/components/ui/ProfileButton';
-import DrawerOverlay from '@/components/ui/DrawerOverlay';
 
 export default function TabLayout() {
 
@@ -49,8 +48,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-
-      {/*<DrawerOverlay />*/}
     </>
   );
 }

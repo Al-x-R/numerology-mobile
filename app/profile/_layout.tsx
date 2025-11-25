@@ -8,11 +8,10 @@ import { COLORS } from '@/lib/constants/theme';
 export default function ProfileLayout() {
   return (
     <Stack>
-      {/* Главный экран профиля */}
       <Stack.Screen
         name="index"
         options={{
-          title: t('profile.title'), // "Профиль"
+          title: t('profile.title'),
           headerStyle: { backgroundColor: COLORS.headerBackground },
           headerTintColor: COLORS.accent,
           headerTitleAlign: 'center',
@@ -27,19 +26,14 @@ export default function ProfileLayout() {
         }}
       />
 
-      {/* Экран редактирования */}
       <Stack.Screen
         name="edit"
         options={{
-          title: t('profile.edit'), // "Редактировать"
+          title: t('profile.editProfile'),
           presentation: 'card',
-          headerStyle: {
-            backgroundColor: '#0d0d0d',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: '600',
-          },
+          headerStyle: { backgroundColor: COLORS.headerBackground },
+          headerTintColor: COLORS.accent,
+          headerTitleAlign: 'center',
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}

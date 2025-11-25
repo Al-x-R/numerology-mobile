@@ -1,4 +1,5 @@
-// app/(app)/profile/edit.tsx
+// app/profile/edit.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -12,28 +13,34 @@ import {
   ScrollView,
   Alert,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { user, updateUserProfile, activeProfile } = useProfile();
 
   const [name, setName] = useState(user?.displayName || activeProfile?.name || '');
   const [birthDate, setBirthDate] = useState<Date | null>(
     user?.birthDate ? new Date(user.birthDate) : activeProfile?.date ? new Date(activeProfile.date) : null
   );
+
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+
   useEffect(() => {
-    // Синхронизация при открытии
     setName(user?.displayName || activeProfile?.name || '');
     if (user?.birthDate) {
       setBirthDate(new Date(user.birthDate));
@@ -51,7 +58,7 @@ export default function EditProfileScreen() {
 
   const saveChanges = async () => {
     if (!name.trim()) {
-      Alert.alert(t('errors.error'), t('profile.nameRequired'));
+      Alert.alert(t('common.error'), t('profile.nameRequired'));
       return;
     }
 
@@ -62,18 +69,21 @@ export default function EditProfileScreen() {
         birthDate: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
       });
 
-      Alert.alert(t('common.success'), t('profile.saved'), [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+
+      setTimeout(() => {
+        router.back();
+      }, 500);
+
     } catch (err) {
-      Alert.alert(t('errors.error'), t('errors.tryAgain'));
+      Alert.alert(t('common.error'), t('errors.tryAgain'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handlePickImage = async () => {
-    // Здесь будет ImagePicker (ниже код)
+    // TODO: Подключить expo-image-picker
+    Alert.alert("Info", "Image Picker functionality needs expo-image-picker package.");
   };
 
   const handleRemovePhoto = () => {
@@ -94,109 +104,152 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        {/* АВАТАРКА С ВОЗМОЖНОСТЬЮ ДОБАВИТЬ / УДАЛИТЬ */}
-        <View style={styles.avatarSection}>
-          <Text style={styles.label}>{t('profile.avatar')}</Text>
+    <View style={{ flex: 1 }}>
+      <Stack.Screen
+        options={{
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: -8, padding: 8 }}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
 
-          <View style={styles.avatarWrapper}>
-            {user?.photoURL ? (
-              <Image source={{ uri: user.photoURL }} style={styles.avatarLarge} />
-            ) : (
-              <View style={styles.avatarPlaceholderLarge}>
-                <Ionicons name="person" size={60} color="#666" />
-              </View>
-            )}
+      {/* Global background */}
+      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
 
-            <View style={styles.avatarButtons}>
-              <TouchableOpacity style={styles.avatarBtn} onPress={handlePickImage}>
-                <Ionicons name="camera-outline" size={20} color="#fff" />
-                <Text style={styles.avatarBtnText}>{t('profile.changePhoto')}</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+      >
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
+          showsVerticalScrollIndicator={false}
+        >
+
+          {/* Avatar Section */}
+          <View style={styles.avatarSection}>
+            <View style={styles.avatarContainer}>
+              {user?.photoURL ? (
+                <Image source={{ uri: user.photoURL }} style={styles.avatarLarge} />
+              ) : (
+                <View style={styles.avatarPlaceholderLarge}>
+                  <Ionicons name="person" size={50} color={COLORS.accent} />
+                </View>
+              )}
+
+              {/* The edit button is on the avatar itself. */}
+              <TouchableOpacity style={styles.editIconBadge} onPress={handlePickImage}>
+                <Ionicons name="camera" size={18} color="#000" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.avatarActions}>
+              <TouchableOpacity onPress={handlePickImage}>
+                <Text style={styles.changePhotoText}>{t('profile.changePhoto')}</Text>
               </TouchableOpacity>
 
               {user?.photoURL && (
-                <TouchableOpacity style={[styles.avatarBtn, styles.deleteBtn]} onPress={handleRemovePhoto}>
-                  <Ionicons name="trash-outline" size={20} color="#fff" />
-                  <Text style={styles.avatarBtnText}>{t('profile.removePhoto')}</Text>
+                <TouchableOpacity onPress={handleRemovePhoto} style={{ marginTop: 10 }}>
+                  <Text style={styles.removePhotoText}>{t('profile.removePhoto')}</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
-        </View>
 
-        {/* Имя */}
-        <View style={styles.field}>
-          <Text style={styles.label}>{t('profile.name')}</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder={t('profile.enterName')}
-            placeholderTextColor="#666"
-            autoCapitalize="words"
-            maxLength={30}
-          />
-        </View>
+          {/* Form */}
+          <View style={styles.formContainer}>
 
-        {/* Дата рождения */}
-        <View style={styles.field}>
-          <Text style={styles.label}>{t('profile.birthDate')}</Text>
-          <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
-            <Text style={birthDate ? styles.dateText : styles.placeholderText}>
-              {birthDate ? formatBirthDateFromDate(birthDate) : t('profile.selectDate')}
-            </Text>
-            <Ionicons name="calendar-outline" size={22} color={COLORS.accent} />
+            {/* Name field */}
+            <View style={styles.field}>
+              <Text style={styles.label}>{t('profile.name')}</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="person-outline" size={20} color={COLORS.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder={t('profile.enterName')}
+                  placeholderTextColor={COLORS.textSecondary}
+                  autoCapitalize="words"
+                  maxLength={30}
+                />
+              </View>
+            </View>
+
+            {/* Date of birth field */}
+            <View style={styles.field}>
+              <Text style={styles.label}>{t('profile.birthDate')}</Text>
+              <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons name="calendar-outline" size={20} color={COLORS.textSecondary} style={styles.inputIcon} />
+                  <Text style={birthDate ? styles.dateText : styles.placeholderText}>
+                    {birthDate ? formatBirthDateFromDate(birthDate) : t('profile.selectDate')}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+          </View>
+
+          {/* Save button */}
+          <TouchableOpacity
+            style={styles.saveButtonContainer}
+            onPress={saveChanges}
+            disabled={isSaving}
+          >
+            <LinearGradient
+              colors={isSaving ? [COLORS.card, COLORS.card] : GRADIENTS.button}
+              style={styles.saveButton}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              {isSaving ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.saveButtonText}>{t('common.save')}</Text>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
-        </View>
 
-        {/* Кнопка сохранения */}
-        <TouchableOpacity
-          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-          onPress={saveChanges}
-          disabled={isSaving}
-        >
-          <Text style={styles.saveButtonText}>
-            {isSaving ? t('common.saving') : t('common.save')}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
+      {/* Date modal for iOS */}
       {showPicker && Platform.OS === 'ios' ? (
-        <Modal transparent animationType="slide" visible={showPicker}>
+        <Modal transparent animationType="fade" visible={showPicker}>
           <View style={styles.modalOverlay}>
             <TouchableOpacity
               style={{ flex: 1 }}
               activeOpacity={1}
               onPress={() => setShowPicker(false)}
             />
-
             <View style={styles.pickerContainer}>
               <View style={styles.pickerHeader}>
                 <TouchableOpacity onPress={() => setShowPicker(false)}>
                   <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setShowPicker(false)}
-                >
+                <TouchableOpacity onPress={() => setShowPicker(false)}>
                   <Text style={styles.doneText}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
-
               <DateTimePicker
                 value={birthDate || new Date()}
                 mode="date"
                 display="spinner"
                 onChange={onDateChange}
                 maximumDate={new Date()}
-                style={{ backgroundColor: 'white' }}
+                style={{ backgroundColor: 'white', height: 200 }}
                 textColor="black"
-                locale="ru_RU"
+                locale={t('localeCode') || 'ru'}
               />
             </View>
           </View>
         </Modal>
-      ) : showPicker ? (
+      ) : showPicker && (
         <DateTimePicker
           value={birthDate || new Date()}
           mode="date"
@@ -204,103 +257,129 @@ export default function EditProfileScreen() {
           onChange={onDateChange}
           maximumDate={new Date()}
         />
-      ) : null}
-    </KeyboardAvoidingView>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d0d0d' },
-  content: { padding: SPACING.xl, paddingTop: SPACING.lg },
-  field: { marginBottom: SPACING.xl },
-  label: { ...FONTS.body, color: '#ccc', marginBottom: SPACING.sm, fontSize: 16 },
-  input: {
-    ...FONTS.body,
-    backgroundColor: '#1a1a1a',
-    color: '#fff',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.lg,
-    fontSize: 17,
+  container: { flex: 1 },
+  content: { padding: SPACING.xl },
+
+  // Avatar Styles
+  avatarSection: { alignItems: 'center', marginBottom: 30 },
+  avatarContainer: { position: 'relative' },
+  avatarLarge: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: COLORS.accent,
   },
+  avatarPlaceholderLarge: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.accent,
+    borderStyle: 'dashed',
+  },
+  editIconBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: COLORS.accent,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: COLORS.background,
+  },
+  avatarActions: { marginTop: SPACING.md, alignItems: 'center' },
+  changePhotoText: { ...FONTS.button, color: COLORS.accent, fontSize: 16 },
+  removePhotoText: { ...FONTS.body, color: '#FF3B30', fontSize: 14 },
+
+  // Form Styles
+  formContainer: { marginBottom: 30 },
+  field: { marginBottom: SPACING.lg },
+  label: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 8, fontSize: 14, marginLeft: 4 },
+
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: SPACING.md,
+  },
+  inputIcon: { marginRight: SPACING.sm },
+  input: {
+    flex: 1,
+    paddingVertical: 16,
+    ...FONTS.body,
+  },
+
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 16,
   },
-  dateText: { ...FONTS.body, color: '#fff', fontSize: 17 },
-  placeholderText: { ...FONTS.body, color: '#666', fontSize: 17 },
-  saveButton: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: SPACING.lg,
-    borderRadius: RADIUS.xl,
-    alignItems: 'center',
-    marginTop: SPACING.xl,
+  dateText: {
+    ...FONTS.body
   },
-  saveButtonDisabled: { opacity: 0.6 },
-  saveButtonText: { ...FONTS.body, color: '#fff', fontWeight: '600', fontSize: 18 },
+  placeholderText: {
+    ...FONTS.body
+  },
 
-  // iOS Picker Modal
+  // Save Button
+  saveButtonContainer: { marginTop: SPACING.sm },
+  saveButton: {
+    paddingVertical: 18,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveButtonText: {
+    ...FONTS.button,
+    color: '#000',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+
+  // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
   pickerContainer: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    overflow: 'hidden',
+    paddingBottom: 20,
   },
   pickerHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.lg,
-    backgroundColor: '#f2f2f7',
+    padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#eee',
+    backgroundColor: '#f9f9f9',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  cancelText: { fontSize: 17, color: '#007AFF', fontWeight: '600' },
-  doneText: { fontSize: 17, color: '#007AFF', fontWeight: '600' },
-  avatarSection: { marginBottom: SPACING.xl, alignItems: 'center' },
-  avatarWrapper: { alignItems: 'center', marginTop: SPACING.lg },
-  avatarLarge: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    borderWidth: 4,
-    borderColor: COLORS.accent,
-  },
-  avatarPlaceholderLarge: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#1a1a1a',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: COLORS.accent,
-    borderStyle: 'dashed',
-  },
-  avatarButtons: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-    marginTop: SPACING.lg
-  },
-  avatarBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#333',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.lg,
-    gap: SPACING.sm,
-  },
-  deleteBtn: { backgroundColor: '#c42b1c' },
-  avatarBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  cancelText: { color: '#FF3B30', fontSize: 16 },
+  doneText: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
 });
