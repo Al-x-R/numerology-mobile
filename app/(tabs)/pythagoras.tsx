@@ -12,28 +12,9 @@ import { CalculationResult } from '@/lib/types/calculation';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { t } from '@/lib/constants/locales';
-import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
+import { BackButton } from '@/components/ui/BackButton';
 
-const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginRight: SPACING.md,
-    }}
-  >
-    <MaterialCommunityIcons
-      name="arrow-left-thick"
-      size={LAYOUT.iconSize}
-      color={COLORS.textSecondary}
-      style={{ marginRight: SPACING.sm }}
-    />
-    <Text style={FONTS.button}>
-      {t('back')}
-    </Text>
-  </TouchableOpacity>
-);
 
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
@@ -79,7 +60,7 @@ export default function HomeScreen() {
             <Text style={FONTS.headerSubtitle}>{dateString}</Text>
           </View>
         ),
-        headerLeft: () => <HeaderBackButton onPress={handleBack} />,
+        headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
         headerRight: () => (
           <View style={{ alignItems: 'center' }} />
         ),

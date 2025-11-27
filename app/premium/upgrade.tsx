@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// Импортируем функцию локализации
+
 import { t } from '@/lib/constants/locales';
 
 export default function PremiumUpgradeScreen() {

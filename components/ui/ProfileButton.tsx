@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 type Props = {
   onPress?: () => void;
@@ -17,7 +18,7 @@ type Props = {
 export const ProfileButton = ({ onPress }: Props) => {
   const { activeProfile, user } = useProfile();
 
-  const displayName = user?.displayName || activeProfile?.name || 'Гость';
+  const displayName = user?.displayName || activeProfile?.name || t('profile.guest');
   const photoURL = user?.photoURL;
 
   return (

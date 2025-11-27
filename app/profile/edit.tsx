@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useProfile } from '@/contexts/ProfileContext';
@@ -31,14 +31,17 @@ export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, updateUserProfile, activeProfile } = useProfile();
 
+  // Basic form data
   const [name, setName] = useState(user?.displayName || activeProfile?.name || '');
   const [birthDate, setBirthDate] = useState<Date | null>(
     user?.birthDate ? new Date(user.birthDate) : activeProfile?.date ? new Date(activeProfile.date) : null
   );
 
+  // Temporary state for DatePicker (iOS)
+  const [tempDate, setTempDate] = useState<Date>(new Date());
+
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
 
   useEffect(() => {
     setName(user?.displayName || activeProfile?.name || '');
@@ -49,12 +52,36 @@ export default function EditProfileScreen() {
     }
   }, [user, activeProfile]);
 
+  // --- Date Picker Logic ---
+  const openDatePicker = () => {
+    setTempDate(birthDate || new Date());
+    setShowPicker(true);
+  };
+
   const onDateChange = (_: any, selectedDate?: Date) => {
-    setShowPicker(Platform.OS === 'ios' ? true : false);
-    if (selectedDate) {
-      setBirthDate(selectedDate);
+    if (Platform.OS === 'ios') {
+      // On iOS, change only the tempDate until you click "Done."
+      if (selectedDate) {
+        setTempDate(selectedDate);
+      }
+    } else {
+      // On Android, the choice happens immediately
+      setShowPicker(false);
+      if (selectedDate) {
+        setBirthDate(selectedDate);
+      }
     }
   };
+
+  const confirmIOSDate = () => {
+    setBirthDate(tempDate);
+    setShowPicker(false);
+  };
+
+  const cancelIOSDate = () => {
+    setShowPicker(false);
+  };
+
 
   const saveChanges = async () => {
     if (!name.trim()) {
@@ -68,7 +95,6 @@ export default function EditProfileScreen() {
         displayName: name.trim(),
         birthDate: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
       });
-
 
       setTimeout(() => {
         router.back();
@@ -105,16 +131,6 @@ export default function EditProfileScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen
-        options={{
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: -8, padding: 8 }}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
-          ),
-        }}
-      />
-
       {/* Global background */}
       <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
 
@@ -140,7 +156,6 @@ export default function EditProfileScreen() {
                 </View>
               )}
 
-              {/* The edit button is on the avatar itself. */}
               <TouchableOpacity style={styles.editIconBadge} onPress={handlePickImage}>
                 <Ionicons name="camera" size={18} color="#000" />
               </TouchableOpacity>
@@ -182,7 +197,7 @@ export default function EditProfileScreen() {
             {/* Date of birth field */}
             <View style={styles.field}>
               <Text style={styles.label}>{t('profile.birthDate')}</Text>
-              <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
+              <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons name="calendar-outline" size={20} color={COLORS.textSecondary} style={styles.inputIcon} />
                   <Text style={birthDate ? styles.dateText : styles.placeholderText}>
@@ -222,40 +237,49 @@ export default function EditProfileScreen() {
       {showPicker && Platform.OS === 'ios' ? (
         <Modal transparent animationType="fade" visible={showPicker}>
           <View style={styles.modalOverlay}>
+            {/* Close by clicking on the background = Cancel */}
             <TouchableOpacity
               style={{ flex: 1 }}
               activeOpacity={1}
-              onPress={() => setShowPicker(false)}
+              onPress={cancelIOSDate}
             />
+
             <View style={styles.pickerContainer}>
               <View style={styles.pickerHeader}>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                {/* CANCEL button */}
+                <TouchableOpacity onPress={cancelIOSDate}>
                   <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowPicker(false)}>
+
+                {/* DONE button */}
+                <TouchableOpacity onPress={confirmIOSDate}>
                   <Text style={styles.doneText}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
+
               <DateTimePicker
-                value={birthDate || new Date()}
+                value={tempDate}
                 mode="date"
                 display="spinner"
                 onChange={onDateChange}
                 maximumDate={new Date()}
-                style={{ backgroundColor: 'white', height: 200 }}
-                textColor="black"
+                themeVariant="dark"
+                textColor="white"
+                style={{ backgroundColor: '#1A1A1A', height: 200, width: '100%' }}
                 locale={t('localeCode') || 'ru'}
               />
             </View>
           </View>
         </Modal>
       ) : showPicker && (
+        // Android Picker
         <DateTimePicker
           value={birthDate || new Date()}
           mode="date"
           display="default"
           onChange={onDateChange}
           maximumDate={new Date()}
+          themeVariant="dark"
         />
       )}
     </View>
@@ -340,7 +364,8 @@ const styles = StyleSheet.create({
     ...FONTS.body
   },
   placeholderText: {
-    ...FONTS.body
+    ...FONTS.body,
+    color: COLORS.textSecondary
   },
 
   // Save Button
@@ -358,28 +383,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  // Modal Styles
+  // Modal Styles (Dark Theme Fixed)
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'flex-end',
   },
   pickerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingBottom: 20,
+    paddingBottom: 30,
+    borderWidth: 1,
+    borderColor: '#333',
+    alignItems: 'center',
   },
   pickerHeader: {
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#f9f9f9',
+    borderBottomColor: '#333',
+    backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
-  cancelText: { color: '#FF3B30', fontSize: 16 },
-  doneText: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
+  cancelText: { color: '#FF453A', fontSize: 17, fontWeight: '600' },
+  doneText: { color: COLORS.accent, fontSize: 17, fontWeight: '600' },
 });

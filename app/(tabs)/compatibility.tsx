@@ -14,6 +14,7 @@ import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { useProfile } from '@/contexts/ProfileContext';
+import { BackButton } from '@/components/ui/BackButton';
 
 const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
   <TouchableOpacity
@@ -75,7 +76,7 @@ export default function CompatibilityScreen() {
             {/*<Text style={FONTS.headerSubtitle}>{dateString1} & {dateString2}</Text>*/}
           </View>
         ),
-        headerLeft: () => <HeaderBackButton onPress={handleBack} />,
+        headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
         headerRight: () => (
           <View style={{ alignItems: 'center' }} />
         ),

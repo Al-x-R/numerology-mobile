@@ -23,6 +23,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from 'expo-router';
 import { Platform } from 'react-native';
+import { t } from '@/lib/constants/locales';
 
 let GoogleSignin: any = null;
 if (Platform.OS !== 'web') {
@@ -137,7 +138,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-
   const handleGuestOrLogout = async (wasLoggedIn: boolean, isNowLoggedIn: boolean) => {
     const lastKnown = await AsyncStorage.getItem(LAST_KNOWN_AUTH);
 
@@ -166,18 +166,18 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }
 
-  useEffect(() => {
-    if (isLoading || !authInitialized) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-
-    if (user && inAuthGroup) {
-      router.replace('/(tabs)/pythagoras');
-    }
-  }, [user, segments, isLoading, authInitialized]);
+  // useEffect(() => {
+  //   if (isLoading || !authInitialized) return;
+  //
+  //   const inAuthGroup = segments[0] === '(auth)';
+  //
+  //   if (user && inAuthGroup) {
+  //     router.replace('/(tabs)/pythagoras');
+  //   }
+  // }, [user, segments, isLoading, authInitialized]);
 
   const completeOnboarding = async () => {
-    const guest: Profile = { id: 'guest_1', name: 'Гость', date: '' };
+    const guest: Profile = { id: 'guest_1', name: t('profile.guest'), date: '' };
     await AsyncStorage.multiSet([
       [LAST_KNOWN_AUTH, 'guest'],
       [GUEST_PROFILE_KEY, JSON.stringify(guest)],

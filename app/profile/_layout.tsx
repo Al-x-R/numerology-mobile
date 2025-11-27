@@ -1,9 +1,9 @@
 // app/(app)/profile/_layout.tsx
 import { router, Stack } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { t } from '@/lib/constants/locales';
 import { COLORS } from '@/lib/constants/theme';
+import { BackButton } from '@/components/ui/BackButton';
+import React from 'react';
 
 export default function ProfileLayout() {
   return (
@@ -16,12 +16,7 @@ export default function ProfileLayout() {
           headerTintColor: COLORS.accent,
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{ marginLeft: 12 }}
-            >
-              <Ionicons name="chevron-back" size={28} color={COLORS.accent} />
-            </TouchableOpacity>
+            <BackButton onPress={() => router.back()} style={{ marginLeft: 0 }} />
           ),
         }}
       />
@@ -35,12 +30,7 @@ export default function ProfileLayout() {
           headerTintColor: COLORS.accent,
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{ marginLeft: 12 }}
-            >
-              <Ionicons name="chevron-back" size={28} color={COLORS.accent} />
-            </TouchableOpacity>
+            <BackButton onPress={() => router.back()} style={{ marginLeft: 0 }} />
           ),
         }}
       />

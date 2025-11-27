@@ -21,7 +21,7 @@ export const COLORS = {
   card: 'rgba(255, 255, 255, 0.04)',
   cardFocused: 'rgba(167, 139, 250, 0.08)',
   border: 'rgba(255, 255, 255, 0.2)',
-  borderFocused: '#A78BFA', // Использует primary цвет
+  borderFocused: '#A78BFA',
   borderAccent: '#E0B873',
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
@@ -30,7 +30,7 @@ export const COLORS = {
   primaryDark: '#7C3AED',
   error: '#FF6B6B',
   boxShadow: '#000',
-  shadowAccent: '#A78BFA', // Дубликат primary, но оставляем для совместимости
+  shadowAccent: '#A78BFA',
   // === НОВЫЕ: ПОДСВЕТКА ЯЧЕЕК ===
   highlightWeak: '#FF9500',
   highlightStrong: '#8B5CF6',
