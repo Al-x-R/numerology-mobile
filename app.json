@@ -19,7 +19,8 @@
       "bundleIdentifier": "com.destinycode.app",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "GIDClientID": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com"
+        "GIDClientID": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com",
+        "NSPhotoLibraryUsageDescription": "Allow access to photos to upload your profile avatar."
       }
     },
     "android": {
@@ -55,6 +56,12 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4",
           "iosClientId": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you set a profile picture."
         }
       ]
     ],

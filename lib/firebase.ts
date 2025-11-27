@@ -8,6 +8,8 @@ import {
   GoogleAuthProvider
 } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+
 // Importing a React Native Store
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
@@ -55,6 +57,8 @@ const googleProvider = new GoogleAuthProvider();
 
 // Export ready-to-use instances
 export { app, auth, db, googleProvider };
+
+export const storage = getStorage(app);
 
 // Exporting keys for Google Sign-In
 export const googleWebClientId = Constants.expoConfig?.extra?.googleWebClientId;

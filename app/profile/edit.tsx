@@ -19,6 +19,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase';
 
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
@@ -31,17 +34,16 @@ export default function EditProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, updateUserProfile, activeProfile } = useProfile();
 
-  // Basic form data
   const [name, setName] = useState(user?.displayName || activeProfile?.name || '');
   const [birthDate, setBirthDate] = useState<Date | null>(
     user?.birthDate ? new Date(user.birthDate) : activeProfile?.date ? new Date(activeProfile.date) : null
   );
 
-  // Temporary state for DatePicker (iOS)
   const [tempDate, setTempDate] = useState<Date>(new Date());
-
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // Add a local state for photos to show previews immediately
+  const [localImage, setLocalImage] = useState<string | null>(null);
 
   useEffect(() => {
     setName(user?.displayName || activeProfile?.name || '');
@@ -60,16 +62,10 @@ export default function EditProfileScreen() {
 
   const onDateChange = (_: any, selectedDate?: Date) => {
     if (Platform.OS === 'ios') {
-      // On iOS, change only the tempDate until you click "Done."
-      if (selectedDate) {
-        setTempDate(selectedDate);
-      }
+      if (selectedDate) setTempDate(selectedDate);
     } else {
-      // On Android, the choice happens immediately
       setShowPicker(false);
-      if (selectedDate) {
-        setBirthDate(selectedDate);
-      }
+      if (selectedDate) setBirthDate(selectedDate);
     }
   };
 
@@ -81,7 +77,49 @@ export default function EditProfileScreen() {
   const cancelIOSDate = () => {
     setShowPicker(false);
   };
+  // ---------------------------
 
+  // --- PHOTO UPLOADING LOGIC ---
+  const handlePickImage = async () => {
+    // 1. ask for permission (on newer iOS this is often not necessary, but for reliability)
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(t('common.error'), "Permission to access camera roll is required!");
+      return;
+    }
+
+    // 2. Opening the gallery
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setLocalImage(uri);
+    }
+  };
+
+  const uploadImageAsync = async (uri: string) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const filename = `avatars/${user?.uid}/${Date.now()}.jpg`;
+      const storageRef = ref(storage, filename);
+
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (e) {
+      console.error("Upload failed", e);
+      throw e;
+    }
+  };
+  // ---------------------------
 
   const saveChanges = async () => {
     if (!name.trim()) {
@@ -91,25 +129,29 @@ export default function EditProfileScreen() {
 
     setIsSaving(true);
     try {
+      let photoURL = user?.photoURL;
+
+      if (localImage) {
+        photoURL = await uploadImageAsync(localImage);
+      }
+
       await updateUserProfile({
         displayName: name.trim(),
         birthDate: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
+        photoURL: photoURL,
       });
 
+      // A slight delay for UX
       setTimeout(() => {
         router.back();
       }, 500);
 
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err);
       Alert.alert(t('common.error'), t('errors.tryAgain'));
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handlePickImage = async () => {
-    // TODO: Подключить expo-image-picker
-    Alert.alert("Info", "Image Picker functionality needs expo-image-picker package.");
   };
 
   const handleRemovePhoto = () => {
@@ -122,6 +164,7 @@ export default function EditProfileScreen() {
           text: t('common.remove'),
           style: 'destructive',
           onPress: async () => {
+            setLocalImage(null);
             await updateUserProfile({ photoURL: null });
           }
         }
@@ -129,9 +172,11 @@ export default function EditProfileScreen() {
     );
   };
 
+  // Determine which image to show (Local > Server > Placeholder)
+  const currentAvatar = localImage || user?.photoURL;
+
   return (
     <View style={{ flex: 1 }}>
-      {/* Global background */}
       <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
 
       <KeyboardAvoidingView
@@ -148,8 +193,8 @@ export default function EditProfileScreen() {
           {/* Avatar Section */}
           <View style={styles.avatarSection}>
             <View style={styles.avatarContainer}>
-              {user?.photoURL ? (
-                <Image source={{ uri: user.photoURL }} style={styles.avatarLarge} />
+              {currentAvatar ? (
+                <Image source={{ uri: currentAvatar }} style={styles.avatarLarge} />
               ) : (
                 <View style={styles.avatarPlaceholderLarge}>
                   <Ionicons name="person" size={50} color={COLORS.accent} />
@@ -166,7 +211,7 @@ export default function EditProfileScreen() {
                 <Text style={styles.changePhotoText}>{t('profile.changePhoto')}</Text>
               </TouchableOpacity>
 
-              {user?.photoURL && (
+              {currentAvatar && (
                 <TouchableOpacity onPress={handleRemovePhoto} style={{ marginTop: 10 }}>
                   <Text style={styles.removePhotoText}>{t('profile.removePhoto')}</Text>
                 </TouchableOpacity>
@@ -176,7 +221,6 @@ export default function EditProfileScreen() {
 
           {/* Form */}
           <View style={styles.formContainer}>
-
             {/* Name field */}
             <View style={styles.field}>
               <Text style={styles.label}>{t('profile.name')}</Text>
@@ -207,7 +251,6 @@ export default function EditProfileScreen() {
                 <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
               </TouchableOpacity>
             </View>
-
           </View>
 
           {/* Save button */}
@@ -233,30 +276,20 @@ export default function EditProfileScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Date modal for iOS */}
+      {/* Date Modal (iOS) */}
       {showPicker && Platform.OS === 'ios' ? (
         <Modal transparent animationType="fade" visible={showPicker}>
           <View style={styles.modalOverlay}>
-            {/* Close by clicking on the background = Cancel */}
-            <TouchableOpacity
-              style={{ flex: 1 }}
-              activeOpacity={1}
-              onPress={cancelIOSDate}
-            />
-
+            <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={cancelIOSDate} />
             <View style={styles.pickerContainer}>
               <View style={styles.pickerHeader}>
-                {/* CANCEL button */}
                 <TouchableOpacity onPress={cancelIOSDate}>
                   <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-
-                {/* DONE button */}
                 <TouchableOpacity onPress={confirmIOSDate}>
                   <Text style={styles.doneText}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
-
               <DateTimePicker
                 value={tempDate}
                 mode="date"
@@ -272,7 +305,6 @@ export default function EditProfileScreen() {
           </View>
         </Modal>
       ) : showPicker && (
-        // Android Picker
         <DateTimePicker
           value={birthDate || new Date()}
           mode="date"
@@ -289,8 +321,6 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: SPACING.xl },
-
-  // Avatar Styles
   avatarSection: { alignItems: 'center', marginBottom: 30 },
   avatarContainer: { position: 'relative' },
   avatarLarge: {
@@ -327,12 +357,9 @@ const styles = StyleSheet.create({
   avatarActions: { marginTop: SPACING.md, alignItems: 'center' },
   changePhotoText: { ...FONTS.button, color: COLORS.accent, fontSize: 16 },
   removePhotoText: { ...FONTS.body, color: '#FF3B30', fontSize: 14 },
-
-  // Form Styles
   formContainer: { marginBottom: 30 },
   field: { marginBottom: SPACING.lg },
   label: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 8, fontSize: 14, marginLeft: 4 },
-
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -343,12 +370,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
   },
   inputIcon: { marginRight: SPACING.sm },
-  input: {
-    flex: 1,
-    paddingVertical: 16,
-    ...FONTS.body,
-  },
-
+  input: { flex: 1, paddingVertical: 16, ...FONTS.body },
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -360,15 +382,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: 16,
   },
-  dateText: {
-    ...FONTS.body
-  },
-  placeholderText: {
-    ...FONTS.body,
-    color: COLORS.textSecondary
-  },
-
-  // Save Button
+  dateText: { ...FONTS.body },
+  placeholderText: { ...FONTS.body, color: COLORS.textSecondary },
   saveButtonContainer: { marginTop: SPACING.sm },
   saveButton: {
     paddingVertical: 18,
@@ -376,19 +391,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveButtonText: {
-    ...FONTS.button,
-    color: '#000',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-
-  // Modal Styles (Dark Theme Fixed)
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    justifyContent: 'flex-end',
-  },
+  saveButtonText: { ...FONTS.button, color: '#000', fontWeight: '700', fontSize: 16 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   pickerContainer: {
     backgroundColor: '#1A1A1A',
     borderTopLeftRadius: 20,

@@ -166,16 +166,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }
 
-  // useEffect(() => {
-  //   if (isLoading || !authInitialized) return;
-  //
-  //   const inAuthGroup = segments[0] === '(auth)';
-  //
-  //   if (user && inAuthGroup) {
-  //     router.replace('/(tabs)/pythagoras');
-  //   }
-  // }, [user, segments, isLoading, authInitialized]);
-
   const completeOnboarding = async () => {
     const guest: Profile = { id: 'guest_1', name: t('profile.guest'), date: '' };
     await AsyncStorage.multiSet([
@@ -292,6 +282,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateUserProfile = async (data: {
     displayName?: string;
     birthDate?: string | undefined;
+    photoURL?: string | null;
   }): Promise<void> => {
     if (!user) return;
 
@@ -304,6 +295,10 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updates.birthDate = data.birthDate;
     }
 
+    if (data.photoURL !== undefined) {
+      updates.photoURL = data.photoURL;
+    }
+
     if (Object.keys(updates).length === 0) return;
 
     try {
@@ -311,12 +306,17 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       setUser(prev => prev ? { ...prev, ...updates } : null);
 
-      if (data.displayName !== undefined) {
+      if (data.displayName !== undefined || data.photoURL !== undefined) {
+        const authUpdates: { displayName?: string; photoURL?: string | null } = {};
+
+        if (data.displayName !== undefined) authUpdates.displayName = data.displayName;
+        if (data.photoURL !== undefined) authUpdates.photoURL = data.photoURL;
+
         try {
-          await updateProfile(auth.currentUser!, { displayName: data.displayName });
+          await updateProfile(auth.currentUser!, authUpdates);
           await auth.currentUser?.reload();
         } catch (err) {
-          console.log('Auth displayName update failed — но это не страшно');
+          console.log('Auth profile update warning:', err);
         }
       }
     } catch (error) {
