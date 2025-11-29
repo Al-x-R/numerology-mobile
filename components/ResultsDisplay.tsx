@@ -31,11 +31,11 @@ interface ResultsDisplayProps {
 export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   const { matrix, workingNumbers } = results;
   const { width } = useWindowDimensions();
-  const PADDING = 20;
+  const PADDING_HORIZONTAL = 20;
   const GAP = 10;
 
-  const gridWidth = width - (PADDING * 2);
-  const cellSize = (gridWidth - (GAP * 2)) / 3;
+  const availableWidth = width - PADDING_HORIZONTAL * 2 - GAP * 2;
+  const cellSize = Math.floor(availableWidth / 3);
 
   const [selected, setSelected] = useState<Interpretation | null>(null);
 
