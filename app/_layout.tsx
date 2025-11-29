@@ -10,7 +10,6 @@ import LOGO_IMAGE from '../assets/images/NumericalCompass.png';
 import { COLORS, LAYOUT } from '@/lib/constants/theme';
 import { ProfileProvider } from '@/contexts/ProfileContext';
 
-// Предотвращаем скрытие сплеш-скрина
 SplashScreen.preventAutoHideAsync();
 
 const styles = StyleSheet.create({
@@ -69,13 +68,12 @@ export default function RootLayout() {
             >
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              {/*<Stack.Screen name="(app)" options={{ headerShown: false }} />*/}
               <Stack.Screen
                 name="premium/upgrade"
                 options={{
-                  presentation: 'fullScreenModal', // Красивое открытие снизу вверх
+                  presentation: 'fullScreenModal',
                   headerShown: false,
-                  gestureEnabled: true // Можно смахнуть вниз, если это modal
+                  gestureEnabled: true
                 }}
               />
               <Stack.Screen name="profile" options={{ headerShown: false }} />

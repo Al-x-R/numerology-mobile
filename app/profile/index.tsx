@@ -31,7 +31,7 @@ interface MenuItemProps {
   isPremiumAction?: boolean;
 }
 
-export default function ProfileDrawer({ onClose }: Props) {
+export default function ProfileScreen({ onClose }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, logout, activeProfile } = useProfile();
@@ -127,11 +127,6 @@ export default function ProfileDrawer({ onClose }: Props) {
               </View>
             )}
 
-            {!isGuest && (
-              <TouchableOpacity style={styles.cameraIcon}>
-                <Ionicons name="camera" size={16} color="#000" />
-              </TouchableOpacity>
-            )}
           </View>
 
           <Text style={styles.greeting}>{t('profile.hello')}</Text>
@@ -152,11 +147,13 @@ export default function ProfileDrawer({ onClose }: Props) {
 
         {/* --- MENU --- */}
         <View style={styles.menu}>
-          <MenuItem
-            icon="person-outline"
-            text={t('profile.editProfile')}
-            onPress={() => router.push('/profile/edit')}
-          />
+          {!isGuest && (
+            <MenuItem
+              icon="person-outline"
+              text={t('profile.editProfile')}
+              onPress={() => router.push('/profile/edit')}
+            />
+          )}
 
           <MenuItem
             icon="globe-outline"
@@ -234,16 +231,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: COLORS.accent,
-  },
-  cameraIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.accent,
-    padding: 6,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: COLORS.background,
   },
   greeting: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 4, fontSize: 14 },
   nameContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
