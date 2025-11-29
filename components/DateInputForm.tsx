@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform
 } from 'react-native';
 
 import { t } from '@/lib/constants/locales';
@@ -128,13 +129,21 @@ export function DateInputForm({
       <Animated.View style={[styles.inputContainer, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={[styles.input, isFocused && styles.inputFocused, localError && styles.inputError]}
+            style={[
+              styles.input,
+              isFocused && styles.inputFocused,
+              localError && styles.inputError,
+              date.length > 0
+                ? { textAlign: 'left', paddingLeft: 20 }
+                : { textAlign: 'center' }
+            ]}
             placeholder={t('inputPlaceholder')}
             placeholderTextColor={COLORS.textSecondary}
             value={date}
             onChangeText={handleTextChange}
             keyboardType="numbers-and-punctuation"
             maxLength={10}
+            cursorColor={COLORS.accent}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           />
@@ -225,13 +234,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
-    ...SHADOWS.card,
+    includeFontPadding: false,
+    textAlign: 'center',
   },
   inputFocused: {
     borderColor: COLORS.borderFocused,
     borderWidth: 2,
-    backgroundColor: COLORS.cardFocused,
-    ...SHADOWS.inputFocused,
+    backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
+    ...(Platform.OS === 'ios' && {
+      ...SHADOWS.inputFocused,
+    }),
   },
   inputError: {
     borderColor: COLORS.error,

@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Animated,
+  Animated, Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -177,7 +177,14 @@ export function DoubleDateInputForm({
         <Text style={styles.label}>{t('compatibility.partner1Label')}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={[styles.input, isFocused1 && styles.inputFocused, localError1 && styles.inputError]}
+            style={[
+              styles.input,
+              isFocused1 && styles.inputFocused,
+              localError1 && styles.inputError,
+              date1.length > 0
+                ? { textAlign: 'left', paddingLeft: 20 }
+                : { textAlign: 'center' }
+            ]}
             placeholder={t('compatibility.partner1Placeholder')}
             placeholderTextColor={COLORS.textSecondary}
             value={date1}
@@ -186,6 +193,7 @@ export function DoubleDateInputForm({
             maxLength={10}
             onFocus={() => setIsFocused1(true)}
             onBlur={() => setIsFocused1(false)}
+            cursorColor={COLORS.accent}
           />
         </View>
 
@@ -209,7 +217,14 @@ export function DoubleDateInputForm({
         <Text style={styles.label}>{t('compatibility.partner2Label')}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={[styles.input, isFocused2 && styles.inputFocused, localError2 && styles.inputError]}
+            style={[
+              styles.input,
+              isFocused2 && styles.inputFocused,
+              localError2 && styles.inputError,
+              date2.length > 0
+                ? { textAlign: 'left', paddingLeft: 20 }
+                : { textAlign: 'center' }
+            ]}
             placeholder={t('compatibility.partner2Placeholder')}
             placeholderTextColor={COLORS.textSecondary}
             value={date2}
@@ -218,6 +233,7 @@ export function DoubleDateInputForm({
             maxLength={10}
             onFocus={() => setIsFocused2(true)}
             onBlur={() => setIsFocused2(false)}
+            cursorColor={COLORS.accent}
           />
         </View>
 
@@ -313,13 +329,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
-    ...SHADOWS.card,
   },
   inputFocused: {
     borderColor: COLORS.borderFocused,
     borderWidth: 2,
-    backgroundColor: COLORS.cardFocused,
-    ...SHADOWS.inputFocused,
+    backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
+    ...(Platform.OS === 'ios' && {
+      ...SHADOWS.inputFocused,
+    }),
   },
   inputError: {
     borderColor: COLORS.error,
