@@ -13,7 +13,7 @@ interface LocaleData {
   [lang: string]: Translations;
 }
 
-const translations: LocaleData = {
+export const translations: LocaleData = {
   ru: {
     title: 'Код Даты',
 

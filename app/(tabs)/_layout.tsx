@@ -3,10 +3,11 @@ import { router, Tabs } from 'expo-router';
 import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, LAYOUT } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
 import { ProfileButton } from '@/components/ui/ProfileButton';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function TabLayout() {
+  const { t } = useAppTranslation();
 
   return (
     <>

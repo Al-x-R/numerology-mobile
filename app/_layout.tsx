@@ -9,27 +9,9 @@ import { useEffect } from 'react';
 import LOGO_IMAGE from '../assets/images/NumericalCompass.png';
 import { COLORS, LAYOUT } from '@/lib/constants/theme';
 import { ProfileProvider } from '@/contexts/ProfileContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 SplashScreen.preventAutoHideAsync();
-
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.background },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '100%',
-    maxWidth: LAYOUT.logoMedium,
-    maxHeight: LAYOUT.logoMedium,
-    opacity: 1,
-  },
-  navigation: {
-    flex: 1,
-    backgroundColor: COLORS.transparent,
-  },
-});
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -52,35 +34,62 @@ export default function RootLayout() {
 
   return (
     <ProfileProvider>
-      <SafeAreaProvider>
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
-        <View style={styles.root}>
-          <View style={styles.background}>
-            <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-          </View>
-          <View style={styles.navigation}>
-            <Stack
-              screenOptions={{
-                contentStyle: { backgroundColor: 'transparent' },
-                headerStyle: { backgroundColor: 'transparent' },
-                headerShadowVisible: false,
-              }}
-            >
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="premium/upgrade"
-                options={{
-                  presentation: 'fullScreenModal',
-                  headerShown: false,
-                  gestureEnabled: true
+      <LanguageProvider>
+        <SafeAreaProvider>
+          <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+          <View style={styles.root}>
+            <View style={styles.background}>
+              <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
+            </View>
+            <View style={styles.navigation}>
+              <Stack
+                screenOptions={{
+                  contentStyle: { backgroundColor: 'transparent' },
+                  headerStyle: { backgroundColor: 'transparent' },
+                  headerShadowVisible: false,
                 }}
-              />
-              <Stack.Screen name="profile" options={{ headerShown: false }} />
-            </Stack>
+              >
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="premium/upgrade"
+                  options={{
+                    presentation: 'fullScreenModal',
+                    headerShown: false,
+                    gestureEnabled: true
+                  }}
+                />
+                <Stack.Screen name="profile" options={{ headerShown: false }} />
+              </Stack>
+            </View>
           </View>
-        </View>
-      </SafeAreaProvider>
+        </SafeAreaProvider>
+      </LanguageProvider>
     </ProfileProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: COLORS.background },
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: '100%',
+    maxWidth: LAYOUT.logoMedium,
+    maxHeight: LAYOUT.logoMedium,
+    opacity: 1,
+  },
+  navigation: {
+    flex: 1,
+    backgroundColor: COLORS.transparent,
+  },
+  restartContainer: {
+    flex: 1,
+    backgroundColor: '#0F0A2E',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

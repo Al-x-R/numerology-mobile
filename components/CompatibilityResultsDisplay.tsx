@@ -17,11 +17,12 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { t } from '@/lib/constants/locales';
+// import { t } from '@/lib/constants/locales';
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 import { router } from 'expo-router';
 import { useProfile } from '@/contexts/ProfileContext';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
@@ -60,6 +61,7 @@ function GeneralAnalysisCard({
 }: GeneralAnalysisCardProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(30);
+  const { t } = useAppTranslation();
 
   useEffect(() => {
     const delay = index * 120;
@@ -114,6 +116,7 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(20);
   const scale = useSharedValue(0.95);
+  const { t } = useAppTranslation();
 
   useEffect(() => {
     const delay = index * 90;
@@ -200,6 +203,8 @@ interface PremiumConclusionCardProps {
 }
 
 function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusionCardProps) {
+  const { t } = useAppTranslation();
+
   return (
     <View style={[styles.section, styles.premiumConclusionSection]}>
       <Text style={styles.sectionTitle}>{t('compatibility.conclusionTitle')}</Text>
@@ -255,6 +260,8 @@ export function CompatibilityResultsDisplay({
   date1,
   date2,
 }: CompatibilityResultsDisplayProps) {
+  const { t } = useAppTranslation();
+
   const getTotalColor = (pct: number) => {
     if (pct >= 85) return COLORS.battery.full;
     if (pct >= 70) return '#FFD700';

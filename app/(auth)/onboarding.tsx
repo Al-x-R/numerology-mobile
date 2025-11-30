@@ -9,11 +9,12 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { COLORS, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 const { width } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
+  const { t } = useAppTranslation();
 
   const handleContinueGuest = () => {
     router.replace('/(tabs)/pythagoras');

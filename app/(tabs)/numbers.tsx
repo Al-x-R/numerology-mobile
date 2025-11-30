@@ -22,8 +22,8 @@ import { useProfile } from '@/contexts/ProfileContext';
 
 // Константы
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT, RADIUS, SHADOWS } from '@/lib/constants/theme';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface ForecastResult {
   personalYear: number;
@@ -34,6 +34,7 @@ interface ForecastResult {
 export default function NumbersScreen() {
   const [results, setResults] = useState<ForecastResult | null>(null);
   const navigation = useNavigation();
+  const { t, language } = useAppTranslation();
 
   // Достаем данные пользователя из контекста
   // Предполагаем, что user содержит поле birthDate (или date)
@@ -86,7 +87,7 @@ export default function NumbersScreen() {
         borderTopColor: COLORS.background
       },
     });
-  }, [navigation]);
+  }, [navigation, language]);
 
   // --- Рендер содержимого в зависимости от состояния ---
   const renderContent = () => {

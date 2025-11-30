@@ -10,32 +10,11 @@ import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
 import { calculateCompatibility, CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { t } from '@/lib/constants/locales';
-import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { useProfile } from '@/contexts/ProfileContext';
 import { BackButton } from '@/components/ui/BackButton';
-
-const HeaderBackButton = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginRight: SPACING.md,
-    }}
-  >
-    <MaterialCommunityIcons
-      name="arrow-left-thick"
-      size={LAYOUT.iconSize}
-      color={COLORS.textSecondary}
-      style={{ marginRight: SPACING.sm }}
-    />
-    <Text style={FONTS.button}>
-      {t('back')}
-    </Text>
-  </TouchableOpacity>
-);
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function CompatibilityScreen() {
   const [dateString1, setDateString1] = useState<string>('');
@@ -44,6 +23,7 @@ export default function CompatibilityScreen() {
 
   const navigation = useNavigation();
   const { user } = useProfile();
+  const { t, language } = useAppTranslation();
 
   const handleCalculate = () => {
     try {
@@ -95,7 +75,7 @@ export default function CompatibilityScreen() {
       });
     }
 
-  }, [navigation, hasResults, handleBack, dateString1, dateString2]);
+  }, [navigation, hasResults, handleBack, dateString1, dateString2, language]);
 
   return (
     <SafeAreaView style={styles.container}>

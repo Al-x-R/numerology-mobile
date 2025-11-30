@@ -17,8 +17,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function LoginScreen() {
   const {
@@ -33,6 +33,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const { t } = useAppTranslation();
 
   const validate = () => {
     const newErrors = { email: '', password: '' };

@@ -14,7 +14,8 @@ import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMe
 import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types/calculation';
 import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
-import { t, getCurrentLocale } from '@/lib/constants/locales';
+import { getCurrentLocale } from '@/lib/constants/locales';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -22,12 +23,16 @@ interface WorkingNumbersDisplayProps {
   textAccentStyle: any;
 }
 
-function getFullWorkingInterpretation(id: string, value: number): Interpretation {
+function getFullWorkingInterpretation(
+  id: string,
+  value: number,
+  t: (key: string) => string, // Принимаем функцию перевода
+  language?: 'en' | 'ru'       // Принимаем текущий язык (для выбора массива данных)
+): Interpretation {
   const context = contextualInterpretations[id as keyof typeof contextualInterpretations];
   const locale = getCurrentLocale();
   const meanings = locale === 'en' ? workingMeaningsEn : workingMeanings;
   const meaning = meanings[value];
-
   if (!context || !meaning) {
     return { title: t('errorNotFound'), description: t('errorDataNotFound'), type: 'working' };
   }
@@ -46,6 +51,8 @@ export function WorkingNumbersDisplayAnimated({
   onPress,
   textAccentStyle,
 }: WorkingNumbersDisplayProps) {
+  const { t } = useAppTranslation();
+
   return (
     <View style={styles.numbersSection}>
       <Text style={styles.sectionTitle}>{t('section_workingNumbers')}</Text>
@@ -73,7 +80,8 @@ const WorkingNumberCard: React.FC<{
   numberId: string;
   onPress: (data: Interpretation) => void;
 }> = ({ index, num, numberId, onPress }) => {
-  const interpretationData = getFullWorkingInterpretation(numberId, num);
+  const { t } = useAppTranslation();
+  const interpretationData = getFullWorkingInterpretation(numberId, num, t);
 
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(15);
@@ -110,7 +118,8 @@ const FateCard: React.FC<{
   onPress: (data: Interpretation) => void;
   textAccentStyle: any;
 }> = ({ value, onPress, textAccentStyle }) => {
-  const interpretationData = getFullWorkingInterpretation('destiny', value);
+  const { t } = useAppTranslation();
+  const interpretationData = getFullWorkingInterpretation('destiny', value, t);
 
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.9);

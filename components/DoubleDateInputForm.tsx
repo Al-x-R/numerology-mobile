@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 
-import { t } from '@/lib/constants/locales';
 import {
   COLORS,
   FONTS,
@@ -24,6 +23,7 @@ import {
 } from '@/lib/constants/theme';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface DoubleDateInputFormProps {
   onSubmit: () => void;
@@ -48,6 +48,8 @@ export function DoubleDateInputForm({
   setDate1,
   setDate2,
 }: DoubleDateInputFormProps) {
+  const { t } = useAppTranslation();
+
   const [isFocused1, setIsFocused1] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
   const [localError1, setLocalError1] = useState<string | null>(null);

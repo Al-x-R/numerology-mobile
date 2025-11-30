@@ -12,7 +12,6 @@ import {
   Platform
 } from 'react-native';
 
-import { t } from '@/lib/constants/locales';
 import {
   COLORS,
   FONTS,
@@ -24,6 +23,7 @@ import {
   SPACING
 } from '@/lib/constants/theme';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface DateInputFormProps {
   onSubmit: () => void;
@@ -44,6 +44,8 @@ export function DateInputForm({
   date,
   setDate,
 }: DateInputFormProps) {
+  const { t } = useAppTranslation();
+
   const [isFocused, setIsFocused] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

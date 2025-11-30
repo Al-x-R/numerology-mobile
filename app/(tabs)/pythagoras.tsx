@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, TouchableOpacity } from 'react-native';
+import { Image, StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DateInputForm } from '@/components/DateInputForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
@@ -11,9 +10,9 @@ import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare'
 import { CalculationResult } from '@/lib/types/calculation';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 
 export default function HomeScreen() {
@@ -21,6 +20,7 @@ export default function HomeScreen() {
   const [results, setResults] = useState<CalculationResult | null>(null);
 
   const navigation = useNavigation();
+  const { t, language } = useAppTranslation();
 
   const handleCalculate = () => {
     // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
@@ -68,7 +68,7 @@ export default function HomeScreen() {
       });
     } else {
       navigation.setOptions({
-        headerTitle: t('pythagorasTitle'),
+        headerTitle: t('tabs.pythagoras'),
         headerLeft: () => null,
         headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
         tabBarStyle: {
@@ -79,7 +79,7 @@ export default function HomeScreen() {
       });
     }
 
-  }, [navigation, results, handleBack, dateString]);
+  }, [navigation, results, handleBack, dateString, language]);
 
   return (
     <SafeAreaView style={styles.container}>

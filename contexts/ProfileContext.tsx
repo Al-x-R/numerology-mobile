@@ -42,6 +42,7 @@ export interface Profile {
   name: string;
   date: string;
   isPremium?: boolean;
+  language?: 'en' | 'ru';
 }
 
 interface ProfileContextType {
@@ -64,6 +65,7 @@ interface ProfileContextType {
     displayName?: string;
     birthDate?: string;
     photoURL?: string | null | undefined;
+    language?: 'en' | 'ru';
   }) => Promise<void>;
 }
 
@@ -101,6 +103,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
           ...firebaseUser,
           birthDate: customData.birthDate ?? null,
           isPremium: customData.isPremium ?? false,
+          language: customData.language ?? null,
         } as User & { birthDate?: string | null; isPremium?: boolean });
 
         unsubProfiles?.();
@@ -283,6 +286,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     displayName?: string;
     birthDate?: string | undefined;
     photoURL?: string | null;
+    language?: 'en' | 'ru';
   }): Promise<void> => {
     if (!user) return;
 

@@ -7,12 +7,12 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { t } from '@/lib/constants/locales';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function PremiumUpgradeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useAppTranslation();
 
   const handlePurchase = () => {
     // Тут будет логика RevenueCat или IAP

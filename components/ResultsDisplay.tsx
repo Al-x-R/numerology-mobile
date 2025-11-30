@@ -19,8 +19,7 @@ import { CalculationResult, Interpretation } from '@/lib/types/calculation';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
 import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -29,6 +28,8 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
+  const { t } = useAppTranslation();
+
   const { matrix, workingNumbers } = results;
   const { width } = useWindowDimensions();
   const PADDING_HORIZONTAL = 20;

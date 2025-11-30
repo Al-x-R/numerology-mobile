@@ -1,6 +1,6 @@
 // app/profile/index.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,11 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { t } from '@/lib/constants/locales';
+// import { t } from '@/lib/constants/locales';
 import { formatBirthDate } from '@/lib/utils/date';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 type Props = {
   onClose: () => void;
@@ -35,6 +36,7 @@ export default function ProfileScreen({ onClose }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, logout, activeProfile } = useProfile();
+  const { t, language } = useAppTranslation();
 
   const isGuest = !user;
   const displayName = isGuest
@@ -44,6 +46,13 @@ export default function ProfileScreen({ onClose }: Props) {
   const isPremium = user?.isPremium;
   const photoURL = user?.photoURL;
   const birthDate = activeProfile?.date || null;
+
+  const navigation = useNavigation();
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: t('profile.title'),
+    });
+  }, [language, navigation]);
 
   const handleLogout = () => {
     Alert.alert(t('alerts.logout'), '', [
@@ -158,7 +167,7 @@ export default function ProfileScreen({ onClose }: Props) {
           <MenuItem
             icon="globe-outline"
             text={t('profile.changeLanguage')}
-            onPress={() => { /* The logic of language change */ }}
+            onPress={() => router.push('/profile/language')}
           />
 
           {isPremium ? (

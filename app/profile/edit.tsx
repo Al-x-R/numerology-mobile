@@ -25,9 +25,9 @@ import { storage } from '@/lib/firebase';
 
 import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
-import { t } from '@/lib/constants/locales';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -44,6 +44,7 @@ export default function EditProfileScreen() {
   const [isSaving, setIsSaving] = useState(false);
   // Add a local state for photos to show previews immediately
   const [localImage, setLocalImage] = useState<string | null>(null);
+  const { t } = useAppTranslation();
 
   useEffect(() => {
     setName(user?.displayName || activeProfile?.name || '');

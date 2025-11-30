@@ -18,8 +18,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-import { t } from '@/lib/constants/locales';
 import { COLORS, FONTS, SPACING, RADIUS, SHADOWS, FONT_FAMILY } from '@/lib/constants/theme';
+import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface PremiumTeaserModalProps {
   visible: boolean;
@@ -28,6 +28,8 @@ interface PremiumTeaserModalProps {
 }
 
 export function PremiumTeaserModal({ visible, onClose, onAction }: PremiumTeaserModalProps) {
+  const { t } = useAppTranslation();
+
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.95);
   const translateY = useSharedValue(20);
