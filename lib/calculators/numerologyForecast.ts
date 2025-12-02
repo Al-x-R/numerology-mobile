@@ -1,11 +1,7 @@
 // lib/calculators/numerologyForecast.ts
 
 /**
- * Recursive reduction to a single digit (1-9).
- * Master numbers (11, 22, 33) are reduced here for simplicity in daily forecasts.
- *
  * Рекурсивное сведение к одной цифре (1-9).
- * Мастер-числа (11, 22, 33) здесь редуцируются для простоты ежедневных прогнозов.
  */
 const reduceSum = (num: number): number => {
   let sum = num;
@@ -18,51 +14,83 @@ const reduceSum = (num: number): number => {
 };
 
 /**
- * Calculates Personal Year Number.
- * Formula: Birth Day + Birth Month + Current Year.
- *
+ * Хелпер для получения Дня и Месяца из любого формата даты.
+ * Поддерживает:
+ * - "YYYY-MM-DD" (Firestore: "1985-07-02")
+ * - "DD.MM.YYYY" (Input: "02.07.1985")
+ * - Date object
+ */
+const getDayAndMonth = (date: string | Date): { day: number, month: number } => {
+  try {
+    if (date instanceof Date) {
+      return { day: date.getDate(), month: date.getMonth() + 1 };
+    }
+
+    if (typeof date === 'string') {
+      // Вариант 1: Формат базы данных "1985-07-02"
+      if (date.includes('-')) {
+        const parts = date.split('-'); // ["1985", "07", "02"]
+        // Обратите внимание: год-месяц-день
+        return {
+          day: Number(parts[2]),
+          month: Number(parts[1])
+        };
+      }
+
+      // Вариант 2: Формат ввода "02.07.1985"
+      if (date.includes('.')) {
+        const parts = date.split('.'); // ["02", "07", "1985"]
+        return {
+          day: Number(parts[0]),
+          month: Number(parts[1])
+        };
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing date:", date, e);
+  }
+
+  return { day: 0, month: 0 }; // Fallback на случай ошибки
+};
+
+/**
  * Расчет Числа Персонального Года.
  * Формула: День рождения + Месяц рождения + Текущий год.
  */
-export const calculatePersonalYear = (birthDate: string, targetDate: Date = new Date()): number => {
-  const [day, month] = birthDate.split('.').map(Number);
-  const currentYear = targetDate.getFullYear();
+export const calculatePersonalYear = (birthDate: string | Date, targetDate: Date = new Date()): number => {
+  const { day, month } = getDayAndMonth(birthDate);
 
-  // Sum: Day + Month + Current Year
+  // Если дата кривая — возвращаем 0
+  if (!day || !month) return 0;
+
+  const currentYear = targetDate.getFullYear();
   const rawSum = day + month + currentYear;
 
   return reduceSum(rawSum);
 };
 
 /**
- * Calculates Personal Month Number.
- * Formula: Personal Year + Current Month.
- *
  * Расчет Числа Персонального Месяца.
  * Формула: Персональный Год + Текущий Месяц.
  */
-export const calculatePersonalMonth = (birthDate: string, targetDate: Date = new Date()): number => {
+export const calculatePersonalMonth = (birthDate: string | Date, targetDate: Date = new Date()): number => {
   const personalYear = calculatePersonalYear(birthDate, targetDate);
-  const currentMonth = targetDate.getMonth() + 1; // JS months are 0-11
+  if (personalYear === 0) return 0;
+
+  const currentMonth = targetDate.getMonth() + 1;
 
   return reduceSum(personalYear + currentMonth);
 };
 
 /**
- * Calculates Personal Day Number (Key metric for Daily Forecast).
- * Formula: Personal Month + Current Day.
- *
- * Расчет Числа Персонального Дня (ключевая метрика для прогнозов на день).
+ * Расчет Числа Персонального Дня.
  * Формула: Персональный Месяц + Текущий День.
  */
-export const calculatePersonalDay = (birthDate: string, targetDate: Date = new Date()): number => {
+export const calculatePersonalDay = (birthDate: string | Date, targetDate: Date = new Date()): number => {
   const personalMonth = calculatePersonalMonth(birthDate, targetDate);
+  if (personalMonth === 0) return 0;
+
   const currentDay = targetDate.getDate();
 
   return reduceSum(personalMonth + currentDay);
 };
-
-// Example usage / Пример использования:
-// const pDay = calculatePersonalDay("02.07.1985", new Date());
-// Returns a number from 1 to 9. / Возвращает число от 1 до 9.
-// Then we fetch the text for this number and date from the DB. / Затем мы берем текст для этого числа на эту дату из БД.

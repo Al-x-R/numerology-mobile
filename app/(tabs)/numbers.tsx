@@ -1,159 +1,162 @@
 // app/(tabs)/numbers.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Компоненты
-import { ForecastDisplay } from '@/components/ForecastDisplay';
 import { ProfileButton } from '@/components/ui/ProfileButton';
+import { UniversalForecastCard } from '@/components/UniversalForecastCard';
 
-// Логика
-import {
-  calculatePersonalYear,
-  calculatePersonalMonth,
-  calculatePersonalDay
-} from '@/lib/calculators/numerologyForecast';
-
-// Контекст профиля (предполагаем, что он у нас есть и хранит дату)
+import { calculatePersonalYear, calculatePersonalMonth, calculatePersonalDay } from '@/lib/calculators/numerologyForecast';
 import { useProfile } from '@/contexts/ProfileContext';
-
-// Константы
-import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, FONTS, GRADIENTS, SPACING, LAYOUT, RADIUS, SHADOWS } from '@/lib/constants/theme';
+import { useForecasts } from '@/hooks/useForecasts';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { COLORS, GRADIENTS, LAYOUT, SPACING, RADIUS, FONTS } from '@/lib/constants/theme';
+import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 
-interface ForecastResult {
-  personalYear: number;
-  personalMonth: number;
-  personalDay: number;
-}
+type TabType = 'day' | 'month' | 'year';
 
 export default function NumbersScreen() {
-  const [results, setResults] = useState<ForecastResult | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('day');
+
+  // Calculated numbers
+  const [pDay, setPDay] = useState(0);
+  const [pMonth, setPMonth] = useState(0);
+  const [pYear, setPYear] = useState(0);
+
   const navigation = useNavigation();
   const { t, language } = useAppTranslation();
+  const { user } = useProfile();
 
-  // Достаем данные пользователя из контекста
-  // Предполагаем, что user содержит поле birthDate (или date)
-  const { user, isLoading: isProfileLoading } = useProfile();
-
-  // Функция расчета (вынесена, чтобы вызывать при фокусе)
   const performCalculation = useCallback(() => {
-    // 1. Если пользователя нет или нет даты — сбрасываем результат
-    if (!user || !user.birthDate) {
-      setResults(null);
-      return;
-    }
-
-    // 2. Если дата есть — считаем автоматически
+    if (!user || !user.birthDate) return;
     try {
       const today = new Date();
-      // user.birthDate должен быть строкой "DD.MM.YYYY" или Date объектом
-      // Если у вас в базе YYYY-MM-DD, нужно будет конвертировать
-      const pYear = calculatePersonalYear(user.birthDate, today);
-      const pMonth = calculatePersonalMonth(user.birthDate, today);
-      const pDay = calculatePersonalDay(user.birthDate, today);
-
-      setResults({
-        personalYear: pYear,
-        personalMonth: pMonth,
-        personalDay: pDay
-      });
+      setPDay(calculatePersonalDay(user.birthDate, today));
+      setPMonth(calculatePersonalMonth(user.birthDate, today));
+      setPYear(calculatePersonalYear(user.birthDate, today));
     } catch (e) {
-      console.error("Error calculating forecast:", e);
+      console.error("Calculation error:", e);
     }
   }, [user]);
 
-  // Используем useFocusEffect, чтобы пересчитывать, если юзер обновил профиль и вернулся сюда
-  useFocusEffect(
-    useCallback(() => {
-      performCalculation();
-    }, [performCalculation])
-  );
+  useFocusEffect(useCallback(() => { performCalculation(); }, [performCalculation]));
 
-  // Настройка хедера
+  const dayForecast = useForecasts('day', pDay);
+  const monthForecast = useForecasts('month', pMonth);
+  const yearForecast = useForecasts('year', pYear);
+
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: t('numbersTitle'),
-      headerLeft: () => null,
+      headerTitle: t('numbersTitle') || 'Прогноз',
       headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
-      // Таббар показываем всегда, так как это главный экран раздела
-      tabBarStyle: {
-        display: 'flex',
-        backgroundColor: COLORS.background,
-        borderTopColor: COLORS.background
-      },
+      headerLeft: () => null,
+      headerShadowVisible: false,
+      headerStyle: { backgroundColor: COLORS.headerBackground },
+      tabBarStyle: { display: 'flex', backgroundColor: COLORS.background, borderTopColor: COLORS.background },
     });
   }, [navigation, language]);
 
-  // --- Рендер содержимого в зависимости от состояния ---
+  // --- TABS ---
+  const renderTabs = () => (
+    <View style={styles.tabsContainer}>
+      {(['day', 'month', 'year'] as TabType[]).map((tab) => {
+        const isActive = activeTab === tab;
+        const labels: Record<string, string> = {
+          day: language === 'ru' ? 'День' : 'Day',
+          month: language === 'ru' ? 'Месяц' : 'Month',
+          year: language === 'ru' ? 'Год' : 'Year'
+        };
+
+        return (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setActiveTab(tab)}
+            style={[styles.tabButton, isActive && styles.activeTabButton]}
+          >
+            <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+              {labels[tab]}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+
+  // --- CONTENT ---
   const renderContent = () => {
-    // 1. Если не авторизован (Гость)
-    if (!user) {
-      return (
-        <View style={styles.emptyStateContainer}>
-          <MaterialCommunityIcons name="lock-outline" size={64} color={COLORS.accent} />
-          <Text style={styles.emptyStateTitle}>Доступно после входа</Text>
-          <Text style={styles.emptyStateText}>
-            Войдите в аккаунт, чтобы получить персональный нумерологический прогноз на каждый день.
-          </Text>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => router.push('/(auth)/login')}
-          >
-            <LinearGradient colors={GRADIENTS.button} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>{t('auth.login')}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      );
+    let currentAI = dayForecast;
+    let currentNumber = pDay;
+
+    if (activeTab === 'month') {
+      currentAI = monthForecast;
+      currentNumber = pMonth;
+    } else if (activeTab === 'year') {
+      currentAI = yearForecast;
+      currentNumber = pYear;
     }
 
-    // 2. Если авторизован, но НЕТ ДАТЫ РОЖДЕНИЯ
-    if (user && !user.birthDate) {
-      return (
-        <View style={styles.emptyStateContainer}>
-          <MaterialCommunityIcons name="calendar-alert" size={64} color={COLORS.error} />
-          <Text style={styles.emptyStateTitle}>Дата не указана</Text>
-          <Text style={styles.emptyStateText}>
-            Чтобы рассчитать ваши Личные Числа, нам нужно знать дату вашего рождения.
-          </Text>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => router.push('/profile')} // Ведем в профиль для редактирования
-          >
-            <LinearGradient colors={GRADIENTS.button} style={styles.buttonGradient}>
-              <Text style={styles.buttonText}>Указать дату</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    // 3. Если все ок — показываем прогноз
-    if (results && user.birthDate) {
-      return (
-        <ForecastDisplay
-          result={results}
-          date={user.birthDate}
+    return (
+      <View>
+        <UniversalForecastCard
+          data={currentAI.data}
+          loading={currentAI.loading}
+          type={activeTab}
+          number={currentNumber}
         />
-      );
-    }
-
-    return null; // Загрузка или ошибка
+        <View style={{ height: 20 }} />
+      </View>
+    );
   };
 
+  // --- IF THERE IS NO USER ---
+  if (!user || !user.birthDate) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        <LinearGradient colors={GRADIENTS.background} style={styles.background} />
+        <View style={styles.centeredContent}>
+          <View style={styles.emptyStateContainer}>
+            <MaterialCommunityIcons name={!user ? "lock-outline" : "calendar-alert"} size={64} color={COLORS.accent} />
+            <Text style={styles.emptyStateTitle}>
+              {!user ? "Требуется вход" : "Нет даты рождения"}
+            </Text>
+            <Text style={styles.emptyStateText}>
+              {!user
+                ? "Войдите в аккаунт, чтобы получить прогноз."
+                : "Укажите дату рождения в профиле для расчета."}
+            </Text>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push(!user ? '/(auth)/login' : '/profile')}
+            >
+              <LinearGradient colors={GRADIENTS.button} style={styles.buttonGradient}>
+                <Text style={styles.buttonText}>{!user ? "Войти" : "Указать дату"}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // --- MAIN RENDER ---
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
 
-      <View style={styles.content}>
-        {renderContent()}
+      <View style={styles.mainContainer}>
+        {renderTabs()}
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          {renderContent()}
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -162,60 +165,43 @@ export default function NumbersScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.transparent,
+    backgroundColor: COLORS.background
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: LAYOUT.contentPadding,
-    alignItems: 'center',
-    justifyContent: 'center', // Центруем контент (важно для пустых состояний)
-  },
-  background: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-  },
+  background: { ...StyleSheet.absoluteFillObject, alignItems: 'center' },
   logo: {
     width: '150%',
     maxWidth: LAYOUT.logoLarge,
     maxHeight: LAYOUT.logoLarge,
-    opacity: 0.1, // Чуть прозрачнее, чтобы не мешал тексту
+    opacity: 0.1,
     position: 'absolute',
-    top: 50,
+    top: 50
   },
-  // Стили для Empty State
-  emptyStateContainer: {
-    alignItems: 'center',
-    padding: SPACING.xl,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Полупрозрачная подложка
-    borderRadius: RADIUS.xl,
-    width: '100%',
+
+  mainContainer: {
+    flex: 1,
+    paddingHorizontal: LAYOUT.contentPadding,
+    paddingTop: 10
   },
-  emptyStateTitle: {
-    ...FONTS.sectionTitle,
-    color: COLORS.text,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
-    textAlign: 'center',
+  centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+
+  tabsContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 10,
+    marginTop: 0
   },
-  emptyStateText: {
-    ...FONTS.body,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.xl,
-  },
-  actionButton: {
-    width: '100%',
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-    ...SHADOWS.button,
-  },
-  buttonGradient: {
-    paddingVertical: SPACING.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    ...FONTS.button,
-    color: COLORS.text,
-  },
+  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  activeTabButton: { backgroundColor: '#C4A484' },
+  tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
+  activeTabText: { color: '#000', fontWeight: 'bold' },
+
+  // Empty State
+  emptyStateContainer: { alignItems: 'center', padding: SPACING.xl, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: RADIUS.xl, width: '100%' },
+  emptyStateTitle: { ...FONTS.sectionTitle, color: COLORS.text, marginTop: SPACING.md, marginBottom: SPACING.sm },
+  emptyStateText: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 20 },
+  actionButton: { width: '100%', borderRadius: RADIUS.lg, overflow: 'hidden' },
+  buttonGradient: { paddingVertical: SPACING.md, alignItems: 'center' },
+  buttonText: { ...FONTS.button, color: COLORS.text },
 });
