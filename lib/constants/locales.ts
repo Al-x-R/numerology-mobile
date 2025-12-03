@@ -32,8 +32,11 @@ export const translations: LocaleData = {
     tabs: {
       pythagoras: 'Психоматрица',
       compatibility: 'Совместимость',
-      numbers: 'Числа'
+      numbers: 'Числа',
+      horoscope: 'Гороскоп'
     },
+
+    horoscopeTitle: "Гороскоп",
 
     back: 'Назад',
     pythagorasTitle: 'Психоматрица',
@@ -397,8 +400,11 @@ export const translations: LocaleData = {
     tabs: {
       pythagoras: 'Psychomatrix',
       compatibility: 'Compatibility',
-      numbers: 'Numbers'
+      numbers: 'Numbers',
+      horoscope: 'Horoscope',
     },
+
+    horoscopeTitle: "Horoscope",
 
     errorEmpty: 'Enter a date',
     errorFormat: 'Format: DD.MM.YYYY',

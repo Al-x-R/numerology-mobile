@@ -2,10 +2,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { useLanguage } from '@/contexts/LanguageContext'; // Импортируем, чтобы знать язык
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-// Типы данных
 export interface ForecastSection {
   title: string;
   summary: string;
@@ -20,10 +19,11 @@ interface Props {
   data: ForecastSection | null;
   loading: boolean;
   type: 'day' | 'month' | 'year';
-  number: number;
+  number?: number;
+  zodiacSign?: string;
+  signName?: string;
 }
 
-// Словарик для заголовков секций
 const SECTION_TITLES = {
   ru: {
     love: 'Любовь и Отношения',
@@ -51,9 +51,31 @@ const SECTION_TITLES = {
   }
 };
 
-export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, number }) => {
+const ZODIAC_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
+  aries: 'zodiac-aries',
+  taurus: 'zodiac-taurus',
+  gemini: 'zodiac-gemini',
+  cancer: 'zodiac-cancer',
+  leo: 'zodiac-leo',
+  virgo: 'zodiac-virgo',
+  libra: 'zodiac-libra',
+  scorpio: 'zodiac-scorpio',
+  sagittarius: 'zodiac-sagittarius',
+  capricorn: 'zodiac-capricorn',
+  aquarius: 'zodiac-aquarius',
+  pisces: 'zodiac-pisces',
+};
+
+export const UniversalForecastCard: React.FC<Props> = ({
+  data,
+  loading,
+  type,
+  number,
+  zodiacSign,
+  signName
+}) => {
   const { language } = useLanguage();
-  // Выбираем тексты на нужном языке (или дефолт en)
+
   const labels = SECTION_TITLES[language] || SECTION_TITLES.en;
 
   if (loading) {
@@ -73,7 +95,6 @@ export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, nu
     );
   }
 
-  // Динамические заголовки шапки
   const getHeaderTitle = () => {
     const d = new Date();
     const locale = language === 'ru' ? 'ru-RU' : 'en-US';
@@ -87,6 +108,10 @@ export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, nu
   };
 
   const getLabel = () => {
+    if (signName) {
+      return signName.toUpperCase();
+    }
+
     switch (type) {
       case 'day': return labels.day;
       case 'month': return labels.month;
@@ -94,6 +119,25 @@ export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, nu
       default: return 'Forecast';
     }
   };
+
+  const renderBadgeContent = () => {
+    if (typeof number === 'number') {
+      return <Text style={styles.numberText}>{number}</Text>;
+    }
+
+    if (zodiacSign && ZODIAC_ICONS[zodiacSign]) {
+      return (
+        <MaterialCommunityIcons
+          name={ZODIAC_ICONS[zodiacSign]}
+          size={28}
+          color="#1F2937"
+        />
+      );
+    }
+    return null;
+  };
+
+  const badgeContent = renderBadgeContent();
 
   return (
     <LinearGradient
@@ -104,9 +148,11 @@ export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, nu
     >
       {/* --- ШАПКА КАРТОЧКИ --- */}
       <View style={styles.header}>
-        <View style={styles.numberBadge}>
-          <Text style={styles.numberText}>{number}</Text>
-        </View>
+        {badgeContent && (
+          <View style={styles.numberBadge}>
+            {badgeContent}
+          </View>
+        )}
         <View style={styles.headerTextContainer}>
           <Text style={styles.dateTitle}>{getLabel()}</Text>
           <Text style={styles.subTitle}>{getHeaderTitle()}</Text>
@@ -155,15 +201,15 @@ export const UniversalForecastCard: React.FC<Props> = ({ data, loading, type, nu
       </View>
 
       {/* --- МАНТРА --- */}
-      <LinearGradient
-        colors={['#4C1D95', '#6D28D9']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.affirmationContainer}
-      >
-        <Text style={styles.affirmationLabel}>{labels.affirmation}</Text>
-        <Text style={styles.affirmationText}>{data.affirmation}</Text>
-      </LinearGradient>
+      {/*<LinearGradient*/}
+      {/*  colors={['#4C1D95', '#6D28D9']}*/}
+      {/*  start={{ x: 0, y: 0 }}*/}
+      {/*  end={{ x: 1, y: 0 }}*/}
+      {/*  style={styles.affirmationContainer}*/}
+      {/*>*/}
+      {/*  <Text style={styles.affirmationLabel}>{labels.affirmation}</Text>*/}
+      {/*  <Text style={styles.affirmationText}>{data.affirmation}</Text>*/}
+      {/*</LinearGradient>*/}
     </LinearGradient>
   );
 };

@@ -48,6 +48,14 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <Ionicons name="keypad-outline" size={LAYOUT.iconSize} color={color} />,
           }}
         />
+
+        <Tabs.Screen
+          name="horoscope"
+          options={{
+            title: t('tabs.horoscope'),
+            tabBarIcon: ({ color }) => <Ionicons name="planet-outline" size={LAYOUT.iconSize} color={color} />,
+          }}
+        />
       </Tabs>
     </>
   );
