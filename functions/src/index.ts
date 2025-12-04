@@ -358,7 +358,7 @@ export const seedDatabase = onRequest(
 
     // 2. Зодиак (День, Месяц, Год - текущие)
     await generateZodiacForecast("daily_zodiac", getDateString(0), `Period: DAILY ZODIAC (Seed) ${getDateString(0)}`, apiKey);
-    // await generateZodiacForecast("monthly_zodiac", getMonthString(0), `Period: MONTHLY ZODIAC (Seed) ${getMonthString(0)}`, apiKey);
+    await generateZodiacForecast("monthly_zodiac", getMonthString(0), `Period: MONTHLY ZODIAC (Seed) ${getMonthString(0)}`, apiKey);
     // await generateZodiacForecast("yearly_zodiac", getYearString(0), `Period: YEARLY ZODIAC (Seed) ${getYearString(0)}`, apiKey);
 
     res.send(`✅ Database SEEDED completely (Numerology + Zodiac) for NOW.`);

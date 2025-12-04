@@ -1,6 +1,6 @@
 // app/(tabs)/horoscope.tsx
-import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'; // <-- Добавляем RefreshControl
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
@@ -17,8 +17,15 @@ import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 
 type TabType = 'day' | 'month' | 'year';
 
+interface ForecastResultWithRefetch {
+  data: any;
+  loading: boolean;
+  refetch: () => void;
+}
+
 export default function HoroscopeScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('day');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigation = useNavigation();
   const { user } = useProfile();
   const { t, language } = useAppTranslation();
@@ -26,9 +33,24 @@ export default function HoroscopeScreen() {
   const signKey = user?.birthDate ? getZodiacSign(new Date(user.birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
-  const dayData = useZodiacForecast('day', signKey);
-  const monthData = useZodiacForecast('month', signKey);
-  const yearData = useZodiacForecast('year', signKey);
+  const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
+  const monthData = useZodiacForecast('month', signKey) as ForecastResultWithRefetch;
+  const yearData = useZodiacForecast('year', signKey) as ForecastResultWithRefetch;
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+
+    let currentData = dayData;
+    if (activeTab === 'month') currentData = monthData;
+    else if (activeTab === 'year') currentData = yearData;
+
+    currentData.refetch();
+
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1500);
+
+  }, [activeTab, dayData, monthData, yearData]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -48,21 +70,6 @@ export default function HoroscopeScreen() {
 
     return (
       <View>
-        {/*{signKey && (*/}
-        {/*  <View style={styles.signHeaderRow}>*/}
-        {/*    <View style={styles.iconContainer}>*/}
-        {/*      <MaterialCommunityIcons*/}
-        {/*        name={ZODIAC_ICONS[signKey]}*/}
-        {/*        size={32}*/}
-        {/*        color="#000"*/}
-        {/*      />*/}
-        {/*    </View>*/}
-        {/*    <View style={styles.textContainer}>*/}
-        {/*      <Text style={styles.labelTitle}>{t('zodiacSign') || 'Ваш знак'}</Text>*/}
-        {/*      <Text style={styles.signTitle}>{signName}</Text>*/}
-        {/*    </View>*/}
-        {/*  </View>*/}
-        {/*)}*/}
 
         <UniversalForecastCard
           data={currentData.data}
@@ -129,7 +136,16 @@ export default function HoroscopeScreen() {
 
       <View style={styles.mainContainer}>
         {renderTabs()}
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor="#C4A484"
+            />
+          }
+        >
           {renderContent()}
         </ScrollView>
       </View>

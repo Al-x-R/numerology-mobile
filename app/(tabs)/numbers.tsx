@@ -1,6 +1,6 @@
 // app/(tabs)/numbers.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'; // <-- 1. Импортируем RefreshControl
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
@@ -18,6 +18,12 @@ import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 
 type TabType = 'day' | 'month' | 'year';
 
+interface ForecastResultWithRefetch {
+  data: any;
+  loading: boolean;
+  refetch: () => void;
+}
+
 export default function NumbersScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('day');
 
@@ -25,6 +31,8 @@ export default function NumbersScreen() {
   const [pDay, setPDay] = useState(0);
   const [pMonth, setPMonth] = useState(0);
   const [pYear, setPYear] = useState(0);
+
+  const [isRefreshing, setIsRefreshing] = useState(false); // <-- 2. Состояние для обновления
 
   const navigation = useNavigation();
   const { t, language } = useAppTranslation();
@@ -44,9 +52,9 @@ export default function NumbersScreen() {
 
   useFocusEffect(useCallback(() => { performCalculation(); }, [performCalculation]));
 
-  const dayForecast = useForecasts('day', pDay);
-  const monthForecast = useForecasts('month', pMonth);
-  const yearForecast = useForecasts('year', pYear);
+  const dayForecast = useForecasts('day', pDay) as ForecastResultWithRefetch;
+  const monthForecast = useForecasts('month', pMonth) as ForecastResultWithRefetch;
+  const yearForecast = useForecasts('year', pYear) as ForecastResultWithRefetch;
 
   useEffect(() => {
     navigation.setOptions({
@@ -58,6 +66,27 @@ export default function NumbersScreen() {
       tabBarStyle: { display: 'flex', backgroundColor: COLORS.background, borderTopColor: COLORS.background },
     });
   }, [navigation, language]);
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+
+    let currentForecast = dayForecast;
+    if (activeTab === 'month') {
+      currentForecast = monthForecast;
+    } else if (activeTab === 'year') {
+      currentForecast = yearForecast;
+    }
+
+    if (currentForecast && currentForecast.refetch) {
+      currentForecast.refetch();
+    }
+
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1500);
+
+  }, [activeTab, dayForecast, monthForecast, yearForecast]);
+
 
   // --- TABS ---
   const renderTabs = () => (
@@ -154,6 +183,14 @@ export default function NumbersScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
+          // 4. Добавляем RefreshControl
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor="#C4A484" // Цвет спиннера, как в дизайне
+            />
+          }
         >
           {renderContent()}
         </ScrollView>
