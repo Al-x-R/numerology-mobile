@@ -1,4 +1,3 @@
-// constants/theme.ts
 import { DimensionValue } from 'react-native';
 
 export const FONT_FAMILY = {
@@ -24,6 +23,7 @@ export const COLORS = {
   borderFocused: '#A78BFA',
   borderAccent: '#E0B873',
   text: '#FFFFFF',
+  blackText: '#000000',
   textSecondary: '#A0A0A0',
   accent: '#E0B873',
   primary: '#A78BFA',
@@ -42,7 +42,7 @@ export const COLORS = {
   },
   textTertiary: '#D0D0D0',  // серый для описаний
   loading: '#FFD700',      // золотой для ActivityIndicator
-  
+
   // RGBA значения для прозрачных фонов
   cardBackground: 'rgba(255, 255, 255, 0.05)',
   cardBorder: 'rgba(255, 255, 255, 0.1)',
@@ -60,11 +60,8 @@ export const GRADIENTS = {
   background: ['#1A1C33', '#0D0F21'] as const,
   button: ['#B794F4', '#9F7AEA', '#7C3AED'] as const,
   buttonLoading: ['#9F7AEA', '#7C3AED'] as const,
+  goldenButton: ['#C4A484', '#A88460', '#B99470'] as const,
 };
-// export const GRADIENTS = {
-//   button: ['#4F46E5', '#7C3AED'] as const, // ← as const
-//   buttonLoading: ['#6366F1', '#8B5CF6'] as const,
-// } satisfies Record<string, readonly [string, string, ...string[]]>;
 
 export const SPACING = {
   xs: 4,
@@ -119,6 +116,21 @@ export const SHADOWS = {
     shadowOpacity: 0.5,
     shadowRadius: 20,
     elevation: 16,
+  },
+  goldenButton: {
+    shadowColor: '#C4A484',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+    elevation: 18,
+  },
+
+  goldenButtonSoft: {
+    shadowColor: '#B8860B',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.7,
+    shadowRadius: 16,
+    elevation: 14,
   },
 };
 
@@ -336,30 +348,4 @@ export const GRID_CELL_ANIMATED = {
       backgroundColor: COLORS.strongHighlightBackground,
     },
   },
-
-  // Tooltip
-  // tooltip: {
-  //   wrapper: {
-  //     position: 'absolute' as const,
-  //     top: -8,
-  //     alignItems: 'center' as const,
-  //     zIndex: 10,
-  //   },
-  //   container: (isWeak: boolean) => ({
-  //     paddingHorizontal: 6,
-  //     paddingVertical: 2,
-  //     borderRadius: RADIUS.sm,
-  //     minWidth: 50,
-  //     alignItems: 'center' as const,
-  //     backgroundColor: isWeak ? COLORS.highlightWeak : COLORS.highlightStrong,
-  //   }),
-  //   text: {
-  //     color: COLORS.text,
-  //     fontSize: 9,
-  //     fontWeight: '600' as const,
-  //     fontFamily: 'Manrope-Bold',
-  //     textAlign: 'center' as const,
-  //   },
-  // },
 };
-

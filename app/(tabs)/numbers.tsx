@@ -15,6 +15,7 @@ import { useForecasts } from '@/hooks/useForecasts';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { COLORS, GRADIENTS, LAYOUT, SPACING, RADIUS, FONTS } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
 
 type TabType = 'day' | 'month' | 'year';
 
@@ -144,28 +145,10 @@ export default function NumbersScreen() {
   if (!user || !user.birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
-        <LinearGradient colors={GRADIENTS.background} style={styles.background} />
-        <View style={styles.centeredContent}>
-          <View style={styles.emptyStateContainer}>
-            <MaterialCommunityIcons name={!user ? "lock-outline" : "calendar-alert"} size={64} color={COLORS.accent} />
-            <Text style={styles.emptyStateTitle}>
-              {!user ? "Требуется вход" : "Нет даты рождения"}
-            </Text>
-            <Text style={styles.emptyStateText}>
-              {!user
-                ? "Войдите в аккаунт, чтобы получить прогноз."
-                : "Укажите дату рождения в профиле для расчета."}
-            </Text>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => router.push(!user ? '/(auth)/login' : '/profile')}
-            >
-              <LinearGradient colors={GRADIENTS.button} style={styles.buttonGradient}>
-                <Text style={styles.buttonText}>{!user ? "Войти" : "Указать дату"}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <LinearGradient colors={GRADIENTS.background} style={styles.background}>
+          <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
+        </LinearGradient>
+        <AuthRequiredState />
       </SafeAreaView>
     );
   }
@@ -240,5 +223,5 @@ const styles = StyleSheet.create({
   emptyStateText: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 20 },
   actionButton: { width: '100%', borderRadius: RADIUS.lg, overflow: 'hidden' },
   buttonGradient: { paddingVertical: SPACING.md, alignItems: 'center' },
-  buttonText: { ...FONTS.button, color: COLORS.text },
+  buttonText: { ...FONTS.button, color: COLORS.blackText },
 });

@@ -1,6 +1,6 @@
 // app/(tabs)/horoscope.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'; // <-- Добавляем RefreshControl
+import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
@@ -14,6 +14,7 @@ import { useZodiacForecast } from '@/hooks/useZodiacForecast';
 import { getZodiacSign, getZodiacName } from '@/lib/calculators/zodiac';
 import { COLORS, GRADIENTS, LAYOUT, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
 
 type TabType = 'day' | 'month' | 'year';
 
@@ -33,10 +34,12 @@ export default function HoroscopeScreen() {
   const signKey = user?.birthDate ? getZodiacSign(new Date(user.birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
+  // Используем приведение типов для доступа к refetch
   const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
   const monthData = useZodiacForecast('month', signKey) as ForecastResultWithRefetch;
   const yearData = useZodiacForecast('year', signKey) as ForecastResultWithRefetch;
 
+  // Логика обновления "потягиванием"
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
 
@@ -44,8 +47,12 @@ export default function HoroscopeScreen() {
     if (activeTab === 'month') currentData = monthData;
     else if (activeTab === 'year') currentData = yearData;
 
-    currentData.refetch();
+    // Безопасный вызов refetch
+    if (currentData && typeof currentData.refetch === 'function') {
+      currentData.refetch();
+    }
 
+    // Отключаем спиннер через 1.5 сек
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1500);
@@ -70,7 +77,6 @@ export default function HoroscopeScreen() {
 
     return (
       <View>
-
         <UniversalForecastCard
           data={currentData.data}
           loading={currentData.loading}
@@ -107,23 +113,14 @@ export default function HoroscopeScreen() {
     </View>
   );
 
+  // --- ЕДИНЫЙ БЛОК EMPTY STATE (МОДАЛКА) ---
   if (!user || !user.birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
-        <LinearGradient colors={GRADIENTS.background} style={styles.background} />
-        <View style={styles.centeredContent}>
-          <View style={styles.emptyStateContainer}>
-            <MaterialCommunityIcons name="star-off-outline" size={64} color={COLORS.accent} />
-            <Text style={styles.emptyStateTitle}>
-              {language === 'ru' ? 'Знак не определен' : 'Sign Unknown'}
-            </Text>
-            <Text style={styles.emptyStateText}>
-              {language === 'ru'
-                ? 'Укажите дату рождения в профиле, чтобы узнать свой гороскоп.'
-                : 'Please set your birth date in Profile to see your horoscope.'}
-            </Text>
-          </View>
-        </View>
+        <LinearGradient colors={GRADIENTS.background} style={styles.background}>
+          <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
+        </LinearGradient>
+        <AuthRequiredState />
       </SafeAreaView>
     );
   }
@@ -171,30 +168,41 @@ const styles = StyleSheet.create({
   tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
   activeTabText: { color: '#000', fontWeight: 'bold' },
 
-  signTitle: { color: COLORS.accent, fontSize: 24, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 },
-
-  centeredContent: {  justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
-  signHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(196, 164, 132, 0.1)',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    marginBottom: 5,
+  // --- Стили для модалки и кнопки (Унифицированы) ---
+  centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+  emptyStateContainer: {
+    alignItems: 'center',
+    padding: SPACING.xl,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Полупрозрачный фон модалки
+    borderRadius: RADIUS.xl,
+    width: '100%',
     borderWidth: 1,
-    borderColor: 'rgba(196, 164, 132, 0.3)'
+    borderColor: 'rgba(255,255,255,0.1)' // Легкая рамка для красоты
   },
-  iconContainer: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: '#C4A484',
-    justifyContent: 'center', alignItems: 'center',
-    marginRight: 15
+  emptyStateTitle: {
+    ...FONTS.sectionTitle,
+    color: COLORS.text,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.sm
   },
-  textContainer: { flex: 1 },
-  labelTitle: { color: '#9CA3AF', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 },
-
-  emptyStateContainer: { alignItems: 'center', padding: SPACING.xl, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: RADIUS.xl, width: '100%' },
-  emptyStateTitle: { ...FONTS.sectionTitle, color: COLORS.text, marginTop: SPACING.md },
-  emptyStateText: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', marginTop: 8 },
+  emptyStateText: {
+    ...FONTS.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  actionButton: {
+    width: '100%',
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
+    marginTop: SPACING.sm
+  },
+  buttonGradient: {
+    paddingVertical: SPACING.md,
+    alignItems: 'center'
+  },
+  buttonText: {
+    ...FONTS.button,
+    color: COLORS.blackText
+  },
 });
