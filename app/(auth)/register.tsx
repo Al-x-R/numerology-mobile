@@ -15,19 +15,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useProfile } from '@/contexts/ProfileContext'; // ← Только это!
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT, SHADOWS } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function RegisterScreen() {
-  const { registerWithEmail, loginWithGoogle, isLoading } = useProfile();
+  const { registerWithEmail, loginWithGoogle, updateUserProfile, isLoading } = useProfile();
   const router = useRouter();
   const { redirect } = useLocalSearchParams<{ redirect: string }>();
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [errors, setErrors] = useState({ displayName: '', email: '', password: '' });
 
   const { t } = useAppTranslation();
@@ -54,6 +55,11 @@ export default function RegisterScreen() {
 
     try {
       await registerWithEmail(displayName.trim(), email.trim(), password);
+
+      if (birthDate.trim()) {
+        await updateUserProfile({ birthDate: birthDate.trim() });
+      }
+
       handleLoginSuccess();
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
@@ -97,7 +103,18 @@ export default function RegisterScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>{t('auth.register')}</Text>
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleRegister} disabled={isLoading}>
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={handleGoogleRegister}
+          disabled={isLoading}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={['#1a73e8', '#0d47a1']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.googleButtonGradient}
+          />
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
@@ -142,12 +159,35 @@ export default function RegisterScreen() {
         />
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>
-          )}
+        <TextInput
+          style={styles.input}
+          placeholder={t('auth.birthDatePlaceholder')}
+          value={birthDate}
+          onChangeText={setBirthDate}
+          placeholderTextColor={COLORS.textSecondary}
+          keyboardType="numbers-and-punctuation"
+          autoComplete="birthdate-full"
+          editable={!isLoading}
+        />
+
+        <TouchableOpacity
+          style={styles.goldenButtonContainer}
+          onPress={handleRegister}
+          disabled={isLoading}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={GRADIENTS.goldenButton}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.goldenButton}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.goldenButtonText}>{t('auth.createAccount')}</Text>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={goToLogin}>
@@ -176,14 +216,24 @@ const styles = StyleSheet.create({
   title: { ...FONTS.headerTitle, fontSize: 32, textAlign: 'center', marginBottom: SPACING.xl, color: '#fff' },
   googleButton: {
     flexDirection: 'row',
-    backgroundColor: '#4285F4',
+    backgroundColor: 'transparent',
     padding: SPACING.md,
     borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
+    borderWidth: 1.5,
   },
-  googleText: { ...FONTS.button, marginLeft: SPACING.sm },
+  googleButtonGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: RADIUS.lg,
+  },
+  googleText: {
+    ...FONTS.button,
+    marginLeft: SPACING.sm,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
   input: {
     ...FONTS.body,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -194,15 +244,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
+  hintText: {
+    ...FONTS.body,
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.lg,
+    textAlign: 'center',
+    opacity: 0.8,
+  },
   inputError: { borderColor: COLORS.error },
   errorText: { ...FONTS.error, color: COLORS.error, marginBottom: SPACING.sm, alignSelf: 'flex-start' },
-  button: {
-    backgroundColor: COLORS.accent,
-    padding: SPACING.md,
-    borderRadius: RADIUS.lg,
-    alignItems: 'center',
+  goldenButtonContainer: {
+    marginTop: SPACING.lg,
     marginBottom: SPACING.lg,
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.goldenButtonSoft,
   },
-  buttonText: { ...FONTS.button },
+  goldenButton: {
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goldenButtonText: {
+    ...FONTS.button,
+    fontSize: 18,
+    color: '#000000',
+    fontWeight: '700',
+  },
   link: { ...FONTS.link, textAlign: 'center', color: '#fff' },
 });

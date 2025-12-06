@@ -1,4 +1,3 @@
-// contexts/ProfileContext.tsx
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import {
@@ -54,7 +53,8 @@ interface ProfileContextType {
 
   sendPasswordResetEmail: (email: string) => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
-  registerWithEmail: (displayName: string, email: string, password: string) => Promise<void>;
+  // Обновили сигнатуру: добавили birthDate
+  registerWithEmail: (displayName: string, email: string, password: string, birthDate?: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   saveProfile: (data: { name: string; date: string }) => Promise<void>;
@@ -246,9 +246,20 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const registerWithEmail = async (displayName: string, email: string, password: string) => {
+  const registerWithEmail = async (displayName: string, email: string, password: string, birthDate?: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
+
     await updateProfile(cred.user, { displayName });
+
+    const userDocRef = doc(db, 'users', cred.user.uid);
+    await setDoc(userDocRef, {
+      email: email,
+      displayName: displayName,
+      photoURL: cred.user.photoURL,
+      createdAt: new Date(),
+      isPremium: false,
+      birthDate: birthDate || null
+    });
   };
 
   const logout = async () => {

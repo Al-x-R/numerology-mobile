@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: RADIUS.lg,
     overflow: 'hidden' as const,
-    ...SHADOWS.button,
+    ...SHADOWS.goldenButtonSoft,
   },
   buttonGradient: {
     paddingVertical: SPACING.lg,

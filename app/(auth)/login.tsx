@@ -16,18 +16,12 @@ import { useRouter, useLocalSearchParams, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT, SHADOWS } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 export default function LoginScreen() {
-  const {
-    loginWithEmail,
-    loginWithGoogle,
-    isLoading,
-    sendPasswordResetEmail,
-  } = useProfile();
-
+  const { loginWithEmail, loginWithGoogle, isLoading, sendPasswordResetEmail } = useProfile();
   const router = useRouter();
   const { redirect } = useLocalSearchParams<{ redirect: string }>();
   const [email, setEmail] = useState('');
@@ -59,13 +53,9 @@ export default function LoginScreen() {
       handleLoginSuccess();
     } catch (err: any) {
       let message = t('auth.wrongPasswordOrUserNotFound');
-
       if (err.code === 'auth/network-request-failed') {
         message = t('common.networkError');
-      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        message = t('auth.wrongPasswordOrUserNotFound');
       }
-
       Alert.alert(t('common.error'), message);
     }
   };
@@ -92,7 +82,6 @@ export default function LoginScreen() {
       Alert.alert(t('auth.resetPassword'), t('auth.enterEmailToReset'));
       return;
     }
-
     try {
       await sendPasswordResetEmail(email.trim());
       Alert.alert(t('auth.resetPassword'), t('auth.resetEmailSent'));
@@ -110,8 +99,19 @@ export default function LoginScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>{t('auth.welcome')}</Text>
 
-        {/* Google */}
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin} disabled={isLoading}>
+        {/* Google Button */}
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={handleGoogleLogin}
+          disabled={isLoading}
+          activeOpacity={0.9}
+        >
+          <LinearGradient
+            colors={['#1a73e8', '#0d47a1']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.googleButtonGradient}
+          />
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
@@ -133,9 +133,8 @@ export default function LoginScreen() {
           placeholderTextColor={COLORS.textSecondary}
           editable={!isLoading}
         />
-        {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-        {/* Password */}
         <TextInput
           style={[styles.input, errors.password ? styles.inputError : {}]}
           placeholder={t('auth.password')}
@@ -145,22 +144,32 @@ export default function LoginScreen() {
           placeholderTextColor={COLORS.textSecondary}
           editable={!isLoading}
         />
-        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
         <TouchableOpacity onPress={handlePasswordReset} style={styles.forgotPasswordContainer}>
           <Text style={styles.forgotPasswordLink}>{t('auth.forgotPassword')}</Text>
         </TouchableOpacity>
 
-        {/* Login Button */}
-        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>{t('auth.login')}</Text>
-          )}
+        <TouchableOpacity
+          style={styles.goldenButtonContainer}
+          onPress={handleLogin}
+          disabled={isLoading}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={GRADIENTS.goldenButton}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.goldenButton}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.goldenButtonText}>{t('auth.login')}</Text>
+            )}
+          </LinearGradient>
         </TouchableOpacity>
 
-        {/* Register Link */}
         <TouchableOpacity onPress={goToRegister}>
           <Text style={styles.link}>{t('auth.noAccount')}</Text>
         </TouchableOpacity>
@@ -185,16 +194,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: { ...FONTS.headerTitle, fontSize: 32, textAlign: 'center', marginBottom: SPACING.xl, color: '#fff' },
+
   googleButton: {
     flexDirection: 'row',
-    backgroundColor: '#4285F4',
+    backgroundColor: 'transparent',
     padding: SPACING.md,
     borderRadius: RADIUS.lg,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
+    borderWidth: 1.5,
   },
-  googleText: { ...FONTS.button, marginLeft: SPACING.sm },
+  googleButtonGradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: RADIUS.lg,
+  },
+  googleText: {
+    ...FONTS.button,
+    marginLeft: SPACING.sm,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+
   input: {
     ...FONTS.body,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -207,15 +228,28 @@ const styles = StyleSheet.create({
   },
   inputError: { borderColor: COLORS.error },
   errorText: { ...FONTS.error, color: COLORS.error, marginBottom: SPACING.sm, alignSelf: 'flex-start' },
-  button: {
-    backgroundColor: COLORS.accent,
-    padding: SPACING.md,
-    borderRadius: RADIUS.lg,
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
-  },
-  buttonText: { ...FONTS.button },
-  link: { ...FONTS.link, textAlign: 'center', color: '#fff' },
+
   forgotPasswordContainer: { alignSelf: 'flex-end', marginBottom: SPACING.md },
   forgotPasswordLink: { ...FONTS.link, fontSize: 14, color: COLORS.textSecondary },
+
+  goldenButtonContainer: {
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.goldenButtonSoft,
+  },
+  goldenButton: {
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goldenButtonText: {
+    ...FONTS.button,
+    fontSize: 18,
+    color: '#000000',
+    fontWeight: '700',
+  },
+
+  link: { ...FONTS.link, textAlign: 'center', color: '#fff' },
 });

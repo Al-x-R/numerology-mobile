@@ -313,6 +313,8 @@ export const translations: LocaleData = {
       emailInvalid: 'Email недействителен',
       passwordShort: 'Пароль должен быть ≥6 символов',
 
+      birthDatePlaceholder: "ДД.ММ.ГГГГ",
+
       register: 'Регистрация',
       createAccount: 'Создать аккаунт',
       haveAccount: 'Уже есть аккаунт? Войти',
@@ -668,6 +670,8 @@ export const translations: LocaleData = {
       noAccount: 'Don’t have an account? Sign up',
       emailInvalid: 'Invalid email',
       passwordShort: 'Password must be ≥6 characters',
+
+      birthDatePlaceholder: "DD.MM.YYYY",
 
       register: 'Sign up',
       createAccount: 'Create account',

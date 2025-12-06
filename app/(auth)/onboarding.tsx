@@ -60,7 +60,7 @@ export default function OnboardingScreen() {
             onPress={handleContinueGuest}
           >
             <LinearGradient
-              colors={GRADIENTS.button}
+              colors={GRADIENTS.goldenButton}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.mainButton}
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   mainButtonContainer: {
     width: '100%',
     borderRadius: RADIUS.xl,
-    ...SHADOWS.button,
+    ...SHADOWS.goldenButtonSoft,
     marginBottom: SPACING.lg,
   },
   mainButton: {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   mainButtonText: {
     ...FONTS.button,
     fontSize: 18,
-    color: COLORS.text,
+    color: COLORS.blackText,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
