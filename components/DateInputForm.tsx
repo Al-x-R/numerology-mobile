@@ -181,14 +181,14 @@ export function DateInputForm({
           disabled={isLoading}
         >
           <LinearGradient
-            colors={isLoading ? GRADIENTS.buttonLoading : GRADIENTS.button}
+            colors={isLoading ? GRADIENTS.goldenButton : GRADIENTS.goldenButton}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.buttonGradient}
           >
             {isLoading ? (
               <View style={styles.loadingContent}>
-                <ActivityIndicator size="small" color={COLORS.text} />
+                <ActivityIndicator size="small" color={COLORS.blackText} />
                 <Text style={styles.loadingText}>{t('loadingText')}</Text>
               </View>
             ) : (
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   inputFocused: {
-    borderColor: COLORS.borderFocused,
+    borderColor: COLORS.accent,
     borderWidth: 2,
     backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
     ...(Platform.OS === 'ios' && {
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: RADIUS.lg,
     overflow: 'hidden' as const,
-    ...SHADOWS.button,
+    ...SHADOWS.goldenButtonSoft,
   },
   buttonGradient: {
     paddingVertical: SPACING.lg,
@@ -275,6 +275,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...FONTS.button,
+    color: COLORS.blackText,
     textShadowColor: COLORS.textShadow,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
@@ -286,5 +287,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...FONTS.loading,
+    color: COLORS.blackText
   },
 });

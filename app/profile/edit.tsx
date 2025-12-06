@@ -24,7 +24,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, SHADOWS } from '@/lib/constants/theme';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -256,20 +256,21 @@ export default function EditProfileScreen() {
 
           {/* Save button */}
           <TouchableOpacity
-            style={styles.saveButtonContainer}
+            style={styles.goldenButtonContainer}
             onPress={saveChanges}
             disabled={isSaving}
+            activeOpacity={0.85}
           >
             <LinearGradient
-              colors={isSaving ? [COLORS.card, COLORS.card] : GRADIENTS.button}
-              style={styles.saveButton}
+              colors={GRADIENTS.goldenButton}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
+              style={styles.goldenButton}
             >
               {isSaving ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="#000" />
               ) : (
-                <Text style={styles.saveButtonText}>{t('common.save')}</Text>
+                <Text style={styles.goldenButtonText}>{t('common.save')}</Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
@@ -385,14 +386,23 @@ const styles = StyleSheet.create({
   },
   dateText: { ...FONTS.body },
   placeholderText: { ...FONTS.body, color: COLORS.textSecondary },
-  saveButtonContainer: { marginTop: SPACING.sm },
-  saveButton: {
+  goldenButtonContainer: {
+    marginTop: SPACING.md,
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden' as const,
+    ...SHADOWS.goldenButtonSoft,
+  },
+  goldenButton: {
     paddingVertical: 18,
-    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveButtonText: { ...FONTS.button, color: '#000', fontWeight: '700', fontSize: 16 },
+  goldenButtonText: {
+    ...FONTS.button,
+    fontSize: 18,
+    color: '#000000',
+    fontWeight: '700',
+  },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   pickerContainer: {
     backgroundColor: '#1A1A1A',

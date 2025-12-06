@@ -70,7 +70,6 @@ export const SPACING = {
   lg: 24,
   xl: 32,
   formGap: 35,
-  // Дополнительные отступы из компонентов
   cardPadding: 15,
   sectionMarginTop: 30,
   subtitleMargin: 5,

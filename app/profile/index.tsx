@@ -138,7 +138,7 @@ export default function ProfileScreen({ onClose }: Props) {
 
           </View>
 
-          <Text style={styles.greeting}>{t('profile.hello')}</Text>
+          {/*<Text style={styles.greeting}>{t('profile.hello')}</Text>*/}
 
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{displayName}</Text>

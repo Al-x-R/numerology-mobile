@@ -269,7 +269,7 @@ export function DoubleDateInputForm({
           disabled={isLoading}
         >
           <LinearGradient
-            colors={isLoading ? GRADIENTS.buttonLoading : GRADIENTS.button}
+            colors={isLoading ? GRADIENTS.goldenButton : GRADIENTS.goldenButton}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.buttonGradient}
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
   },
   inputFocused: {
-    borderColor: COLORS.borderFocused,
+    borderColor: COLORS.accent,
     borderWidth: 2,
     backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
     ...(Platform.OS === 'ios' && {
@@ -368,6 +368,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...FONTS.button,
+    color: COLORS.blackText,
     textShadowColor: COLORS.textShadow,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
@@ -379,6 +380,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     ...FONTS.loading,
+    color: COLORS.blackText
   },
 });
 
