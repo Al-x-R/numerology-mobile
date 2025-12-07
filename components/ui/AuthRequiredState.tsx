@@ -16,7 +16,6 @@ export const AuthRequiredState = () => {
   const isLoggedIn = !!user;
   const hasBirthDate = !!user?.birthDate;
 
-  // Если залогинен и есть дата — ничего не показываем
   if (isLoggedIn && hasBirthDate) return null;
 
   const title = !isLoggedIn
@@ -36,7 +35,7 @@ export const AuthRequiredState = () => {
     : (language === 'ru' ? 'Указать дату рождения' : 'Set Birth Date');
 
   const onPress = () => {
-    router.push(!isLoggedIn ? '/(auth)/login' : '/profile');
+    router.push(!isLoggedIn ? '/(auth)/login' : '/profile/edit');
   };
 
   const iconName = !isLoggedIn ? 'lock-outline' : 'calendar-alert';

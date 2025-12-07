@@ -4,7 +4,6 @@ import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshCon
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { UniversalForecastCard } from '@/components/UniversalForecastCard';
 import { ProfileButton } from '@/components/ui/ProfileButton';
@@ -34,12 +33,10 @@ export default function HoroscopeScreen() {
   const signKey = user?.birthDate ? getZodiacSign(new Date(user.birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
-  // Используем приведение типов для доступа к refetch
   const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
   const monthData = useZodiacForecast('month', signKey) as ForecastResultWithRefetch;
   const yearData = useZodiacForecast('year', signKey) as ForecastResultWithRefetch;
 
-  // Логика обновления "потягиванием"
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
 
@@ -47,12 +44,10 @@ export default function HoroscopeScreen() {
     if (activeTab === 'month') currentData = monthData;
     else if (activeTab === 'year') currentData = yearData;
 
-    // Безопасный вызов refetch
     if (currentData && typeof currentData.refetch === 'function') {
       currentData.refetch();
     }
 
-    // Отключаем спиннер через 1.5 сек
     setTimeout(() => {
       setIsRefreshing(false);
     }, 1500);
@@ -113,7 +108,6 @@ export default function HoroscopeScreen() {
     </View>
   );
 
-  // --- ЕДИНЫЙ БЛОК EMPTY STATE (МОДАЛКА) ---
   if (!user || !user.birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
@@ -168,16 +162,15 @@ const styles = StyleSheet.create({
   tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
   activeTabText: { color: '#000', fontWeight: 'bold' },
 
-  // --- Стили для модалки и кнопки (Унифицированы) ---
   centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
   emptyStateContainer: {
     alignItems: 'center',
     padding: SPACING.xl,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Полупрозрачный фон модалки
+    backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: RADIUS.xl,
     width: '100%',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)' // Легкая рамка для красоты
+    borderColor: 'rgba(255,255,255,0.1)'
   },
   emptyStateTitle: {
     ...FONTS.sectionTitle,

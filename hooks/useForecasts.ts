@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ForecastDataMap {
   [key: string]: { ru: ForecastSection; en: ForecastSection };
@@ -14,18 +15,19 @@ export const useForecasts = (
   personalNumber: number
 ) => {
   const [data, setData] = useState<ForecastSection | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { language } = useLanguage();
-
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const fetchForecast = useCallback(async () => {
+  const fetchForecast = useCallback(async (forceUpdate = false) => {
     if (!personalNumber) {
       setData(null);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
+
     try {
       let collectionName = '';
       let docId = '';
@@ -33,7 +35,7 @@ export const useForecasts = (
 
       if (type === 'day') {
         collectionName = 'daily_forecasts';
-        docId = today.toLocaleDateString('en-CA');
+        docId = today.toLocaleDateString('en-CA'); // YYYY-MM-DD
       } else if (type === 'month') {
         collectionName = 'monthly_forecasts';
         const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -41,6 +43,18 @@ export const useForecasts = (
       } else if (type === 'year') {
         collectionName = 'yearly_forecasts';
         docId = `${today.getFullYear()}`;
+      }
+
+      const cacheKey = `@forecast_${type}_${docId}_${personalNumber}_${language}`;
+
+      if (!forceUpdate) {
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          console.log(`📦 Loaded from cache: ${cacheKey}`);
+          setData(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
       }
 
       console.log(`📡 Fetching ${collectionName}/${docId} for number ${personalNumber}...`);
@@ -54,10 +68,16 @@ export const useForecasts = (
 
         if (numberData) {
           const localized = numberData[language];
-          const fallbackData = localized || numberData['ru'] || Object.values(numberData)[0];
+          const finalData = localized || numberData['ru'] || Object.values(numberData)[0];
 
-          setData(fallbackData as ForecastSection || null);
+          if (finalData) {
+            setData(finalData);
+            await AsyncStorage.setItem(cacheKey, JSON.stringify(finalData));
+          } else {
+            setData(null);
+          }
         } else {
+          console.log('Number data not found in document');
           setData(null);
         }
       } else {
@@ -69,15 +89,16 @@ export const useForecasts = (
     } finally {
       setLoading(false);
     }
-  }, [type, personalNumber, language, refreshKey]);
+  }, [type, personalNumber, language]);
 
   useEffect(() => {
-    fetchForecast();
-  }, [fetchForecast]);
+    fetchForecast(false);
+  }, [fetchForecast, refreshKey]);
 
   const refetch = useCallback(() => {
-    setRefreshKey(prev => prev + 1);
-  }, []);
+
+    fetchForecast(true);
+  }, [fetchForecast]);
 
   return { data, loading, refetch };
 };

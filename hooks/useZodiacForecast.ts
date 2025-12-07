@@ -4,30 +4,57 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PeriodType = 'day' | 'month' | 'year';
 
 export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
   const [data, setData] = useState<ForecastSection | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start loading as true to check cache first
   const { language } = useLanguage();
 
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const fetchData = useCallback(async () => {
-    if (!sign) return;
+  const fetchData = useCallback(async (forceUpdate = false) => {
+    if (!sign) {
+      setData(null);
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
       const d = new Date();
-
       let docId = '';
-      if (type === 'day') docId = d.toISOString().split('T')[0];
-      else if (type === 'month') docId = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      else if (type === 'year') docId = `${d.getFullYear()}`;
+
+      // Generate docId based on type
+      if (type === 'day') {
+        docId = d.toISOString().split('T')[0];
+      } else if (type === 'month') {
+        docId = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      } else if (type === 'year') {
+        docId = `${d.getFullYear()}`;
+      }
 
       const collectionName = `${type === 'day' ? 'daily' : type === 'month' ? 'monthly' : 'yearly'}_zodiac`;
 
+      // Generate unique cache key
+      // Example: @zodiac_day_2023-10-27_aries_ru
+      const cacheKey = `@zodiac_${type}_${docId}_${sign}_${language}`;
+
+      // 1. Try to load from cache first (if not force update)
+      if (!forceUpdate) {
+        const cachedData = await AsyncStorage.getItem(cacheKey);
+        if (cachedData) {
+          console.log(`📦 Loaded zodiac from cache: ${cacheKey}`);
+          setData(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 2. Fetch from Firebase
+      console.log(`📡 Fetching ${collectionName}/${docId} for sign ${sign}...`);
       const docRef = doc(db, collectionName, docId);
       const snapshot = await getDoc(docRef);
 
@@ -37,9 +64,16 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
 
         if (signData) {
           const localized = signData[language];
+          // Fallback logic
           const fallbackData = localized || signData['ru'] || Object.values(signData).find(d => d);
+          const finalData = fallbackData || null;
 
-          setData(fallbackData || null);
+          setData(finalData);
+
+          // 3. Save to cache
+          if (finalData) {
+            await AsyncStorage.setItem(cacheKey, JSON.stringify(finalData));
+          }
         } else {
           setData(null);
         }
@@ -52,15 +86,16 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
     } finally {
       setLoading(false);
     }
-  }, [type, sign, language, refreshKey]);
+  }, [type, sign, language]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchData(false);
+  }, [fetchData, refreshKey]);
 
   const refetch = useCallback(() => {
-    setRefreshKey(prev => prev + 1);
-  }, []);
+    // Force update ignores cache and fetches fresh data
+    fetchData(true);
+  }, [fetchData]);
 
   return { data, loading, refetch };
 };

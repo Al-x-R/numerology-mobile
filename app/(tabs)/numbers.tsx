@@ -4,7 +4,6 @@ import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshCon
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { UniversalForecastCard } from '@/components/UniversalForecastCard';
@@ -166,12 +165,11 @@ export default function NumbersScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 40 }}
-          // 4. Добавляем RefreshControl
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              tintColor="#C4A484" // Цвет спиннера, как в дизайне
+              tintColor="#C4A484"
             />
           }
         >
