@@ -13,7 +13,7 @@ import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
-
+import { useInterstitial } from '@/hooks/useAdMob';
 
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
@@ -21,25 +21,26 @@ export default function HomeScreen() {
 
   const navigation = useNavigation();
   const { t, language } = useAppTranslation();
+  const { showInterstitial } = useInterstitial();
 
   const handleCalculate = () => {
     // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
-    const parts = dateString.split('.'); // ['02', '07', '1985']
-    // new Date() in JavaScript doesn't work well with DD/MM/YYYY,
-    // but works well with YYYY-MM-DD
+    const parts = dateString.split('.');
     const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
-    try {
-      const dateObj = new Date(isoDateString);
-      if (isNaN(dateObj.getTime())) {
-        return;
-      }
+    showInterstitial(() => {
+      try {
+        const dateObj = new Date(isoDateString);
+        if (isNaN(dateObj.getTime())) {
+          return;
+        }
 
-      const calcResults = calculatePythagoreanSquare(dateObj);
-      setResults(calcResults);
-    } catch (e) {
-      console.error(e);
-    }
+        const calcResults = calculatePythagoreanSquare(dateObj);
+        setResults(calcResults);
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   const handleBack = useCallback(() => {
@@ -104,7 +105,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.transparent, // Match the gradient background
+    backgroundColor: COLORS.transparent,
   },
   content: {
     flex: 1,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: '150%', // Adjusted for better fit
+    width: '150%',
     maxWidth: LAYOUT.logoLarge,
     maxHeight: LAYOUT.logoLarge,
     opacity: 0.2,
