@@ -1,10 +1,9 @@
 // app/(tabs)/compatibility.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, TouchableOpacity } from 'react-native';
+import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
@@ -15,6 +14,7 @@ import { ProfileButton } from '@/components/ui/ProfileButton';
 import { useProfile } from '@/contexts/ProfileContext';
 import { BackButton } from '@/components/ui/BackButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { useRewarded } from '@/hooks/useAdMob';
 
 export default function CompatibilityScreen() {
   const [dateString1, setDateString1] = useState<string>('');
@@ -25,14 +25,22 @@ export default function CompatibilityScreen() {
   const { user } = useProfile();
   const { t, language } = useAppTranslation();
 
+  const { showRewarded } = useRewarded();
+
   const handleCalculate = () => {
-    try {
-      // calculateCompatibility expects format DD.MM.YYYY
-      const result = calculateCompatibility(dateString1, dateString2, user?.isPremium);
-      setCompatibilityResult(result);
-    } catch (e) {
-      console.error(e);
+    if (!dateString1 || !dateString2 || dateString1.length < 10 || dateString2.length < 10) {
+      return;
     }
+
+    showRewarded(() => {
+      try {
+        const result = calculateCompatibility(dateString1, dateString2, user?.isPremium);
+        setCompatibilityResult(result);
+      } catch (e) {
+        console.error(e);
+        Alert.alert(t('common.error'), t('errors.calculationFailed'));
+      }
+    });
   };
 
   const handleBack = useCallback(() => {
@@ -53,7 +61,6 @@ export default function CompatibilityScreen() {
         headerTitle: () => (
           <View style={{ alignItems: 'center' }}>
             <Text style={FONTS.headerTitle}>{t('compatibility.compatibilityResultsTitle')}</Text>
-            {/*<Text style={FONTS.headerSubtitle}>{dateString1} & {dateString2}</Text>*/}
           </View>
         ),
         headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
@@ -92,7 +99,7 @@ export default function CompatibilityScreen() {
             onSubmit={handleCalculate}
           />
         ) : (
-          <CompatibilityResultsDisplay 
+          <CompatibilityResultsDisplay
             result={compatibilityResult}
             date1={dateString1}
             date2={dateString2}
