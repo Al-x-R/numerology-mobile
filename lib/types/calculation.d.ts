@@ -3,6 +3,8 @@ export type MatrixData = {
   [key in '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9']: string;
 };
 
+export type CellKey = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+
 export interface AdditionalParams {
   character: number;
   goal: number;
@@ -34,5 +36,5 @@ export interface Interpretation {
   title: string;
   description: string;
   value?: string;
-  type: 'matrix' | 'working';
+  type?: 'matrix' | 'additional' | 'destiny' | 'working';
 }

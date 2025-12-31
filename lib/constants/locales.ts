@@ -2,7 +2,6 @@
 export type Locale = 'ru' | 'en';
 
 type TranslationValue = string | ((...args: any[]) => string);
-
 type TranslationNode = TranslationValue | Translations | any[] | Record<string, any>;
 
 interface Translations {
@@ -178,7 +177,6 @@ export const translations: LocaleData = {
     interpretation_unavailable: 'Подробное описание пока недоступно.',
 
     compatibility: {
-      // Основные заголовки экрана
       subtitle: 'Проверьте нумерологическую совместимость',
       partner1Label: 'Дата рождения партнёра 1',
       partner1Placeholder: 'ДД.ММ.ГГГГ',
@@ -198,7 +196,6 @@ export const translations: LocaleData = {
 
       paramsSectionTitle: 'Параметры совместимости',
 
-      // Секции результатов
       lpAnalysisSection: 'Анализ Чисел Жизненного Пути',
       baseParamsSection: 'Базовая совместимость',
       premiumParamsSection: 'Глубинная совместимость',
@@ -206,13 +203,11 @@ export const translations: LocaleData = {
       fullTotal: 'Полная совместимость',
       recommendations: 'Рекомендации для пары',
 
-      // Заголовки в карточке анализа
       lpTitle: 'Числа Жизненного Пути',
       destinyTitle: 'Число Союза',
       missionLabel: 'Миссия Пары',
       summaryLabel: 'Общий Вывод',
 
-      // Миссия по Числу Союза (1–9)
       destinyMission_1: 'Вместе вы — лидеры и первопроходцы. Ваша сила в инициативе и смелости начинать новое.',
       destinyMission_2: 'Вы учителя гармонии, дипломатии и настоящей близости. Ваша миссия — исцелять отношения.',
       destinyMission_3: 'Вы несёте в мир радость, творчество и вдохновение. Вместе вы — источник света и красоты.',
@@ -223,7 +218,6 @@ export const translations: LocaleData = {
       destinyMission_8: 'Вы овладеваете властью и ресурсами, чтобы служить большому делу. Сила через ответственность.',
       destinyMission_9: 'Вы завершаете старые циклы и служите человечеству. Ваша любовь — глобальна и бескорыстна.',
 
-      // Параметры совместимости
       energy: 'Энергия и жизненная сила',
       character: 'Характер и воля',
       interest: 'Интересы и творчество',
@@ -232,7 +226,6 @@ export const translations: LocaleData = {
       talent: 'Таланты и самореализация',
       spirituality: 'Духовность и смысл',
 
-      // Подписи партнёров
       partner1: 'Партнёр 1',
       partner2: 'Партнёр 2',
 
@@ -246,10 +239,8 @@ export const translations: LocaleData = {
 
     premiumTeaserTitleGeneral: 'Полный Код Судьбы',
     premiumTeaserTextGeneral: 'Откройте глубинный анализ совместимости, персональные гороскопы и Число Дня без рекламы.',
-
     premiumTeaserTitleGuest: 'Откройте свою Судьбу',
     premiumTeaserTextGuest: 'Для получения полного анализа и рекомендаций, пожалуйста, создайте аккаунт.',
-
     premiumTeaserCTARegister: 'Открыть доступ',
     premiumTeaserCTAUpgrade: 'Открыть всё',
 
@@ -268,39 +259,28 @@ export const translations: LocaleData = {
       plans: {
         year: '1 Год',
         month: '1 Месяц',
-        priceYear: '2990 ₽ / год', // В будущем это будет приходить из стора
-        priceMonth: '499 ₽ / мес', // В будущем это будет приходить из стора
+        priceYear: '2990 ₽ / год',
+        priceMonth: '499 ₽ / мес',
         save: 'Выгода 50%',
       },
       disclaimer: 'Подписка продлевается автоматически. Отмена в любой момент.',
       ctaTry: 'Попробовать бесплатно',
     },
 
-    // SECTION TITLES
     section_workingNumbers: 'Дополнительные числа',
     section_psychomatrix: 'Психоматрица (Квадрат Пифагора)',
 
-    // WORKING NUMBERS DISPLAY
     workingNumberLabel: '{number}-е раб. число',
     destinyNumberLabel: 'Число Судьбы',
 
-    // ERRORS
     errorNotFound: 'Ошибка',
     errorDataNotFound: 'Данные не найдены.',
     workingNumberInterpretation: 'Интерпретация числа {value}:',
-
-    // LOADING SCREEN
     loadingNumerology: 'Загрузка нумерологии...',
-
-    // COMPATIBILITY SCREEN
     compatibilityComingSoon: 'Скоро: Совместимость',
     compatibilityDescription: 'Проверка нумерологической совместимости с партнером.',
-
-    // NUMBERS SCREEN
     numbersScreenTitle: 'Числа Судьбы',
     numbersDescription: 'Здесь будет расчет номера телефона и номера автомобиля. (PRO-функция)',
-
-    // LANGUAGE BUTTON
     changeLanguageAlert: 'Сменить язык!',
 
     auth: {
@@ -312,13 +292,10 @@ export const translations: LocaleData = {
       noAccount: 'Нет аккаунта? Зарегистрируйся',
       emailInvalid: 'Email недействителен',
       passwordShort: 'Пароль должен быть ≥6 символов',
-
       birthDatePlaceholder: "ДД.ММ.ГГГГ",
-
       register: 'Регистрация',
       createAccount: 'Создать аккаунт',
       haveAccount: 'Уже есть аккаунт? Войти',
-
       forgotPassword: 'Забыли пароль?',
       resetPassword: 'Сброс пароля',
       enterEmailToReset: 'Пожалуйста, введите ваш email для сброса пароля.',
@@ -326,10 +303,8 @@ export const translations: LocaleData = {
       userNotFound: 'Пользователь с таким email не найден.',
       displayName: "Имя пользователя",
       displayNameShort: 'Имя должно быть длиннее 2 символов',
-
       emailUsedRedirectLogin: 'Этот email уже зарегистрирован. Желаете войти?',
       goToLogin: 'Войти',
-
       wrongPasswordOrUserNotFound: 'Неверный email или пароль.',
     },
     common: {
@@ -366,7 +341,6 @@ export const translations: LocaleData = {
       guest: 'Гость',
       saved: 'Изменения успешно сохранены',
     },
-
     alerts: {
       logout: 'Выйти из аккаунта?',
       deleteAccount: 'Вы уверены? Это действие нельзя отменить.',
@@ -382,8 +356,8 @@ export const translations: LocaleData = {
         'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
       ],
     },
-
   },
+
   en: {
     title: 'Date Code',
 
@@ -575,7 +549,6 @@ export const translations: LocaleData = {
       missionLabel: 'Union Mission',
       summaryLabel: 'General Conclusion',
 
-      // Destiny Mission (1–9)
       destinyMission_1: 'Together you are leaders and trailblazers. Your strength lies in initiative and courage.',
       destinyMission_2: 'You are teachers of harmony, diplomacy, and true intimacy. Your mission is to heal relationships.',
       destinyMission_3: 'You bring joy, creativity, and inspiration to the world. Together you are a source of light.',
@@ -607,10 +580,8 @@ export const translations: LocaleData = {
 
     premiumTeaserTitleGeneral: 'Full Destiny Code',
     premiumTeaserTextGeneral: 'Unlock deep compatibility analysis, personal horoscopes, and your Daily Number, all ad-free.',
-
     premiumTeaserTitleGuest: 'Unlock Your Destiny',
     premiumTeaserTextGuest: 'To receive the full analysis and recommendations, please create an account.',
-
     premiumTeaserCTARegister: 'Get Access',
     premiumTeaserCTAUpgrade: 'Unlock All',
 
@@ -637,27 +608,16 @@ export const translations: LocaleData = {
       ctaTry: 'Try for Free',
     },
 
-    // SECTION TITLES
     section_workingNumbers: 'Additional Numbers',
     section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
-
-    // WORKING NUMBERS DISPLAY
     workingNumberLabel: '{number}th Working Number',
     destinyNumberLabel: 'Destiny Number',
-
-    // ERRORS
     errorNotFound: 'Error',
     errorDataNotFound: 'Data not found.',
     workingNumberInterpretation: 'Interpretation of number {value}:',
-
-    // LOADING SCREEN
     loadingNumerology: 'Loading numerology...',
-
-    // COMPATIBILITY SCREEN
     compatibilityComingSoon: 'Coming Soon: Compatibility',
     compatibilityDescription: 'Check numerological compatibility with a partner.',
-
-    // NUMBERS SCREEN
     numbersScreenTitle: 'Destiny Numbers',
     numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
 
@@ -670,24 +630,19 @@ export const translations: LocaleData = {
       noAccount: 'Don’t have an account? Sign up',
       emailInvalid: 'Invalid email',
       passwordShort: 'Password must be ≥6 characters',
-
       birthDatePlaceholder: "DD.MM.YYYY",
-
       register: 'Sign up',
       createAccount: 'Create account',
       haveAccount: 'Already have an account? Log in',
-
       forgotPassword: 'Forgot password?',
       resetPassword: 'Password Reset',
       enterEmailToReset: 'Please enter your email to reset your password.',
       resetEmailSent: 'Password reset instructions have been sent to your email.',
       userNotFound: 'No user found with this email.',
       displayName: "Username",
-
       emailUsedRedirectLogin: 'This email is already registered. Would you like to log in?',
       goToLogin: 'Log in',
       displayNameShort: 'Name must be longer than 2 characters',
-
       wrongPasswordOrUserNotFound: 'Invalid email or password.',
     },
     common: {
@@ -722,7 +677,7 @@ export const translations: LocaleData = {
       deleteAccount: 'Delete Account',
       loginOrRegister: 'Log In / Sign Up',
       guest: 'Guest',
-      saved: 'Changes saved successfully', // <--- Добавили
+      saved: 'Changes saved successfully',
     },
     alerts: {
       logout: 'Log out of account?',
@@ -732,7 +687,6 @@ export const translations: LocaleData = {
       logoutButton: 'Log Out',
       deleteButton: 'Delete',
     },
-
     currentLanguage: 'en',
     date: {
       months: [
@@ -740,7 +694,6 @@ export const translations: LocaleData = {
         'July', 'August', 'September', 'October', 'November', 'December'
       ],
     },
-
   },
 };
 

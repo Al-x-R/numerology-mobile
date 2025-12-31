@@ -20,6 +20,7 @@ import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
 import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { AdditionalParamsDisplay } from '@/components/AdditionalParamsDisplay';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -45,6 +46,10 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
       return;
     }
     setSelected(interpretationData);
+  };
+
+  const handleClose = () => {
+    setSelected(null);
   };
 
   const maxLength = Math.max(
@@ -89,7 +94,7 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
           >
             <InterpretationCard
               interpretation={selected}
-              onClose={() => setSelected(null)}
+              onClose={handleClose}
               // showBattery={!selected.value}
             />
           </Animated.View>
@@ -101,6 +106,8 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
           onPress={handlePress}
           textAccentStyle={styles.textAccent}
         />
+        {/*<AdditionalParamsDisplay params={results.additionalParams} />*/}
+
       </ScrollView>
     </>
   );

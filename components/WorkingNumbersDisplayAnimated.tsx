@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { workingMeanings } from '@/lib/data/workingNumberMeanings';
 import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
-import { contextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
+import { getContextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types/calculation';
 import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
 import { getCurrentLocale } from '@/lib/constants/locales';
@@ -26,19 +26,21 @@ interface WorkingNumbersDisplayProps {
 function getFullWorkingInterpretation(
   id: string,
   value: number,
-  t: (key: string) => string, // Принимаем функцию перевода
-  language?: 'en' | 'ru'       // Принимаем текущий язык (для выбора массива данных)
+  t: (key: string) => string,
 ): Interpretation {
-  const context = contextualInterpretations[id as keyof typeof contextualInterpretations];
+  const contextMap = getContextualInterpretations(t);
+  const context = contextMap[id as keyof typeof contextMap];
+
   const locale = getCurrentLocale();
+
   const meanings = locale === 'en' ? workingMeaningsEn : workingMeanings;
   const meaning = meanings[value];
+
   if (!context || !meaning) {
     return { title: t('errorNotFound'), description: t('errorDataNotFound'), type: 'working' };
   }
 
   const fullDescription = `${context.description}\n\n${t('workingNumberInterpretation').replace('{value}', value.toString())}\n${meaning}`;
-
   return {
     title: context.title,
     description: fullDescription,
