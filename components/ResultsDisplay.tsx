@@ -106,7 +106,10 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
           onPress={handlePress}
           textAccentStyle={styles.textAccent}
         />
-        {/*<AdditionalParamsDisplay params={results.additionalParams} />*/}
+        {/*<AdditionalParamsDisplay*/}
+        {/*  params={results.additionalParams}*/}
+        {/*  onPress={handlePress}*/}
+        {/*/>*/}
 
       </ScrollView>
     </>

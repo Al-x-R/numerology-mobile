@@ -1,201 +1,161 @@
 // components/AdditionalParamsDisplay.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-
-import { AdditionalParams } from '@/lib/types/calculation';
-import { COLORS, FONTS, RADIUS, SHADOWS, SPACING, GRADIENTS } from '@/lib/constants/theme';
-import { useProfile } from '@/contexts/ProfileContext';
-import { useRewarded } from '@/hooks/useAdMob';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  Easing,
+} from 'react-native-reanimated';
+import { AdditionalParams, Interpretation } from '@/lib/types/calculation';
+import { COLORS, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 
 interface AdditionalParamsProps {
   params: AdditionalParams;
+  onPress: (data: Interpretation) => void;
 }
 
-export function AdditionalParamsDisplay({ params }: AdditionalParamsProps) {
-  const { user } = useProfile();
-  const { t } = useAppTranslation();
-  const { showRewarded, isLoaded } = useRewarded();
+// Маппинг параметров к ячейкам матрицы для интерпретации
+const PARAM_TO_CELL_MAP: Record<string, { cellId: string; useMatrix?: boolean }> = {
+  goal: { cellId: '1' },
+  family: { cellId: '6' },
+  habits: { cellId: '5' },
+  talent: { cellId: '3' },
+  spirituality: { cellId: '3' },
+  selfEsteem: { cellId: '7' },
+};
 
-  // Локальное состояние разблокировки для этой сессии
-  const [isUnlocked, setIsUnlocked] = useState(false);
+function getAdditionalParamInterpretation(
+  key: string,
+  value: number | string,
+  label: string,
+  t: (key: string) => string,
+): Interpretation {
+  // Для параметров, которые соответствуют ячейкам матрицы
+  const cellMapping = PARAM_TO_CELL_MAP[key];
+  if (cellMapping && typeof value === 'number') {
+    // Преобразуем число в строку из повторяющихся цифр (например, 3 -> "111", 4 -> "2222")
+    const digit = cellMapping.cellId;
+    const valueString = value === 0 ? '' : digit.repeat(value);
+    const matrixInterpretation = getInterpretation(cellMapping.cellId, valueString);
+    return {
+      title: label,
+      description: matrixInterpretation.description,
+      type: 'matrix',
+      value: valueString || '—',
+    };
+  }
 
-  // Если у пользователя Премиум, контент открыт всегда
-  useEffect(() => {
-    if (user?.isPremium) {
-      setIsUnlocked(true);
-    }
-  }, [user?.isPremium]);
-
-  const handleUnlock = () => {
-    if (user?.isPremium) return;
-
-    showRewarded(() => {
-      // Этот код выполнится только после просмотра рекламы
-      setIsUnlocked(true);
-    });
+  // Для остальных параметров (например, temperament) просто показываем значение
+  return {
+    title: label,
+    description: `${label}: ${value}`,
+    type: 'additional',
+    value: String(value),
   };
+}
 
-  // Список параметров для отображения
+export function AdditionalParamsDisplay({ params, onPress }: AdditionalParamsProps) {
+  const { t } = useAppTranslation();
+
+  // Формируем список параметров
   const paramItems = [
-    { key: 'destinyNumber', label: t('params.destiny'), value: params.destinyNumber, highlight: true },
     { key: 'temperament', label: t('params.temperament'), value: params.temperament },
     { key: 'goal', label: t('params.goal'), value: params.goal },
     { key: 'family', label: t('params.family'), value: params.family },
     { key: 'habits', label: t('params.habits'), value: params.habits },
-    { key: 'energy', label: t('params.energy'), value: params.utilityMoney }, // Быт/Деньги часто utilityMoney
     { key: 'talent', label: t('params.talent'), value: params.talent },
     { key: 'spirituality', label: t('params.spirituality'), value: params.spirituality },
     { key: 'selfEsteem', label: t('params.selfEsteem'), value: params.selfEsteem },
   ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t('section_additional') || 'Глубокий Анализ'}</Text>
-
-      <View style={styles.grid}>
+    <View style={styles.numbersSection}>
+      <Text style={styles.sectionTitle}>{t('section_additional')}</Text>
+      <View style={styles.numbersGrid}>
         {paramItems.map((item, index) => (
-          <View
+          <AdditionalParamCard
             key={item.key}
-            style={[
-              styles.card,
-              item.highlight && styles.highlightCard,
-              !isUnlocked && styles.blurredCard // Визуальный эффект закрытия
-            ]}
-          >
-            <Text style={[styles.label, item.highlight && styles.highlightText]}>
-              {item.label}
-            </Text>
-
-            {/* Если закрыто - показываем звездочки или размытие */}
-            <Text style={[styles.value, item.highlight && styles.highlightText]}>
-              {isUnlocked ? item.value : '**'}
-            </Text>
-          </View>
+            index={index}
+            item={item}
+            onPress={onPress}
+          />
         ))}
-
-        {/* Слой блокировки (Overlay) */}
-        {!isUnlocked && (
-          <View style={styles.lockOverlay}>
-            <LinearGradient
-              colors={['rgba(13, 15, 33, 0.6)', 'rgba(13, 15, 33, 0.95)']}
-              style={styles.gradientOverlay}
-            >
-              <Ionicons name="lock-closed" size={32} color={COLORS.accent} style={{ marginBottom: 10 }} />
-              <Text style={styles.lockText}>
-                {t('unlockFullAnalysis') || 'Открыть полный анализ'}
-              </Text>
-
-              <TouchableOpacity
-                style={styles.unlockButton}
-                onPress={handleUnlock}
-              >
-                <LinearGradient
-                  colors={GRADIENTS.goldenButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.buttonGradient}
-                >
-                  <Ionicons name="play-circle" size={20} color={COLORS.blackText} style={{ marginRight: 8 }} />
-                  <Text style={styles.buttonText}>
-                    {isLoaded ? (t('watchAd') || 'Смотреть видео') : (t('loading') || 'Загрузка...')}
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-        )}
       </View>
     </View>
   );
 }
 
+const AdditionalParamCard: React.FC<{
+  index: number;
+  item: { key: string; label: string; value: number };
+  onPress: (data: Interpretation) => void;
+}> = ({ index, item, onPress }) => {
+  const { t } = useAppTranslation();
+  const interpretationData = getAdditionalParamInterpretation(item.key, item.value, item.label, t);
+
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(15);
+  const scale = useSharedValue(0.9);
+
+  useEffect(() => {
+    const delay = index * 100 + 400;
+
+    opacity.value = withDelay(delay, withTiming(1, { duration: 350 }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) }));
+    scale.value = withDelay(delay, withTiming(1, { duration: 450 }));
+  }, [index]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <TouchableOpacity
+        style={styles.numberCard}
+        onPress={() => onPress(interpretationData)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.numberLabel}>{item.label}</Text>
+        <Text style={styles.numberValue}>{item.value}</Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 const styles = StyleSheet.create({
-  container: {
+  numbersSection: {
     marginTop: SPACING.xl,
-    width: '100%',
   },
-  title: {
+  sectionTitle: {
     ...FONTS.sectionTitle,
     marginBottom: SPACING.md,
   },
-  grid: {
+  numbersGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 10,
-    position: 'relative', // Важно для overlay
+    gap: SPACING.numberCardGap,
   },
-  card: {
-    width: '31%', // 3 колонки
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.md,
-    padding: SPACING.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
+  numberCard: {
+    width: (Dimensions.get('window').width - 48) / 2,
+    backgroundColor: COLORS.cardBackground,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    minHeight: 80,
-  },
-  highlightCard: {
-    borderColor: COLORS.accent,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
-  },
-  blurredCard: {
-    opacity: 0.3,
-  },
-  label: {
-    ...FONTS.headerTitle,
-    fontSize: 10,
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  value: {
-    ...FONTS.subtitle,
-    color: '#fff',
-  },
-  highlightText: {
-    color: COLORS.accent,
-  },
-  // Блокировка
-  lockOverlay: {
-    ...StyleSheet.absoluteFillObject, // Перекрывает весь grid
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: COLORS.cardBorder,
     borderRadius: RADIUS.md,
-    overflow: 'hidden',
-    zIndex: 10,
-  },
-  gradientOverlay: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  lockText: {
-    ...FONTS.body,
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  unlockButton: {
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-    ...SHADOWS.goldenButtonSoft,
-  },
-  buttonGradient: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    flexDirection: 'row',
+    padding: SPACING.cardPadding,
     alignItems: 'center',
   },
-  buttonText: {
-    ...FONTS.button,
-    color: COLORS.blackText,
-    fontSize: 14,
+  numberLabel: {
+    ...FONTS.workingLabel,
+    marginBottom: SPACING.xs,
+  },
+  numberValue: {
+    ...FONTS.workingValue,
   },
 });

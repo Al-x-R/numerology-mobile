@@ -269,9 +269,21 @@ export const translations: LocaleData = {
 
     section_workingNumbers: 'Дополнительные числа',
     section_psychomatrix: 'Психоматрица (Квадрат Пифагора)',
+    section_additional: 'Дополнительные параметры',
 
     workingNumberLabel: '{number}-е раб. число',
     destinyNumberLabel: 'Число Судьбы',
+
+    params: {
+      temperament: 'Темперамент',
+      goal: 'Цель',
+      family: 'Семья',
+      habits: 'Привычки',
+      energy: 'Энергия',
+      talent: 'Талант',
+      spirituality: 'Духовность',
+      selfEsteem: 'Самооценка',
+    },
 
     errorNotFound: 'Ошибка',
     errorDataNotFound: 'Данные не найдены.',
@@ -611,8 +623,21 @@ export const translations: LocaleData = {
 
     section_workingNumbers: 'Additional Numbers',
     section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
+    section_additional: 'Additional Parameters',
+
     workingNumberLabel: '{number}th Working Number',
     destinyNumberLabel: 'Destiny Number',
+
+    params: {
+      temperament: 'Temperament',
+      goal: 'Goal',
+      family: 'Family',
+      habits: 'Habits',
+      energy: 'Energy',
+      talent: 'Talent',
+      spirituality: 'Spirituality',
+      selfEsteem: 'Self-Esteem',
+    },
     errorNotFound: 'Error',
     errorDataNotFound: 'Data not found.',
     workingNumberInterpretation: 'Interpretation of number {value}:',

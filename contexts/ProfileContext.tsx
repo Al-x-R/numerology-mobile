@@ -1,3 +1,5 @@
+// contexts/ProfileContext.tsx
+
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import {
@@ -44,8 +46,14 @@ export interface Profile {
   language?: 'en' | 'ru';
 }
 
+export interface CustomUser extends User {
+  birthDate?: string | null;
+  isPremium?: boolean;
+  language?: 'en' | 'ru';
+}
+
 interface ProfileContextType {
-  user: User | null;
+  user: CustomUser | null;
   profiles: Profile[];
   activeProfile: Profile | null;
   isLoading: boolean;
@@ -53,14 +61,15 @@ interface ProfileContextType {
 
   sendPasswordResetEmail: (email: string) => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
-  // Обновили сигнатуру: добавили birthDate
   registerWithEmail: (displayName: string, email: string, password: string, birthDate?: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   saveProfile: (data: { name: string; date: string }) => Promise<void>;
   setActiveProfile: (profile: Profile) => void;
   completeOnboarding: () => Promise<void>;
-  unlockPremium: () => Promise<void>;
+
+  setPremiumStatus: (status: boolean) => Promise<void>;
+
   updateUserProfile: (data: {
     displayName?: string;
     birthDate?: string;
@@ -72,17 +81,14 @@ interface ProfileContextType {
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CustomUser | null>(null);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
 
   const router = useRouter();
-  const segments = useSegments();
-
   const prevUserRef = useRef<User | null>(null);
-
 
   useEffect(() => {
     let unsubProfiles: Unsubscribe | null = null;
@@ -104,7 +110,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
           birthDate: customData.birthDate ?? null,
           isPremium: customData.isPremium ?? false,
           language: customData.language ?? null,
-        } as User & { birthDate?: string | null; isPremium?: boolean });
+        } as CustomUser);
 
         unsubProfiles?.();
         unsubProfiles = onSnapshot(
@@ -127,7 +133,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       } else {
         await handleGuestOrLogout(wasLoggedIn, isNowLoggedIn);
-
         setAuthInitialized(true);
         setIsLoading(false);
       }
@@ -209,14 +214,10 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
       const userInfo = await GoogleSignin.signIn();
-
       const idToken = userInfo.idToken || userInfo.data?.idToken;
-      if (!idToken) {
-        throw new Error('Не удалось получить ID token от Google (токен отсутствует)');
-      }
+      if (!idToken) throw new Error('Не удалось получить ID token от Google');
 
       const credential = GoogleAuthProvider.credential(idToken);
-
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
 
@@ -224,7 +225,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const userDocSnap = await getDoc(userDocRef);
 
       if (!userDocSnap.exists()) {
-
         await setDoc(userDocRef, {
           email: user.email,
           displayName: user.displayName,
@@ -233,7 +233,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
           isPremium: false,
           birthDate: null
         });
-        console.log("User document created in Firestore via Google Login");
       }
 
     } catch (error: any) {
@@ -267,18 +266,19 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     await signOut(auth);
   };
 
-  const unlockPremium = async () => {
-    if (!user) {
-      // setIsPremium(true);
-      return;
-    }
+  // Метод для обновления премиума (используем его в PremiumScreen)
+  const setPremiumStatus = async (status: boolean) => {
+    if (!user) return; // Гостям премиум не сохраняем в БД (можно в AsyncStorage, если нужно)
+
     try {
-      await setDoc(doc(db, 'users', user.uid, 'subscription', 'premium'), {
-        active: true,
-        unlockedAt: new Date(),
-      });
+      // 1. Обновляем Firestore
+      await setDoc(doc(db, 'users', user.uid), { isPremium: status }, { merge: true });
+
+      // 2. Обновляем локальный стейт мгновенно
+      setUser(prev => prev ? { ...prev, isPremium: status } : null);
+
     } catch (e) {
-      console.error("Error unlocking premium:", e);
+      console.error("Error updating premium status:", e);
       throw e;
     }
   };
@@ -303,16 +303,9 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const updates: Record<string, any> = {};
 
-    if (data.displayName !== undefined) {
-      updates.displayName = data.displayName.trim();
-    }
-    if (data.birthDate !== undefined) {
-      updates.birthDate = data.birthDate;
-    }
-
-    if (data.photoURL !== undefined) {
-      updates.photoURL = data.photoURL;
-    }
+    if (data.displayName !== undefined) updates.displayName = data.displayName.trim();
+    if (data.birthDate !== undefined) updates.birthDate = data.birthDate;
+    if (data.photoURL !== undefined) updates.photoURL = data.photoURL;
 
     if (Object.keys(updates).length === 0) return;
 
@@ -323,7 +316,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (data.displayName !== undefined || data.photoURL !== undefined) {
         const authUpdates: { displayName?: string; photoURL?: string | null } = {};
-
         if (data.displayName !== undefined) authUpdates.displayName = data.displayName;
         if (data.photoURL !== undefined) authUpdates.photoURL = data.photoURL;
 
@@ -351,7 +343,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         authInitialized,
 
         sendPasswordResetEmail,
-
         loginWithEmail,
         registerWithEmail,
         loginWithGoogle,
@@ -359,7 +350,9 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
         saveProfile,
         setActiveProfile,
         completeOnboarding,
-        unlockPremium,
+
+        setPremiumStatus,
+
         updateUserProfile
       }}
     >

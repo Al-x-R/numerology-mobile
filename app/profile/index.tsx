@@ -175,7 +175,7 @@ export default function ProfileScreen({ onClose }: Props) {
               icon="diamond"
               text={t('profile.premiumActive')}
               color={COLORS.accent}
-              onPress={() => { /* Управление подпиской */ }}
+              onPress={() => { router.push('/premium/upgrade'); }}
             />
           ) : (
             <MenuItem
