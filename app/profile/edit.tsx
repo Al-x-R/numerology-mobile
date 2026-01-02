@@ -15,7 +15,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -39,12 +39,12 @@ export default function EditProfileScreen() {
     user?.birthDate ? new Date(user.birthDate) : activeProfile?.date ? new Date(activeProfile.date) : null
   );
 
-  const [tempDate, setTempDate] = useState<Date>(new Date());
+  const [tempDate, setTempDate] = useState<Date>(new Date('2000-01-01'));
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  // Add a local state for photos to show previews immediately
+
   const [localImage, setLocalImage] = useState<string | null>(null);
-  const { t } = useAppTranslation();
+  const { t, language } = useAppTranslation();
 
   useEffect(() => {
     setName(user?.displayName || activeProfile?.name || '');
@@ -57,16 +57,18 @@ export default function EditProfileScreen() {
 
   // --- Date Picker Logic ---
   const openDatePicker = () => {
-    setTempDate(birthDate || new Date());
+    setTempDate(birthDate || new Date('2000-01-01'));
     setShowPicker(true);
   };
 
-  const onDateChange = (_: any, selectedDate?: Date) => {
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     if (Platform.OS === 'ios') {
       if (selectedDate) setTempDate(selectedDate);
     } else {
       setShowPicker(false);
-      if (selectedDate) setBirthDate(selectedDate);
+      if (event.type === 'set' && selectedDate) {
+        setBirthDate(selectedDate);
+      }
     }
   };
 
@@ -82,7 +84,6 @@ export default function EditProfileScreen() {
 
   // --- PHOTO UPLOADING LOGIC ---
   const handlePickImage = async () => {
-    // 1. ask for permission (on newer iOS this is often not necessary, but for reliability)
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
@@ -90,7 +91,6 @@ export default function EditProfileScreen() {
       return;
     }
 
-    // 2. Opening the gallery
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -136,13 +136,20 @@ export default function EditProfileScreen() {
         photoURL = await uploadImageAsync(localImage);
       }
 
+      let dateString = undefined;
+      if (birthDate) {
+        const year = birthDate.getFullYear();
+        const month = String(birthDate.getMonth() + 1).padStart(2, '0');
+        const day = String(birthDate.getDate()).padStart(2, '0');
+        dateString = `${year}-${month}-${day}`;
+      }
+
       await updateUserProfile({
         displayName: name.trim(),
-        birthDate: birthDate ? birthDate.toISOString().split('T')[0] : undefined,
+        birthDate: dateString,
         photoURL: photoURL,
       });
 
-      // A slight delay for UX
       setTimeout(() => {
         router.back();
       }, 500);
@@ -173,7 +180,6 @@ export default function EditProfileScreen() {
     );
   };
 
-  // Determine which image to show (Local > Server > Placeholder)
   const currentAvatar = localImage || user?.photoURL;
 
   return (
@@ -292,6 +298,7 @@ export default function EditProfileScreen() {
                   <Text style={styles.doneText}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
+
               <DateTimePicker
                 value={tempDate}
                 mode="date"
@@ -301,14 +308,14 @@ export default function EditProfileScreen() {
                 themeVariant="dark"
                 textColor="white"
                 style={{ backgroundColor: '#1A1A1A', height: 200, width: '100%' }}
-                locale={t('localeCode') || 'ru'}
+                locale={language === 'ru' ? 'ru' : 'en'}
               />
             </View>
           </View>
         </Modal>
       ) : showPicker && (
         <DateTimePicker
-          value={birthDate || new Date()}
+          value={birthDate || new Date('2000-01-01')} // Для Android тоже стартуем с 2000
           mode="date"
           display="default"
           onChange={onDateChange}
@@ -372,7 +379,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
   },
   inputIcon: { marginRight: SPACING.sm },
-  input: { flex: 1, paddingVertical: 16, ...FONTS.body },
+  input: { flex: 1, paddingVertical: 16, ...FONTS.body, color: COLORS.text }, // Явно добавил color: COLORS.text
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -384,12 +391,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: 16,
   },
-  dateText: { ...FONTS.body },
+  dateText: { ...FONTS.body, color: COLORS.text },
   placeholderText: { ...FONTS.body, color: COLORS.textSecondary },
   goldenButtonContainer: {
     marginTop: SPACING.md,
     borderRadius: RADIUS.xl,
-    overflow: 'hidden' as const,
+    overflow: 'hidden',
     ...SHADOWS.goldenButtonSoft,
   },
   goldenButton: {
