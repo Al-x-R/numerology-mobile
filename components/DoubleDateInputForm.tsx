@@ -359,19 +359,14 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: RADIUS.lg,
     overflow: 'hidden' as const,
-    ...SHADOWS.goldenButtonSoft,
   },
   buttonGradient: {
     paddingVertical: SPACING.lg,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   buttonText: {
     ...FONTS.button,
     color: COLORS.blackText,
-    textShadowColor: COLORS.textShadow,
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   loadingContent: {
     flexDirection: 'row',

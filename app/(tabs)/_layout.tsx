@@ -31,21 +31,21 @@ export default function TabLayout() {
           name="pythagoras"
           options={{
             title: t('tabs.pythagoras'),
-            tabBarIcon: ({ color }) => <Ionicons name="grid-outline" size={LAYOUT.iconSize} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="apps-outline" size={LAYOUT.iconSize} color={color} />,
           }}
         />
         <Tabs.Screen
           name="compatibility"
           options={{
             title: t('tabs.compatibility'),
-            tabBarIcon: ({ color }) => <Ionicons name="heart-outline" size={LAYOUT.iconSize} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="people-outline" size={LAYOUT.iconSize} color={color} />,
           }}
         />
         <Tabs.Screen
           name="numbers"
           options={{
             title: t('tabs.numbers'),
-            tabBarIcon: ({ color }) => <Ionicons name="keypad-outline" size={LAYOUT.iconSize} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="calendar-outline" size={LAYOUT.iconSize} color={color} />,
           }}
         />
 
@@ -53,7 +53,7 @@ export default function TabLayout() {
           name="horoscope"
           options={{
             title: t('tabs.horoscope'),
-            tabBarIcon: ({ color }) => <Ionicons name="planet-outline" size={LAYOUT.iconSize} color={color} />,
+            tabBarIcon: ({ color }) => <Ionicons name="moon-outline" size={LAYOUT.iconSize} color={color} />,
           }}
         />
       </Tabs>

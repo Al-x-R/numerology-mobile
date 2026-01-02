@@ -140,7 +140,6 @@ const styles = StyleSheet.create({
   mainButtonContainer: {
     width: '100%',
     borderRadius: RADIUS.xl,
-    ...SHADOWS.goldenButtonSoft,
     marginBottom: SPACING.lg,
   },
   mainButton: {
