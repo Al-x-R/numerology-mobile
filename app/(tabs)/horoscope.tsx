@@ -4,6 +4,7 @@ import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshCon
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { UniversalForecastCard } from '@/components/UniversalForecastCard';
 import { ProfileButton } from '@/components/ui/ProfileButton';
@@ -14,6 +15,7 @@ import { getZodiacSign, getZodiacName } from '@/lib/calculators/zodiac';
 import { COLORS, GRADIENTS, LAYOUT, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
+import { useRewarded } from '@/hooks/useAdMob';
 
 type TabType = 'day' | 'month' | 'year';
 
@@ -26,9 +28,18 @@ interface ForecastResultWithRefetch {
 export default function HoroscopeScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('day');
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [unlockedDates, setUnlockedDates] = useState<{ day: string | null; month: string | null; year: string | null }>({
+    day: null,
+    month: null,
+    year: null,
+  });
+
   const navigation = useNavigation();
   const { user } = useProfile();
   const { t, language } = useAppTranslation();
+
+  const { showRewarded } = useRewarded();
 
   const signKey = user?.birthDate ? getZodiacSign(new Date(user.birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
@@ -36,6 +47,14 @@ export default function HoroscopeScreen() {
   const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
   const monthData = useZodiacForecast('month', signKey) as ForecastResultWithRefetch;
   const yearData = useZodiacForecast('year', signKey) as ForecastResultWithRefetch;
+
+  const getLocals = () => {
+    const d = new Date();
+    const dayStr = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    const monthStr = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    const yearStr = `${d.getFullYear()}`;
+    return { dayStr, monthStr, yearStr };
+  };
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -65,10 +84,79 @@ export default function HoroscopeScreen() {
     });
   }, [navigation, language]);
 
+  const handleUnlockCurrentTab = () => {
+    showRewarded(() => {
+      const { dayStr, monthStr, yearStr } = getLocals();
+
+      setUnlockedDates(prev => ({
+        ...prev,
+        day: activeTab === 'day' ? dayStr : prev.day,
+        month: activeTab === 'month' ? monthStr : prev.month,
+        year: activeTab === 'year' ? yearStr : prev.year,
+      }));
+    });
+  };
+
   const renderContent = () => {
     let currentData = dayData;
     if (activeTab === 'month') currentData = monthData;
     else if (activeTab === 'year') currentData = yearData;
+
+    const { dayStr, monthStr, yearStr } = getLocals();
+    let isUnlocked = false;
+
+    if (activeTab === 'day') isUnlocked = unlockedDates.day === dayStr;
+    if (activeTab === 'month') isUnlocked = unlockedDates.month === monthStr;
+    if (activeTab === 'year') isUnlocked = unlockedDates.year === yearStr;
+
+    const isLocked = !user?.isPremium && !isUnlocked;
+
+    if (isLocked) {
+      const isRu = language === 'ru';
+
+      const titles: Record<TabType, string> = {
+        day: isRu ? 'Звездный прогноз готов' : 'Stellar forecast is ready',
+        month: isRu ? 'Гороскоп на месяц готов' : 'Monthly horoscope is ready',
+        year: isRu ? 'Гороскоп на год готов' : 'Yearly horoscope is ready',
+      };
+
+      const subtitles: Record<TabType, string> = {
+        day: isRu
+          ? 'Узнайте, как расположение планет влияет на вас сегодня.'
+          : 'Find out how planetary alignment affects you today.',
+        month: isRu
+          ? 'Ключевые события в карьере, любви и здоровье.'
+          : 'Key events in career, love, and health.',
+        year: isRu
+          ? 'Глобальные тренды звезд для вашего знака.'
+          : 'Global star trends for your zodiac sign.',
+      };
+
+      const unlockText = isRu ? 'Открыть за рекламу' : 'Watch Ad to Unlock';
+      const premiumText = isRu ? 'Или оформите Premium' : 'Or get Premium';
+
+      return (
+        <View style={styles.lockedContainer}>
+          <View style={styles.iconCircle}>
+            <Ionicons name={"moon"} size={32} color={COLORS.accent} />
+          </View>
+
+          <Text style={styles.lockedTitle}>{titles[activeTab]}</Text>
+          <Text style={styles.lockedSubtitle}>{subtitles[activeTab]}</Text>
+
+          {/* Advertising Button */}
+          <TouchableOpacity style={styles.unlockButton} onPress={handleUnlockCurrentTab}>
+            <Ionicons name="play-circle" size={24} color={COLORS.blackText} style={{ marginRight: 8 }} />
+            <Text style={styles.unlockButtonText}>{unlockText}</Text>
+          </TouchableOpacity>
+
+          {/* Premium Button */}
+          <TouchableOpacity style={styles.premiumButtonLink} onPress={() => router.push('/profile')}>
+            <Text style={styles.premiumLinkText}>{premiumText}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
 
     return (
       <View>
@@ -99,9 +187,11 @@ export default function HoroscopeScreen() {
             onPress={() => setActiveTab(tab)}
             style={[styles.tabButton, isActive && styles.activeTabButton]}
           >
-            <Text style={[styles.tabText, isActive && styles.activeTabText]}>
-              {labels[tab]}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4}}>
+              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+                {labels[tab]}
+              </Text>
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -129,6 +219,7 @@ export default function HoroscopeScreen() {
         {renderTabs()}
         <ScrollView
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -157,45 +248,68 @@ const styles = StyleSheet.create({
     padding: 4,
     marginBottom: 10
   },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   activeTabButton: { backgroundColor: '#C4A484' },
   tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
   activeTabText: { color: '#000', fontWeight: 'bold' },
 
-  centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
-  emptyStateContainer: {
+  // --- Styles for Locked State (Copied from NumbersScreen for consistency) ---
+  lockedContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: SPACING.xl,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(20, 20, 20, 0.6)',
     borderRadius: RADIUS.xl,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)'
-  },
-  emptyStateTitle: {
-    ...FONTS.sectionTitle,
-    color: COLORS.text,
+    padding: SPACING.xl,
     marginTop: SPACING.md,
-    marginBottom: SPACING.sm
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    minHeight: 350,
   },
-  emptyStateText: {
-    ...FONTS.body,
-    color: COLORS.textSecondary,
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(196, 164, 132, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  lockedTitle: {
+    ...FONTS.subtitle,
     textAlign: 'center',
-    marginBottom: 20
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
   },
-  actionButton: {
-    width: '100%',
+  lockedSubtitle: {
+    ...FONTS.body,
+    textAlign: 'center',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
+  },
+  unlockButton: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.accent,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-    marginTop: SPACING.sm
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
-  buttonGradient: {
-    paddingVertical: SPACING.md,
-    alignItems: 'center'
-  },
-  buttonText: {
+  unlockButtonText: {
     ...FONTS.button,
-    color: COLORS.blackText
+    color: COLORS.blackText,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  premiumButtonLink: {
+    marginTop: SPACING.lg,
+    padding: SPACING.sm,
+  },
+  premiumLinkText: {
+    ...FONTS.body,
+    color: COLORS.accent,
+    textDecorationLine: 'underline',
   },
 });

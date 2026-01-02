@@ -186,7 +186,7 @@ export default function NumbersScreen() {
       return (
         <View style={styles.lockedContainer}>
           <View style={styles.iconCircle}>
-            <Ionicons name={activeTab === 'year' ? "planet" : "sparkles"} size={32} color={COLORS.accent} />
+            <Ionicons name={"sparkles"} size={32} color={COLORS.accent} />
           </View>
 
           <Text style={styles.lockedTitle}>
