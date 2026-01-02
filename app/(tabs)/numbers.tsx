@@ -1,9 +1,10 @@
 // app/(tabs)/numbers.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'; // <-- 1. Импортируем RefreshControl
+import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useFocusEffect, useNavigation } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { UniversalForecastCard } from '@/components/UniversalForecastCard';
@@ -15,6 +16,7 @@ import { useAppTranslation } from '@/contexts/LanguageContext';
 import { COLORS, GRADIENTS, LAYOUT, SPACING, RADIUS, FONTS } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
+import { useRewarded } from '@/hooks/useAdMob';
 
 type TabType = 'day' | 'month' | 'year';
 
@@ -32,11 +34,26 @@ export default function NumbersScreen() {
   const [pMonth, setPMonth] = useState(0);
   const [pYear, setPYear] = useState(0);
 
-  const [isRefreshing, setIsRefreshing] = useState(false); // <-- 2. Состояние для обновления
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [unlockedDates, setUnlockedDates] = useState<{ day: string | null; month: string | null; year: string | null }>({
+    day: null,
+    month: null,
+    year: null,
+  });
 
   const navigation = useNavigation();
-  const { t, language } = useAppTranslation();
+  const { language } = useAppTranslation();
   const { user } = useProfile();
+  const { showRewarded } = useRewarded();
+
+  const getLocals = () => {
+    const d = new Date();
+    const dayStr = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    const monthStr = `${d.getFullYear()}-${d.getMonth() + 1}`;
+    const yearStr = `${d.getFullYear()}`;
+    return { dayStr, monthStr, yearStr };
+  };
 
   const performCalculation = useCallback(() => {
     if (!user || !user.birthDate) return;
@@ -58,7 +75,7 @@ export default function NumbersScreen() {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: t('numbersTitle') || 'Прогноз',
+      headerTitle: language === 'ru' ? 'Нумерология' : 'Numerology',
       headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
       headerLeft: () => null,
       headerShadowVisible: false,
@@ -69,24 +86,28 @@ export default function NumbersScreen() {
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
-
     let currentForecast = dayForecast;
-    if (activeTab === 'month') {
-      currentForecast = monthForecast;
-    } else if (activeTab === 'year') {
-      currentForecast = yearForecast;
-    }
+    if (activeTab === 'month') currentForecast = monthForecast;
+    if (activeTab === 'year') currentForecast = yearForecast;
 
     if (currentForecast && currentForecast.refetch) {
       currentForecast.refetch();
     }
-
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1500);
-
+    setTimeout(() => { setIsRefreshing(false); }, 1500);
   }, [activeTab, dayForecast, monthForecast, yearForecast]);
 
+  const handleUnlockCurrentTab = () => {
+    showRewarded(() => {
+      const { dayStr, monthStr, yearStr } = getLocals();
+
+      setUnlockedDates(prev => ({
+        ...prev,
+        day: activeTab === 'day' ? dayStr : prev.day,
+        month: activeTab === 'month' ? monthStr : prev.month,
+        year: activeTab === 'year' ? yearStr : prev.year,
+      }));
+    });
+  };
 
   // --- TABS ---
   const renderTabs = () => (
@@ -105,9 +126,11 @@ export default function NumbersScreen() {
             onPress={() => setActiveTab(tab)}
             style={[styles.tabButton, isActive && styles.activeTabButton]}
           >
-            <Text style={[styles.tabText, isActive && styles.activeTabText]}>
-              {labels[tab]}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4}}>
+              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+                {labels[tab]}
+              </Text>
+            </View>
           </TouchableOpacity>
         );
       })}
@@ -127,6 +150,76 @@ export default function NumbersScreen() {
       currentNumber = pYear;
     }
 
+    const { dayStr, monthStr, yearStr } = getLocals();
+    let isUnlocked = false;
+
+    if (activeTab === 'day') isUnlocked = unlockedDates.day === dayStr;
+    if (activeTab === 'month') isUnlocked = unlockedDates.month === monthStr;
+    if (activeTab === 'year') isUnlocked = unlockedDates.year === yearStr;
+
+    const isLocked = !user?.isPremium && !isUnlocked;
+
+    if (isLocked) {
+      const isRu = language === 'ru';
+
+      const titles: Record<TabType, string> = {
+        day: isRu ? 'Ваш прогноз на сегодня готов' : 'Your daily forecast is ready',
+        month: isRu ? 'Прогноз на месяц готов' : 'Monthly forecast is ready',
+        year: isRu ? 'Прогноз на год готов' : 'Yearly forecast is ready',
+      };
+
+      const subtitles: Record<TabType, string> = {
+        day: isRu
+          ? 'Персональный AI-анализ энергий дня. Узнайте, что приготовила судьба.'
+          : 'Personal AI analysis of daily energies. Find out what fate has prepared.',
+        month: isRu
+          ? 'Узнайте, какие возможности и вызовы готовит вам этот месяц.'
+          : 'Discover what opportunities and challenges this month holds for you.',
+        year: isRu
+          ? 'Глобальные энергии вашего личного года. Стратегия на будущее.'
+          : 'Global energies of your personal year. Strategy for the future.',
+      };
+
+      const unlockText = isRu ? 'Открыть за рекламу' : 'Watch Ad to Unlock';
+      const premiumText = isRu ? 'Или оформите Premium' : 'Or get Premium';
+
+      return (
+        <View style={styles.lockedContainer}>
+          <View style={styles.iconCircle}>
+            <Ionicons name={activeTab === 'year' ? "planet" : "sparkles"} size={32} color={COLORS.accent} />
+          </View>
+
+          <Text style={styles.lockedTitle}>
+            {titles[activeTab]}
+          </Text>
+          <Text style={styles.lockedSubtitle}>
+            {subtitles[activeTab]}
+          </Text>
+
+          {/* Advertising Button */}
+          <TouchableOpacity
+            style={styles.unlockButton}
+            onPress={handleUnlockCurrentTab}
+          >
+            <Ionicons name="play-circle" size={24} color={COLORS.blackText} style={{ marginRight: 8 }} />
+            <Text style={styles.unlockButtonText}>
+              {unlockText}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Premium Button */}
+          <TouchableOpacity
+            style={styles.premiumButtonLink}
+            onPress={() => router.push('/profile')}
+          >
+            <Text style={styles.premiumLinkText}>
+              {premiumText}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     return (
       <View>
         <UniversalForecastCard
@@ -140,7 +233,6 @@ export default function NumbersScreen() {
     );
   };
 
-  // --- IF THERE IS NO USER ---
   if (!user || !user.birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
@@ -152,7 +244,6 @@ export default function NumbersScreen() {
     );
   }
 
-  // --- MAIN RENDER ---
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
@@ -164,7 +255,7 @@ export default function NumbersScreen() {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -200,7 +291,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.contentPadding,
     paddingTop: 10
   },
-  centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
 
   tabsContainer: {
     flexDirection: 'row',
@@ -210,16 +300,68 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 0
   },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
+  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   activeTabButton: { backgroundColor: '#C4A484' },
   tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
   activeTabText: { color: '#000', fontWeight: 'bold' },
 
-  // Empty State
-  emptyStateContainer: { alignItems: 'center', padding: SPACING.xl, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: RADIUS.xl, width: '100%' },
-  emptyStateTitle: { ...FONTS.sectionTitle, color: COLORS.text, marginTop: SPACING.md, marginBottom: SPACING.sm },
-  emptyStateText: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 20 },
-  actionButton: { width: '100%', borderRadius: RADIUS.lg, overflow: 'hidden' },
-  buttonGradient: { paddingVertical: SPACING.md, alignItems: 'center' },
-  buttonText: { ...FONTS.button, color: COLORS.blackText },
+  // --- Styles for Locked State ---
+  lockedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(20, 20, 20, 0.6)',
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    marginTop: SPACING.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    minHeight: 350,
+  },
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(196, 164, 132, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  lockedTitle: {
+    ...FONTS.subtitle,
+    textAlign: 'center',
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+  lockedSubtitle: {
+    ...FONTS.body,
+    textAlign: 'center',
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xl,
+  },
+  unlockButton: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.accent,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: RADIUS.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  unlockButtonText: {
+    ...FONTS.button,
+    color: COLORS.blackText,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  premiumButtonLink: {
+    marginTop: SPACING.lg,
+    padding: SPACING.sm,
+  },
+  premiumLinkText: {
+    ...FONTS.body,
+    color: COLORS.accent,
+    textDecorationLine: 'underline',
+  },
 });
