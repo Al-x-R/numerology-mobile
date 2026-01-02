@@ -15,20 +15,22 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-// import { t } from '@/lib/constants/locales';
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
-import { router } from 'expo-router';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+
+// --- INTERFACES ---
 
 interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
   date1: string;
   date2: string;
   onBack?: () => void;
+  onUnlockRequest: () => void;
 }
 
 interface DestinyInfo {
@@ -49,6 +51,8 @@ interface GeneralAnalysisCardProps {
   date2: string;
   index: number;
 }
+
+// --- SUB-COMPONENTS ---
 
 function GeneralAnalysisCard({
   lifePath1,
@@ -95,11 +99,6 @@ function GeneralAnalysisCard({
       <Text style={styles.destinyOverviewText}>
         {destinyInfo.overview}
       </Text>
-
-
-      {/*<View style={styles.separator} />*/}
-
-
     </Animated.View>
   );
 }
@@ -254,13 +253,16 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
   );
 }
 
+// --- MAIN COMPONENT ---
 
 export function CompatibilityResultsDisplay({
   result,
   date1,
   date2,
+  onUnlockRequest,
 }: CompatibilityResultsDisplayProps) {
   const { t } = useAppTranslation();
+  const { user } = useProfile();
 
   const getTotalColor = (pct: number) => {
     if (pct >= 85) return COLORS.battery.full;
@@ -275,14 +277,12 @@ export function CompatibilityResultsDisplay({
   const finalTotalColor = getTotalColor(finalTotal);
 
   const paramSectionTitle = t('compatibility.paramsSectionTitle');
-  const { user } = useProfile();
 
   const [isTeaserVisible, setIsTeaserVisible] = useState(false);
 
+  // Teaser display logic
   useEffect(() => {
-
     if (!showFullTotal) {
-
       const timer = setTimeout(() => {
         setIsTeaserVisible(true);
       }, 8000);
@@ -291,18 +291,22 @@ export function CompatibilityResultsDisplay({
     }
   }, [showFullTotal]);
 
-  const handleUpgrade = () => {
+  const handleGetPremium = () => {
     setIsTeaserVisible(false);
-
     if (user) {
-      // 1. Если юзер залогинен (но без према) -> Сразу на оплату
       router.push('/premium/upgrade');
     } else {
-      // 2. Если Гость -> На регистрацию, но с параметром redirect
-      // Мы говорим: "После успеха вернись на /premium/upgrade"
       router.push('/(auth)/register?redirect=/premium/upgrade');
     }
-  }
+  };
+
+  const handleWatchAd = () => {
+    setIsTeaserVisible(false);
+
+    setTimeout(() => {
+      onUnlockRequest();
+    }, 1000);
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -351,7 +355,6 @@ export function CompatibilityResultsDisplay({
         </View>
       )}
 
-
       {showFullTotal && result.recommendations && (
         <PremiumConclusionCard
           destinyInfo={result.destinyInfo}
@@ -362,15 +365,23 @@ export function CompatibilityResultsDisplay({
       <PremiumTeaserModal
         visible={isTeaserVisible}
         onClose={() => setIsTeaserVisible(false)}
-        onAction={handleUpgrade}
+        onGetPremium={handleGetPremium}
+        onWatchAd={handleWatchAd}
       />
     </ScrollView>
   );
 }
 
+// --- STYLES ---
+
 const styles = StyleSheet.create({
-  scrollContent: { padding: SPACING.xs, paddingBottom: SPACING.xl * 2 },
-  section: { marginBottom: SPACING.xl },
+  scrollContent: {
+    padding: SPACING.xs,
+    paddingBottom: SPACING.xl * 2
+  },
+  section: {
+    marginBottom: SPACING.xl
+  },
   sectionTitle: {
     ...FONTS.sectionTitle,
     fontSize: 20,
@@ -378,14 +389,12 @@ const styles = StyleSheet.create({
   },
 
   // --- GENERAL ANALYSIS CARD STYLES ---
-
   analysisCard: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     ...SHADOWS.card,
   },
-
   datesText: {
     fontFamily: FONT_FAMILY.manrope.regular,
     fontSize: 15,
@@ -393,7 +402,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SPACING.sm,
   },
-
   analysisTitleLabel: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 22,
@@ -408,7 +416,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SPACING.md,
   },
-
   destinyTitle: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 28,
@@ -416,7 +423,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SPACING.xs,
   },
-
   destinyOverviewText: {
     fontFamily: FONT_FAMILY.manrope.regular,
     fontSize: 16,
@@ -426,14 +432,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  separator: {
-    height: 1,
-    backgroundColor: COLORS.border,
-    marginVertical: SPACING.lg,
-  },
-
-  // --- LP ANALYSIS TEXT SECTION (NEW BLOCK) ---
-
+  // --- LP ANALYSIS TEXT SECTION ---
   lpAnalysisTextSection: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
@@ -529,11 +528,9 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     lineHeight: 22,
   },
-
   challengesList: {
     marginTop: SPACING.xl,
     paddingTop: SPACING.md,
-    // Используем тонкую линию сверху для отделения
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
   },
@@ -556,13 +553,12 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.sm,
   },
 
-  // --- 5. ADVICE/MOTTO STYLES ---
+  // --- ADVICE STYLES ---
   adviceContainer: {
     marginTop: SPACING.xl,
     marginBottom: SPACING.lg,
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.md,
-
     backgroundColor: 'rgba(255, 215, 0, 0.1)',
     borderRadius: RADIUS.md,
     borderLeftWidth: 4,
@@ -579,7 +575,6 @@ const styles = StyleSheet.create({
   },
 
   // --- PARAMETER CARD STYLES ---
-
   paramCard: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.md,
@@ -587,55 +582,46 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     ...SHADOWS.card,
   },
-
   paramTitle: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 17,
     color: COLORS.text,
     marginBottom: SPACING.sm,
   },
-
   paramValues: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
   partnerValue: {
     alignItems: 'center',
     flex: 1,
   },
-
   partnerLabel: {
     fontFamily: FONT_FAMILY.manrope.regular,
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 4,
   },
-
   partnerNumber: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 28,
     color: COLORS.primary,
   },
-
   percentageContainer: {
     alignItems: 'center',
     minWidth: 90,
   },
-
   percentage: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 40,
     fontWeight: '800',
   },
 
-  // --- TOTAL CARD STYLES (Adjusted) ---
-
+  // --- TOTAL CARD STYLES ---
   totalContainer: {
     marginBottom: SPACING.xl,
   },
-
   totalCard: {
     width: '100%',
     alignItems: 'center',
@@ -644,7 +630,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.xl,
     ...SHADOWS.button,
   },
-
   totalLabel: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 18,
@@ -652,7 +637,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.9,
   },
-
   totalValue: {
     fontFamily: FONT_FAMILY.manrope.bold,
     fontSize: 52,

@@ -14,39 +14,56 @@ import { ProfileButton } from '@/components/ui/ProfileButton';
 import { useProfile } from '@/contexts/ProfileContext';
 import { BackButton } from '@/components/ui/BackButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
-import { useRewarded } from '@/hooks/useAdMob';
+import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
 
 export default function CompatibilityScreen() {
   const [dateString1, setDateString1] = useState<string>('');
   const [dateString2, setDateString2] = useState<string>('');
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
 
+  const [isAdUnlocked, setIsAdUnlocked] = useState(false);
+
   const navigation = useNavigation();
   const { user } = useProfile();
   const { t, language } = useAppTranslation();
 
   const { showRewarded } = useRewarded();
+  const { showInterstitial } = useInterstitial();
+
+  const calculateResult = (d1: string, d2: string, unlocked: boolean) => {
+    try {
+      const effectivePremium = user?.isPremium || unlocked;
+      const result = calculateCompatibility(d1, d2, effectivePremium);
+      setCompatibilityResult(result);
+    } catch (e) {
+      console.error(e);
+      Alert.alert(t('common.error'), t('errors.calculationFailed'));
+    }
+  };
 
   const handleCalculate = () => {
     if (!dateString1 || !dateString2 || dateString1.length < 10 || dateString2.length < 10) {
       return;
     }
 
-    showRewarded(() => {
-      try {
-        const result = calculateCompatibility(dateString1, dateString2, user?.isPremium);
-        setCompatibilityResult(result);
-      } catch (e) {
-        console.error(e);
-        Alert.alert(t('common.error'), t('errors.calculationFailed'));
-      }
+    setIsAdUnlocked(false);
+
+    showInterstitial(() => {
+      calculateResult(dateString1, dateString2, false);
     });
+  };
+
+  const handleUnlockFull = () => {
+    setIsAdUnlocked(true);
+
+    calculateResult(dateString1, dateString2, true);
   };
 
   const handleBack = useCallback(() => {
     setCompatibilityResult(null);
     setDateString1('');
     setDateString2('');
+    setIsAdUnlocked(false);
   }, []);
 
   const hasResults = compatibilityResult !== null;
@@ -85,7 +102,10 @@ export default function CompatibilityScreen() {
   }, [navigation, hasResults, handleBack, dateString1, dateString2, language]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={['bottom', 'left', 'right']}
+    >
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
@@ -104,6 +124,12 @@ export default function CompatibilityScreen() {
             date1={dateString1}
             date2={dateString2}
             onBack={handleBack}
+            // Передаем функцию разблокировки
+            onUnlockRequest={() => {
+              showRewarded(() => {
+                handleUnlockFull();
+              });
+            }}
           />
         )}
       </View>
@@ -114,7 +140,8 @@ export default function CompatibilityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.transparent, // Match the gradient background
+    backgroundColor: COLORS.transparent,
+    paddingTop: 20
   },
   content: {
     flex: 1,
@@ -126,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: '150%', // Adjusted for better fit
+    width: '150%',
     maxWidth: LAYOUT.logoLarge,
     maxHeight: LAYOUT.logoLarge,
     opacity: 0.2,

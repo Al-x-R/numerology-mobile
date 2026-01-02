@@ -29,7 +29,7 @@ export default function HomeScreen() {
     const parts = dateString.split('.');
     const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
 
-    showRewarded(() => {
+    showInterstitial(() => {
       try {
         const dateObj = new Date(isoDateString);
         if (isNaN(dateObj.getTime())) {
@@ -84,7 +84,10 @@ export default function HomeScreen() {
   }, [navigation, results, handleBack, dateString, language]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={['bottom', 'left', 'right']}
+    >
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
@@ -107,6 +110,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.transparent,
+    paddingTop: 20
   },
   content: {
     flex: 1,

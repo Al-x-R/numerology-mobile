@@ -1,88 +1,87 @@
 // components/PremiumTeaserModal.tsx
-
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-  Easing,
-} from 'react-native-reanimated';
+import React from 'react';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING, RADIUS, SHADOWS, FONT_FAMILY } from '@/lib/constants/theme';
+
+import { COLORS, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface PremiumTeaserModalProps {
   visible: boolean;
   onClose: () => void;
-  onAction: () => void;
+  onGetPremium: () => void;
+  onWatchAd: () => void;
 }
 
-export function PremiumTeaserModal({ visible, onClose, onAction }: PremiumTeaserModalProps) {
-  const { t } = useAppTranslation();
+export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }: PremiumTeaserModalProps) {
+  const { language } = useAppTranslation();
+  const isRu = language === 'ru';
 
-  const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.95);
-  const translateY = useSharedValue(20);
-
-  useEffect(() => {
-    if (visible) {
-      opacity.value = withDelay(100, withTiming(1, { duration: 400 }));
-      scale.value = withDelay(100, withTiming(1, { duration: 450, easing: Easing.out(Easing.quad) }));
-      translateY.value = withDelay(100, withTiming(0, { duration: 450, easing: Easing.out(Easing.quad) }));
-    } else {
-      opacity.value = withTiming(0, { duration: 300 });
-      scale.value = withTiming(0.95, { duration: 300 });
-      translateY.value = withTiming(20, { duration: 300 });
-    }
-  }, [visible]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ scale: scale.value }, { translateY: translateY.value }],
-  }));
-
-  if (!visible) return null;
+  const title = isRu ? 'Открыть полный анализ?' : 'Unlock full analysis?';
+  const description = isRu
+    ? 'Узнайте кармические задачи пары, скрытые таланты и подробные рекомендации.'
+    : 'Discover karmic tasks, hidden talents, and detailed recommendations.';
+  const adButtonText = isRu ? 'Смотреть рекламу' : 'Watch Ad to Unlock';
+  const orText = isRu ? 'ИЛИ' : 'OR';
+  const premiumButtonText = isRu ? 'Оформить Premium' : 'Get Premium';
 
   return (
-    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <Animated.View style={[styles.modal, animatedStyle]}>
-              <LinearGradient colors={[COLORS.background, '#1A1A1A']} style={styles.gradient}>
-                <MaterialIcons name="lock" size={32} color={COLORS.accent} style={styles.lock} />
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
 
-                <Text style={styles.title}>{t('premiumTeaserTitleGuest')}</Text>
-                <Text style={styles.text}>{t('premiumTeaserTextGuest')}</Text>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+          </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={onAction}>
-                  <LinearGradient
-                    colors={['#FFD700', COLORS.primary]}
-                    style={styles.buttonGradient}
-                  >
-                    <Text style={styles.buttonText}>{t('premiumTeaserCTARegister')}</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+          <View style={styles.iconContainer}>
+            <Ionicons name="lock-closed" size={32} color={COLORS.accent} />
+          </View>
 
-                <TouchableOpacity style={styles.close} onPress={onClose}>
-                  <Text style={styles.closeText}>{t('later')}</Text>
-                </TouchableOpacity>
+          <Text style={styles.title}>
+            {title}
+          </Text>
 
-              </LinearGradient>
-            </Animated.View>
-          </TouchableWithoutFeedback>
+          <Text style={styles.description}>
+            {description}
+          </Text>
+
+          <TouchableOpacity
+            style={styles.adButton}
+            onPress={onWatchAd}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="play-circle" size={24} color={COLORS.blackText} style={{ marginRight: 8 }} />
+            <Text style={styles.adButtonText}>
+              {adButtonText}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.dividerContainer}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>{orText}</Text>
+            <View style={styles.line} />
+          </View>
+
+          <TouchableOpacity onPress={onGetPremium}>
+            <LinearGradient
+              colors={['transparent', 'transparent']}
+              style={styles.premiumLinkContainer}
+            >
+              <Text style={styles.premiumLinkText}>
+                {premiumButtonText}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 }
@@ -90,68 +89,91 @@ export function PremiumTeaserModal({ visible, onClose, onAction }: PremiumTeaser
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modal: {
-    width: '85%',
-    borderRadius: RADIUS.xl,
-    overflow: 'hidden',
-    ...SHADOWS.card,
-    shadowColor: COLORS.accent,
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  gradient: {
+  modalContainer: {
+    width: '85%',
+    maxWidth: 400,
+    backgroundColor: 'rgba(25, 25, 25, 0.95)',
+    borderRadius: RADIUS.xl,
     padding: SPACING.xl,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  lock: {
-    marginBottom: SPACING.sm,
-    color: COLORS.accent,
+  closeButton: {
+    position: 'absolute',
+    top: SPACING.md,
+    right: SPACING.md,
+    padding: 4,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(196, 164, 132, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
   },
   title: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 22,
+    ...FONTS.subtitle,
     color: COLORS.text,
-    marginBottom: SPACING.xs,
     textAlign: 'center',
+    marginBottom: SPACING.sm,
+    fontSize: 20,
   },
-  text: {
+  description: {
     ...FONTS.body,
-    fontSize: 15,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
     lineHeight: 22,
   },
-  button: {
+  adButton: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.accent,
     width: '100%',
-    borderRadius: RADIUS.modal,
-    marginBottom: SPACING.sm,
-    ...SHADOWS.button,
-    overflow: 'hidden',
-  },
-  buttonGradient: {
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: RADIUS.lg,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  buttonText: {
+  adButtonText: {
     ...FONTS.button,
-    color: '#000',
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    color: COLORS.blackText,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  close: {
-    marginTop: SPACING.xs,
-    padding: SPACING.sm,
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: SPACING.lg,
   },
-  closeText: {
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  orText: {
     ...FONTS.body,
     color: COLORS.textSecondary,
-    fontSize: 14,
+    marginHorizontal: SPACING.md,
+    fontSize: 12,
+  },
+  premiumLinkContainer: {
+    paddingVertical: 4,
+  },
+  premiumLinkText: {
+    ...FONTS.button,
+    color: COLORS.accent,
+    fontSize: 15,
+    textDecorationLine: 'underline',
   },
 });

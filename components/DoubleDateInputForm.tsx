@@ -22,7 +22,6 @@ import {
   SPACING
 } from '@/lib/constants/theme';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
-import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface DoubleDateInputFormProps {

@@ -533,6 +533,7 @@ export const translations: LocaleData = {
       lpAnalysisTextTitle: 'Deep Life Path Analysis',
       purposeLabel: 'Union Purpose',
       premiumConclusionTitle: 'Deep Conclusions & Recommendations',
+      conclusionTitle: 'Conclusions & Recommendations',
       challengesLabel: 'Core Union Challenges',
 
       paramsSectionTitle: 'Compatibility Parameters',
