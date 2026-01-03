@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: 'Destiny Code',
   slug: 'destiny-code',
   extra: {
-    eas: { projectId: '3426a50d-f107-46d2-9e02-ed6f3c073957' },
+    eas: { projectId: '1ffcb12d-2e63-4b0a-95dd-8162848dd57b' },
     firebaseApiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
     firebaseAuthDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
     firebaseProjectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
