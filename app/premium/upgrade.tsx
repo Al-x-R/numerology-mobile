@@ -207,11 +207,21 @@ export default function PremiumScreen() {
 
           {/* Footer Links */}
           <View style={styles.footer}>
-            <TouchableOpacity onPress={() => openLink('https://your-site.com/terms')}><Text style={styles.footerLink}>{isRussian ? 'Условия' : 'Terms'}</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')}>
+              <Text style={styles.footerLink}>{isRussian ? 'Условия' : 'Terms'}</Text>
+            </TouchableOpacity>
+
             <Text style={styles.footerDivider}>|</Text>
-            <TouchableOpacity onPress={handleRestore}><Text style={styles.footerLink}>{isRussian ? 'Восстановить' : 'Restore'}</Text></TouchableOpacity>
+
+            <TouchableOpacity onPress={handleRestore}>
+              <Text style={styles.footerLink}>{isRussian ? 'Восстановить' : 'Restore'}</Text>
+            </TouchableOpacity>
+
             <Text style={styles.footerDivider}>|</Text>
-            <TouchableOpacity onPress={() => openLink('https://your-site.com/privacy')}><Text style={styles.footerLink}>{isRussian ? 'Приватность' : 'Privacy'}</Text></TouchableOpacity>
+
+            <TouchableOpacity onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')}>
+              <Text style={styles.footerLink}>{isRussian ? 'Приватность' : 'Privacy'}</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
