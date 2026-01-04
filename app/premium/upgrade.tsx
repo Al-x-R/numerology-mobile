@@ -14,7 +14,7 @@ import { useAppTranslation } from '@/contexts/LanguageContext';
 type PlanId = 'weekly' | 'monthly' | 'yearly';
 
 export default function PremiumScreen() {
-  const insets = useSafeAreaInsets(); // Получаем точные размеры системных отступов
+  const insets = useSafeAreaInsets();
   const { language } = useAppTranslation();
   const { user, setPremiumStatus } = useProfile();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('weekly');
@@ -23,9 +23,8 @@ export default function PremiumScreen() {
   const isRu = language === 'ru';
   const isPremium = user?.isPremium;
 
-  // --- ХАРДКОД ТЕКСТОВ ---
   const headerTitle = 'PREMIUM';
-  const isRussian = isRu; // для краткости
+  const isRussian = isRu;
 
   const plansData = {
     weekly: {
@@ -97,7 +96,6 @@ export default function PremiumScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <LinearGradient colors={GRADIENTS.background} style={styles.background} />
 
-      {/* Используем обычный View с отступом вместо SafeAreaView edges, чтобы ScrollView мог уходить под индикатор внизу */}
       <View style={[styles.mainWrapper, { paddingTop: insets.top }]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -108,7 +106,7 @@ export default function PremiumScreen() {
             <TouchableOpacity
               onPress={() => router.back()}
               style={styles.closeButton}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} // Увеличили область нажатия
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             >
               <Ionicons name="close" size={24} color={COLORS.textSecondary} />
             </TouchableOpacity>
@@ -302,7 +300,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
   actionSection: { paddingHorizontal: SPACING.xl },
-  ctaButton: { borderRadius: RADIUS.xl, overflow: 'hidden', ...SHADOWS.goldenButton },
+  ctaButton: { borderRadius: RADIUS.xl, overflow: 'hidden' },
   ctaGradient: { paddingVertical: 16, alignItems: 'center' },
   ctaText: { ...FONTS.button, color: COLORS.blackText, fontSize: 17, fontWeight: 'bold' },
   disclaimer: { textAlign: 'center', color: COLORS.textSecondary, fontSize: 11, marginTop: SPACING.sm, marginBottom: SPACING.md },

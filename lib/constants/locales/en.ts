@@ -349,5 +349,9 @@ export const en = {
       'July', 'August', 'September', 'October', 'November', 'December'
     ],
   },
+
+  ads: {
+    notReady: "Ad is still loading, please try again in a moment"
+  },
 };
 

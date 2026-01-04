@@ -8,25 +8,20 @@ import {
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
-// --- ID РЕКЛАМНЫХ БЛОКОВ ---
-
-// 1. Interstitial (Межстраничная)
 const INTERSTITIAL_ID = __DEV__
   ? TestIds.INTERSTITIAL
   : Platform.select({
-  ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyy', // Твой реальный iOS ID
-  android: 'ca-app-pub-xxxxxxxxxxxxx/zzzzzz', // Твой реальный Android ID
+  ios: process.env.EXPO_PUBLIC_AD_INTERSTITIAL_IOS,
+  android: process.env.EXPO_PUBLIC_AD_INTERSTITIAL_ANDROID,
 }) || '';
 
-// 2. Rewarded (За вознаграждение)
 const REWARDED_ID = __DEV__
   ? TestIds.REWARDED
   : Platform.select({
-  ios: 'ca-app-pub-xxxxxxxxxxxxx/aaaaaa', // Твой реальный iOS ID
-  android: 'ca-app-pub-xxxxxxxxxxxxx/bbbbbb', // Твой реальный Android ID
+  ios: process.env.EXPO_PUBLIC_AD_REWARDED_IOS,
+  android: process.env.EXPO_PUBLIC_AD_REWARDED_ANDROID,
 }) || '';
 
-// --- ХУК ДЛЯ INTERSTITIAL (Межстраничная) ---
 export const useInterstitial = () => {
   const { user } = useProfile();
   const { isLoaded, isClosed, load, show } = useInterstitialAd(INTERSTITIAL_ID, {
@@ -74,7 +69,6 @@ export const useInterstitial = () => {
   return { showInterstitial, isLoaded };
 };
 
-// --- ХУК ДЛЯ REWARDED (За вознаграждение) ---
 export const useRewarded = () => {
   const { user } = useProfile();
   const { t } = useAppTranslation();

@@ -1,9 +1,9 @@
-// app/(tabs)/compatibility.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleProp, StyleSheet, View, ViewStyle, Text, Alert } from 'react-native';
+import { Image, StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
@@ -20,44 +20,16 @@ export default function CompatibilityScreen() {
   const [dateString1, setDateString1] = useState<string>('');
   const [dateString2, setDateString2] = useState<string>('');
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
-
   const [isAdUnlocked, setIsAdUnlocked] = useState(false);
 
   const navigation = useNavigation();
+  const tabBarHeight = useBottomTabBarHeight();
   const { user } = useProfile();
   const { t, language } = useAppTranslation();
-
   const { showRewarded } = useRewarded();
   const { showInterstitial } = useInterstitial();
 
-  const calculateResult = (d1: string, d2: string, unlocked: boolean) => {
-    try {
-      const effectivePremium = user?.isPremium || unlocked;
-      const result = calculateCompatibility(d1, d2, effectivePremium);
-      setCompatibilityResult(result);
-    } catch (e) {
-      console.error(e);
-      Alert.alert(t('common.error'), t('errors.calculationFailed'));
-    }
-  };
-
-  const handleCalculate = () => {
-    if (!dateString1 || !dateString2 || dateString1.length < 10 || dateString2.length < 10) {
-      return;
-    }
-
-    setIsAdUnlocked(false);
-
-    showInterstitial(() => {
-      calculateResult(dateString1, dateString2, false);
-    });
-  };
-
-  const handleUnlockFull = () => {
-    setIsAdUnlocked(true);
-
-    calculateResult(dateString1, dateString2, true);
-  };
+  const hasResults = compatibilityResult !== null;
 
   const handleBack = useCallback(() => {
     setCompatibilityResult(null);
@@ -65,12 +37,6 @@ export default function CompatibilityScreen() {
     setDateString2('');
     setIsAdUnlocked(false);
   }, []);
-
-  const hasResults = compatibilityResult !== null;
-
-  const contentStyle: StyleProp<ViewStyle> = hasResults ?
-    { justifyContent: 'flex-start', alignItems: 'stretch' } :
-    { alignItems: 'center', marginTop: LAYOUT.topMarginLarge };
 
   useEffect(() => {
     if (hasResults) {
@@ -81,9 +47,7 @@ export default function CompatibilityScreen() {
           </View>
         ),
         headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
-        headerRight: () => (
-          <View style={{ alignItems: 'center' }} />
-        ),
+        headerRight: () => <View />,
         tabBarStyle: { display: 'none' },
       });
     } else {
@@ -98,41 +62,62 @@ export default function CompatibilityScreen() {
         },
       });
     }
+  }, [navigation, hasResults, handleBack, language]);
 
-  }, [navigation, hasResults, handleBack, dateString1, dateString2, language]);
+  const calculateResult = (d1: string, d2: string, unlocked: boolean) => {
+    try {
+      const effectivePremium = user?.isPremium || unlocked;
+      const result = calculateCompatibility(d1, d2, effectivePremium);
+      setCompatibilityResult(result);
+    } catch (e) {
+      Alert.alert(t('common.error'), t('errors.calculationFailed'));
+    }
+  };
+
+  const handleCalculate = () => {
+    if (!dateString1 || !dateString2 || dateString1.length < 10 || dateString2.length < 10) return;
+    setIsAdUnlocked(false);
+    showInterstitial(() => calculateResult(dateString1, dateString2, false));
+  };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={['bottom', 'left', 'right']}
-    >
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
-      <View style={[styles.content, contentStyle]}>
-        {!hasResults ? (
-          <DoubleDateInputForm
-            date1={dateString1}
-            date2={dateString2}
-            setDate1={setDateString1}
-            setDate2={setDateString2}
-            onSubmit={handleCalculate}
-          />
-        ) : (
-          <CompatibilityResultsDisplay
-            result={compatibilityResult}
-            date1={dateString1}
-            date2={dateString2}
-            onBack={handleBack}
-            // Передаем функцию разблокировки
-            onUnlockRequest={() => {
-              showRewarded(() => {
-                handleUnlockFull();
-              });
-            }}
-          />
-        )}
-      </View>
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            !hasResults && { paddingBottom: tabBarHeight + 40 }
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            {!hasResults ? (
+              <DoubleDateInputForm
+                date1={dateString1}
+                date2={dateString2}
+                setDate1={setDateString1}
+                setDate2={setDateString2}
+                onSubmit={handleCalculate}
+              />
+            ) : (
+              <CompatibilityResultsDisplay
+                result={compatibilityResult}
+                date1={dateString1}
+                date2={dateString2}
+                onBack={handleBack}
+                onUnlockRequest={() => showRewarded(() => calculateResult(dateString1, dateString2, true))}
+              />
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -140,22 +125,27 @@ export default function CompatibilityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.transparent,
-    paddingTop: 20
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: LAYOUT.contentPadding,
-    alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
   background: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: LAYOUT.contentPadding,
+    alignItems: 'center',
+    paddingTop: LAYOUT.topMarginLarge,
+  },
   logo: {
     width: '150%',
     maxWidth: LAYOUT.logoLarge,
     maxHeight: LAYOUT.logoLarge,
-    opacity: 0.2,
+    opacity: 0.1,
+    position: 'absolute',
+    top: -50,
   },
 });

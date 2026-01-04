@@ -22,7 +22,8 @@
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "GIDClientID": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com",
-        "NSPhotoLibraryUsageDescription": "Allow access to photos to upload your profile avatar."
+        "NSPhotoLibraryUsageDescription": "Allow access to photos to upload your profile avatar.",
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       }
     },
     "android": {
@@ -72,8 +73,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+          "androidAppId": "ca-app-pub-2225591755579064~5326522792",
+          "iosAppId": "ca-app-pub-2225591755579064~2213274293"
         }
       ]
     ],
