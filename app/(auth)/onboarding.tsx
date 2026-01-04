@@ -8,7 +8,7 @@ import { router } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 const { width } = Dimensions.get('window');

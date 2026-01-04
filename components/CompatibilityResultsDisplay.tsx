@@ -18,7 +18,7 @@ import Animated, {
 import { router } from 'expo-router';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -393,7 +393,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
-    ...SHADOWS.card,
   },
   datesText: {
     fontFamily: FONT_FAMILY.manrope.regular,
@@ -438,7 +437,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     marginBottom: SPACING.xl,
-    ...SHADOWS.card,
   },
   analysisTextTitle: {
     fontFamily: FONT_FAMILY.manrope.bold,
@@ -457,7 +455,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     marginBottom: SPACING.xl,
-    ...SHADOWS.card,
   },
   destinyMissionLabel: {
     fontFamily: FONT_FAMILY.manrope.bold,
@@ -563,7 +560,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.accent,
-    ...SHADOWS.card,
   },
   adviceMotto: {
     fontFamily: FONT_FAMILY.manrope.bold,
@@ -580,7 +576,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
     marginBottom: SPACING.md,
-    ...SHADOWS.card,
   },
   paramTitle: {
     fontFamily: FONT_FAMILY.manrope.bold,
@@ -628,7 +623,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.xl,
-    ...SHADOWS.button,
   },
   totalLabel: {
     fontFamily: FONT_FAMILY.manrope.bold,

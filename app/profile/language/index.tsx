@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useAppTranslation, useLanguage } from '@/contexts/LanguageContext';
-import { COLORS, FONTS, SPACING, RADIUS, GRADIENTS, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, FONTS, SPACING, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LanguageScreen() {
@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
   cardActive: {
     borderColor: COLORS.accent,
     backgroundColor: 'rgba(212, 175, 55, 0.05)',
-    ...SHADOWS.card,
   },
   row: {
     flexDirection: 'row',

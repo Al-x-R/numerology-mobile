@@ -80,6 +80,8 @@ export default function CompatibilityScreen() {
     showInterstitial(() => calculateResult(dateString1, dateString2, false));
   };
 
+  const paddingTop = hasResults ? LAYOUT.topMarginLarge / 2 : LAYOUT.topMarginLarge;
+
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
@@ -97,7 +99,7 @@ export default function CompatibilityScreen() {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.content}>
+          <View style={[styles.content, { paddingTop }]}>
             {!hasResults ? (
               <DoubleDateInputForm
                 date1={dateString1}
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: LAYOUT.contentPadding,
     alignItems: 'center',
-    paddingTop: LAYOUT.topMarginLarge,
+    // paddingTop: LAYOUT.topMarginLarge,
   },
   logo: {
     width: '150%',

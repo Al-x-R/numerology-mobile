@@ -12,16 +12,7 @@ import {
   Platform
 } from 'react-native';
 
-import {
-  COLORS,
-  FONTS,
-  FORM_STYLES,
-  GRADIENTS,
-  LAYOUT,
-  RADIUS,
-  SHADOWS,
-  SPACING
-} from '@/lib/constants/theme';
+import { COLORS, FONTS, FORM_STYLES, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING } from '@/lib/constants/theme';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 

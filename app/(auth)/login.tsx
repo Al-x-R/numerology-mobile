@@ -16,7 +16,7 @@ import { useRouter, useLocalSearchParams, Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -237,7 +237,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
-    ...SHADOWS.goldenButtonSoft,
   },
   goldenButton: {
     paddingVertical: 18,

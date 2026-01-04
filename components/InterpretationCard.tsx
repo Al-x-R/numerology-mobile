@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types/calculation';
-import { COLORS, SPACING, RADIUS, FONTS, SHADOWS, LAYOUT } from '@/lib/constants/theme';
+import { COLORS, SPACING, RADIUS, FONTS, LAYOUT } from '@/lib/constants/theme';
 import { getCurrentLocale } from '@/lib/constants/locales';
 
 interface InterpretationCardProps {
@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.borderFocused,
     padding: SPACING.lg,
-    ...SHADOWS.card,
   },
   closeButton: {
     position: 'absolute',

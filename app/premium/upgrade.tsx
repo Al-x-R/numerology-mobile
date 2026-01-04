@@ -1,13 +1,13 @@
 // app/premium/upgrade.tsx
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, Dimensions } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'; // Добавили insets
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 
-import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -261,7 +261,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     borderWidth: 1,
     borderColor: 'rgba(255, 215, 0, 0.3)',
-    ...SHADOWS.goldenButtonSoft
   },
   heroTitle: { ...FONTS.title, fontSize: 24, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.xs, fontWeight: 'bold' },
   heroSubtitle: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', fontSize: 14, lineHeight: 20 },

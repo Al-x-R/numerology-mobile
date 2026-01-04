@@ -24,7 +24,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS, SHADOWS } from '@/lib/constants/theme';
+import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -397,7 +397,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
-    ...SHADOWS.goldenButtonSoft,
   },
   goldenButton: {
     paddingVertical: 18,
