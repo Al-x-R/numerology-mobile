@@ -82,7 +82,7 @@ export default function HoroscopeScreen() {
       headerStyle: { backgroundColor: COLORS.headerBackground },
       tabBarStyle: { display: 'flex', backgroundColor: COLORS.background, borderTopColor: COLORS.background },
     });
-  }, [navigation, language]);
+  }, [navigation, language, t]);
 
   const handleUnlockCurrentTab = () => {
     showRewarded(() => {
@@ -112,28 +112,20 @@ export default function HoroscopeScreen() {
     const isLocked = !user?.isPremium && !isUnlocked;
 
     if (isLocked) {
-      const isRu = language === 'ru';
-
       const titles: Record<TabType, string> = {
-        day: isRu ? 'Звездный прогноз готов' : 'Stellar forecast is ready',
-        month: isRu ? 'Гороскоп на месяц готов' : 'Monthly horoscope is ready',
-        year: isRu ? 'Гороскоп на год готов' : 'Yearly horoscope is ready',
+        day: t('horoscope.dayTitle'),
+        month: t('horoscope.monthTitle'),
+        year: t('horoscope.yearTitle'),
       };
 
       const subtitles: Record<TabType, string> = {
-        day: isRu
-          ? 'Узнайте, как расположение планет влияет на вас сегодня.'
-          : 'Find out how planetary alignment affects you today.',
-        month: isRu
-          ? 'Ключевые события в карьере, любви и здоровье.'
-          : 'Key events in career, love, and health.',
-        year: isRu
-          ? 'Глобальные тренды звезд для вашего знака.'
-          : 'Global star trends for your zodiac sign.',
+        day: t('horoscope.daySubtitle'),
+        month: t('horoscope.monthSubtitle'),
+        year: t('horoscope.yearSubtitle'),
       };
 
-      const unlockText = isRu ? 'Открыть за рекламу' : 'Watch Ad to Unlock';
-      const premiumText = isRu ? 'Или оформите Premium' : 'Or get Premium';
+      const unlockText = t('horoscope.watchAdToUnlock');
+      const premiumText = t('horoscope.orGetPremium');
 
       return (
         <View style={styles.lockedContainer}>
@@ -177,9 +169,9 @@ export default function HoroscopeScreen() {
       {(['day', 'month', 'year'] as TabType[]).map((tab) => {
         const isActive = activeTab === tab;
         const labels: Record<string, string> = {
-          day: language === 'ru' ? 'День' : 'Day',
-          month: language === 'ru' ? 'Месяц' : 'Month',
-          year: language === 'ru' ? 'Год' : 'Year'
+          day: t('tabs.day'),
+          month: t('tabs.month'),
+          year: t('tabs.year')
         };
         return (
           <TouchableOpacity
@@ -259,6 +251,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(20, 20, 20, 0.6)',
+    // backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: RADIUS.xl,
     padding: SPACING.xl,
     marginTop: SPACING.md,

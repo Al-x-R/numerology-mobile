@@ -18,7 +18,10 @@ export const ru = {
     pythagoras: 'Психоматрица',
     compatibility: 'Совместимость',
     numbers: 'Числа',
-    horoscope: 'Гороскоп'
+    horoscope: 'Гороскоп',
+    day: "День",
+    month: "Месяц",
+    year: "Год",
   },
 
   horoscopeTitle: "Гороскоп",
@@ -233,26 +236,6 @@ export const ru = {
   later: 'Позже',
   alreadyHaveAccount: 'У меня уже есть аккаунт',
 
-  premium: {
-    title: 'Premium',
-    subtitle: 'Раскрой все тайны своей судьбы',
-    benefits: {
-      compatibility: 'Полная совместимость по Матрице Судьбы',
-      horoscope: 'Персональный гороскоп на каждый день',
-      karma: 'Расшифровка Кармического хвоста',
-      ads: 'Без рекламы и ограничений',
-    },
-    plans: {
-      year: '1 Год',
-      month: '1 Месяц',
-      priceYear: '2990 ₽ / год',
-      priceMonth: '499 ₽ / мес',
-      save: 'Выгода 50%',
-    },
-    disclaimer: 'Подписка продлевается автоматически. Отмена в любой момент.',
-    ctaTry: 'Попробовать бесплатно',
-  },
-
   section_workingNumbers: 'Дополнительные числа',
   section_psychomatrix: 'Психоматрица (Квадрат Пифагора)',
   section_additional: 'Дополнительные параметры',
@@ -357,6 +340,96 @@ export const ru = {
 
   ads: {
     notReady: "Реклама еще загружается, попробуйте через мгновение"
-  }
+  },
+
+  authRequired: {
+    loginRequired: "Требуется вход",
+    birthDateMissing: "Дата рождения не указана",
+    loginDescription: "Войдите в аккаунт, чтобы получить персональный прогноз.",
+    birthDateDescription: "Укажите дату рождения в профиле для точных расчетов.",
+    loginButton: "Войти в аккаунт",
+    setBirthDateButton: "Указать дату рождения",
+  },
+
+  horoscope: {
+    dayTitle: "Звездный прогноз готов",
+    monthTitle: "Гороскоп на месяц готов",
+    yearTitle: "Гороскоп на год готов",
+    daySubtitle: "Узнайте, как расположение планет влияет на вас сегодня.",
+    monthSubtitle: "Ключевые события в карьере, любви и здоровье.",
+    yearSubtitle: "Глобальные тренды звезд для вашего знака.",
+    watchAdToUnlock: "Открыть за рекламу",
+    orGetPremium: "Или оформите Premium",
+  },
+
+  numbers: {
+    title: "Нумерология",
+    dayTitle: "Ваш прогноз на сегодня готов",
+    monthTitle: "Прогноз на месяц готов",
+    yearTitle: "Прогноз на год готов",
+    daySubtitle: "Персональный AI-анализ энергий дня. Узнайте, что приготовила судьба.",
+    monthSubtitle: "Узнайте, какие возможности и вызовы готовит вам этот месяц.",
+    yearSubtitle: "Глобальные энергии вашего личного года. Стратегия на будущее.",
+    watchAdToUnlock: "Открыть за рекламу",
+    orGetPremium: "Или оформите Premium",
+  },
+
+  premium: {
+    headerTitle: "PREMIUM",
+    youArePro: "Вы в команде PRO",
+    unlockYourDestiny: "Открой свою судьбу",
+    heroSubtitle: "Получите детальный анализ, прогнозы и рекомендации без ограничений.",
+    featureCompatibility: "Полный анализ совместимости",
+    featureForecasts: "Прогнозы на День, Месяц и Год",
+    featureAnalysis: "Детальный разбор характера",
+    featureAdFree: "Без рекламы",
+    planWeekly: "Неделя",
+    planMonthly: "Месяц",
+    planYearly: "Год",
+    planWeeklyPeriod: "/ нед",
+    planMonthlyPeriod: "/ мес",
+    planYearlyPeriod: "/ год",
+    planWeeklySubtitle: "Отмена в любой момент",
+    planMonthlySave: "ВЫГОДА 50%",
+    planYearlySubtext: "$2.50 / месяц",
+    planYearlyBestValue: "ЛУЧШИЙ ВЫБОР",
+    continue: "Продолжить",
+    loading: "Загрузка...",
+    subscriptionDisclaimer: "Подписка продлевается автоматически. Отмена в настройках Store.",
+    manageSubscription: "Управление подпиской",
+    terms: "Условия",
+    restore: "Восстановить",
+    privacy: "Приватность",
+    success: "Успешно",
+    subscriptionUpdated: "Статус подписки обновлен!",
+    restoreTitle: "Восстановление",
+    restoreSuccess: "Ваша подписка успешно восстановлена!",
+
+    title: 'Premium',
+    subtitle: 'Раскрой все тайны своей судьбы',
+    benefits: {
+      compatibility: 'Полная совместимость по Матрице Судьбы',
+      horoscope: 'Персональный гороскоп на каждый день',
+      karma: 'Расшифровка Кармического хвоста',
+      ads: 'Без рекламы и ограничений',
+    },
+    plans: {
+      year: '1 Год',
+      month: '1 Месяц',
+      priceYear: '2990 ₽ / год',
+      priceMonth: '499 ₽ / мес',
+      save: 'Выгода 50%',
+    },
+    disclaimer: 'Подписка продлевается автоматически. Отмена в любой момент.',
+    ctaTry: 'Попробовать бесплатно',
+  },
+
+  premiumTeaser: {
+    title: "Открыть полный анализ?",
+    description: "Узнайте кармические задачи пары, скрытые таланты и подробные рекомендации.",
+    watchAd: "Смотреть рекламу",
+    or: "ИЛИ",
+    getPremium: "Оформить Premium",
+  },
 };
 

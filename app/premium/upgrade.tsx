@@ -15,47 +15,43 @@ type PlanId = 'weekly' | 'monthly' | 'yearly';
 
 export default function PremiumScreen() {
   const insets = useSafeAreaInsets();
-  const { language } = useAppTranslation();
+  const { language, t } = useAppTranslation();
   const { user, setPremiumStatus } = useProfile();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('weekly');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isRu = language === 'ru';
   const isPremium = user?.isPremium;
-
-  const headerTitle = 'PREMIUM';
-  const isRussian = isRu;
 
   const plansData = {
     weekly: {
       id: 'weekly',
-      title: isRussian ? 'Неделя' : 'Weekly',
+      title: t('premium.planWeekly'),
       price: '$2.99',
-      period: isRussian ? '/ нед' : '/ week',
-      subtitle: isRussian ? 'Отмена в любой момент' : 'Cancel anytime',
+      period: t('premium.planWeeklyPeriod'),
+      subtitle: t('premium.planWeeklySubtitle'),
       subtext: '',
       save: null,
       bestValue: null
     },
     monthly: {
       id: 'monthly',
-      title: isRussian ? 'Месяц' : 'Monthly',
+      title: t('premium.planMonthly'),
       price: '$6.99',
-      period: isRussian ? '/ мес' : '/ month',
+      period: t('premium.planMonthlyPeriod'),
       subtitle: '',
       subtext: '',
-      save: isRussian ? 'ВЫГОДА 50%' : 'SAVE 50%',
+      save: t('premium.planMonthlySave'),
       bestValue: null
     },
     yearly: {
       id: 'yearly',
-      title: isRussian ? 'Год' : 'Yearly',
+      title: t('premium.planYearly'),
       price: '$29.99',
-      period: isRussian ? '/ год' : '/ year',
+      period: t('premium.planYearlyPeriod'),
       subtitle: '',
-      subtext: isRussian ? '$2.50 / месяц' : '$2.50 / month',
+      subtext: t('premium.planYearlySubtext'),
       save: null,
-      bestValue: isRussian ? 'ЛУЧШИЙ ВЫБОР' : 'BEST VALUE'
+      bestValue: t('premium.planYearlyBestValue')
     }
   };
 
@@ -64,7 +60,7 @@ export default function PremiumScreen() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      Alert.alert(isRussian ? 'Успешно' : 'Success', isRussian ? 'Статус подписки обновлен!' : 'Subscription status updated!', [
+      Alert.alert(t('premium.success'), t('premium.subscriptionUpdated'), [
         { text: 'OK', onPress: async () => { await setPremiumStatus(true); router.back(); } }
       ]);
     }, 1500);
@@ -82,8 +78,8 @@ export default function PremiumScreen() {
     setTimeout(() => {
       setIsLoading(false);
       Alert.alert(
-        isRussian ? 'Восстановление' : 'Restore',
-        isRussian ? 'Ваша подписка успешно восстановлена!' : 'Your subscription has been successfully restored!',
+        t('premium.restoreTitle'),
+        t('premium.restoreSuccess'),
         [{ text: 'OK', onPress: async () => { await setPremiumStatus(true); router.back(); } }]
       );
     }, 1500);
@@ -110,7 +106,7 @@ export default function PremiumScreen() {
             >
               <Ionicons name="close" size={24} color={COLORS.textSecondary} />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>{headerTitle}</Text>
+            <Text style={styles.headerTitle}>{t('premium.headerTitle')}</Text>
             <View style={{ width: 40 }} />
           </View>
 
@@ -120,22 +116,20 @@ export default function PremiumScreen() {
               <Ionicons name="diamond" size={48} color={COLORS.accent} />
             </View>
             <Text style={styles.heroTitle}>
-              {isPremium ? (isRussian ? 'Вы в команде PRO' : 'You are PRO') : (isRussian ? 'Открой свою судьбу' : 'Unlock Your Destiny')}
+              {isPremium ? t('premium.youArePro') : t('premium.unlockYourDestiny')}
             </Text>
             <Text style={styles.heroSubtitle}>
-              {isRussian
-                ? 'Получите детальный анализ, прогнозы и рекомендации без ограничений.'
-                : 'Get detailed analysis, forecasts, and recommendations without limits.'}
+              {t('premium.heroSubtitle')}
             </Text>
           </View>
 
           {/* Features */}
           <View style={styles.featuresContainer}>
             {[
-              isRussian ? 'Полный анализ совместимости' : 'Unlimited Compatibility Analysis',
-              isRussian ? 'Прогнозы на День, Месяц и Год' : 'Daily, Monthly & Yearly Forecasts',
-              isRussian ? 'Детальный разбор характера' : 'Detailed Character Analysis',
-              isRussian ? 'Без рекламы' : 'Ad-Free Experience',
+              t('premium.featureCompatibility'),
+              t('premium.featureForecasts'),
+              t('premium.featureAnalysis'),
+              t('premium.featureAdFree'),
             ].map((feat, index) => (
               <View key={index} style={styles.featureRow}>
                 <Ionicons name="checkmark-circle" size={20} color={COLORS.accent} style={{ marginRight: 12 }} />
@@ -187,18 +181,16 @@ export default function PremiumScreen() {
               <>
                 <TouchableOpacity style={styles.ctaButton} onPress={handlePurchase} disabled={isLoading}>
                   <LinearGradient colors={GRADIENTS.goldenButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.ctaGradient}>
-                    <Text style={styles.ctaText}>{isLoading ? (isRussian ? 'Загрузка...' : 'Loading...') : (isRussian ? 'Продолжить' : 'Continue')}</Text>
+                    <Text style={styles.ctaText}>{isLoading ? t('premium.loading') : t('premium.continue')}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
                 <Text style={styles.disclaimer}>
-                  {isRussian
-                    ? 'Подписка продлевается автоматически. Отмена в настройках Store.'
-                    : 'Subscription renews automatically. Cancel in Store settings.'}
+                  {t('premium.subscriptionDisclaimer')}
                 </Text>
               </>
             ) : (
               <TouchableOpacity style={styles.manageButton} onPress={handleManageSubscription}>
-                <Text style={styles.manageButtonText}>{isRussian ? 'Управление подпиской' : 'Manage Subscription'}</Text>
+                <Text style={styles.manageButtonText}>{t('premium.manageSubscription')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -206,19 +198,19 @@ export default function PremiumScreen() {
           {/* Footer Links */}
           <View style={styles.footer}>
             <TouchableOpacity onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')}>
-              <Text style={styles.footerLink}>{isRussian ? 'Условия' : 'Terms'}</Text>
+              <Text style={styles.footerLink}>{t('premium.terms')}</Text>
             </TouchableOpacity>
 
             <Text style={styles.footerDivider}>|</Text>
 
             <TouchableOpacity onPress={handleRestore}>
-              <Text style={styles.footerLink}>{isRussian ? 'Восстановить' : 'Restore'}</Text>
+              <Text style={styles.footerLink}>{t('premium.restore')}</Text>
             </TouchableOpacity>
 
             <Text style={styles.footerDivider}>|</Text>
 
             <TouchableOpacity onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')}>
-              <Text style={styles.footerLink}>{isRussian ? 'Приватность' : 'Privacy'}</Text>
+              <Text style={styles.footerLink}>{t('premium.privacy')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

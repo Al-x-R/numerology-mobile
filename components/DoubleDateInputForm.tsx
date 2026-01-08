@@ -190,7 +190,7 @@ export function DoubleDateInputForm({
             placeholderTextColor={COLORS.textSecondary}
             value={date1}
             onChangeText={handleTextChange1}
-            keyboardType="numbers-and-punctuation"
+            keyboardType="number-pad"
             maxLength={10}
             onFocus={() => setIsFocused1(true)}
             onBlur={() => setIsFocused1(false)}
@@ -230,7 +230,7 @@ export function DoubleDateInputForm({
             placeholderTextColor={COLORS.textSecondary}
             value={date2}
             onChangeText={handleTextChange2}
-            keyboardType="numbers-and-punctuation"
+            keyboardType="number-pad"
             maxLength={10}
             onFocus={() => setIsFocused2(true)}
             onBlur={() => setIsFocused2(false)}
@@ -334,10 +334,6 @@ const styles = StyleSheet.create({
   inputFocused: {
     borderColor: COLORS.accent,
     borderWidth: 2,
-    backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
-    ...(Platform.OS === 'ios' && {
-      ...SHADOWS.inputFocused,
-    }),
   },
   inputError: {
     borderColor: COLORS.error,

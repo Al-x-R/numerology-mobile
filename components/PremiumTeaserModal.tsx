@@ -15,16 +15,13 @@ interface PremiumTeaserModalProps {
 }
 
 export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }: PremiumTeaserModalProps) {
-  const { language } = useAppTranslation();
-  const isRu = language === 'ru';
+  const { t } = useAppTranslation();
 
-  const title = isRu ? 'Открыть полный анализ?' : 'Unlock full analysis?';
-  const description = isRu
-    ? 'Узнайте кармические задачи пары, скрытые таланты и подробные рекомендации.'
-    : 'Discover karmic tasks, hidden talents, and detailed recommendations.';
-  const adButtonText = isRu ? 'Смотреть рекламу' : 'Watch Ad to Unlock';
-  const orText = isRu ? 'ИЛИ' : 'OR';
-  const premiumButtonText = isRu ? 'Оформить Premium' : 'Get Premium';
+  const title = t('premiumTeaser.title');
+  const description = t('premiumTeaser.description');
+  const adButtonText = t('premiumTeaser.watchAd');
+  const orText = t('premiumTeaser.or');
+  const premiumButtonText = t('premiumTeaser.getPremium');
 
   return (
     <Modal

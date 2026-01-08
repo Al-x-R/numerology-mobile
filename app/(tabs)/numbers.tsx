@@ -43,7 +43,7 @@ export default function NumbersScreen() {
   });
 
   const navigation = useNavigation();
-  const { language } = useAppTranslation();
+  const { language, t } = useAppTranslation();
   const { user } = useProfile();
   const { showRewarded } = useRewarded();
 
@@ -75,14 +75,14 @@ export default function NumbersScreen() {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: language === 'ru' ? 'Нумерология' : 'Numerology',
+      headerTitle: t('numbers.title'),
       headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
       headerLeft: () => null,
       headerShadowVisible: false,
       headerStyle: { backgroundColor: COLORS.headerBackground },
       tabBarStyle: { display: 'flex', backgroundColor: COLORS.background, borderTopColor: COLORS.background },
     });
-  }, [navigation, language]);
+  }, [navigation, language, t]);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -115,9 +115,9 @@ export default function NumbersScreen() {
       {(['day', 'month', 'year'] as TabType[]).map((tab) => {
         const isActive = activeTab === tab;
         const labels: Record<string, string> = {
-          day: language === 'ru' ? 'День' : 'Day',
-          month: language === 'ru' ? 'Месяц' : 'Month',
-          year: language === 'ru' ? 'Год' : 'Year'
+          day: t('tabs.day'),
+          month: t('tabs.month'),
+          year: t('tabs.year')
         };
 
         return (
@@ -160,28 +160,20 @@ export default function NumbersScreen() {
     const isLocked = !user?.isPremium && !isUnlocked;
 
     if (isLocked) {
-      const isRu = language === 'ru';
-
       const titles: Record<TabType, string> = {
-        day: isRu ? 'Ваш прогноз на сегодня готов' : 'Your daily forecast is ready',
-        month: isRu ? 'Прогноз на месяц готов' : 'Monthly forecast is ready',
-        year: isRu ? 'Прогноз на год готов' : 'Yearly forecast is ready',
+        day: t('numbers.dayTitle'),
+        month: t('numbers.monthTitle'),
+        year: t('numbers.yearTitle'),
       };
 
       const subtitles: Record<TabType, string> = {
-        day: isRu
-          ? 'Персональный AI-анализ энергий дня. Узнайте, что приготовила судьба.'
-          : 'Personal AI analysis of daily energies. Find out what fate has prepared.',
-        month: isRu
-          ? 'Узнайте, какие возможности и вызовы готовит вам этот месяц.'
-          : 'Discover what opportunities and challenges this month holds for you.',
-        year: isRu
-          ? 'Глобальные энергии вашего личного года. Стратегия на будущее.'
-          : 'Global energies of your personal year. Strategy for the future.',
+        day: t('numbers.daySubtitle'),
+        month: t('numbers.monthSubtitle'),
+        year: t('numbers.yearSubtitle'),
       };
 
-      const unlockText = isRu ? 'Открыть за рекламу' : 'Watch Ad to Unlock';
-      const premiumText = isRu ? 'Или оформите Premium' : 'Or get Premium';
+      const unlockText = t('numbers.watchAdToUnlock');
+      const premiumText = t('numbers.orGetPremium');
 
       return (
         <View style={styles.lockedContainer}>
@@ -311,6 +303,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(20, 20, 20, 0.6)',
+// backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: RADIUS.xl,
     padding: SPACING.xl,
     marginTop: SPACING.md,

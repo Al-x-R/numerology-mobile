@@ -19,20 +19,16 @@ export const AuthRequiredState = () => {
   if (isLoggedIn && hasBirthDate) return null;
 
   const title = !isLoggedIn
-    ? (language === 'ru' ? 'Требуется вход' : 'Login Required')
-    : (language === 'ru' ? 'Дата рождения не указана' : 'Birth Date Missing');
+    ? t('authRequired.loginRequired')
+    : t('authRequired.birthDateMissing');
 
   const description = !isLoggedIn
-    ? (language === 'ru'
-      ? 'Войдите в аккаунт, чтобы получить персональный прогноз.'
-      : 'Log in to get your personal forecast.')
-    : (language === 'ru'
-      ? 'Укажите дату рождения в профиле для точных расчетов.'
-      : 'Set your birth date in profile for accurate calculations.');
+    ? t('authRequired.loginDescription')
+    : t('authRequired.birthDateDescription');
 
   const buttonText = !isLoggedIn
-    ? (language === 'ru' ? 'Войти в аккаунт' : 'Log In')
-    : (language === 'ru' ? 'Указать дату рождения' : 'Set Birth Date');
+    ? t('authRequired.loginButton')
+    : t('authRequired.setBirthDateButton');
 
   const onPress = () => {
     router.push(!isLoggedIn ? '/(auth)/login' : '/profile/edit');
@@ -73,6 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.xl,
     backgroundColor: 'rgba(0,0,0,0.5)',
+// backgroundColor: 'rgba(255, 255, 255, 0.03)',
     borderRadius: RADIUS.xl,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',

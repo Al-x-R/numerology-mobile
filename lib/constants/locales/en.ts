@@ -19,6 +19,9 @@ export const en = {
     compatibility: 'Compatibility',
     numbers: 'Numbers',
     horoscope: 'Horoscope',
+    day: "Day",
+    month: "Month",
+    year: "Year",
   },
 
   horoscopeTitle: "Horoscope",
@@ -230,26 +233,6 @@ export const en = {
   later: 'Later',
   alreadyHaveAccount: 'I already have an account',
 
-  premium: {
-    title: 'Premium',
-    subtitle: 'Unlock all secrets of your destiny',
-    benefits: {
-      compatibility: 'Full Matrix of Destiny compatibility',
-      horoscope: 'Personal daily horoscope',
-      karma: 'Karmic Tail deciphering',
-      ads: 'No ads and limits',
-    },
-    plans: {
-      year: '1 Year',
-      month: '1 Month',
-      priceYear: '$29.99 / year',
-      priceMonth: '$4.99 / mo',
-      save: 'Save 50%',
-    },
-    disclaimer: 'Subscription auto-renews. Cancel anytime.',
-    ctaTry: 'Try for Free',
-  },
-
   section_workingNumbers: 'Additional Numbers',
   section_psychomatrix: 'Psychomatrix (Pythagorean Square)',
   section_additional: 'Additional Parameters',
@@ -352,6 +335,96 @@ export const en = {
 
   ads: {
     notReady: "Ad is still loading, please try again in a moment"
+  },
+
+  authRequired: {
+    loginRequired: "Login Required",
+    birthDateMissing: "Birth Date Missing",
+    loginDescription: "Log in to get your personal forecast.",
+    birthDateDescription: "Set your birth date in profile for accurate calculations.",
+    loginButton: "Log In",
+    setBirthDateButton: "Set Birth Date",
+  },
+
+  horoscope: {
+    dayTitle: "Stellar forecast is ready",
+    monthTitle: "Monthly horoscope is ready",
+    yearTitle: "Yearly horoscope is ready",
+    daySubtitle: "Find out how planetary alignment affects you today.",
+    monthSubtitle: "Key events in career, love, and health.",
+    yearSubtitle: "Global star trends for your zodiac sign.",
+    watchAdToUnlock: "Watch Ad to Unlock",
+    orGetPremium: "Or get Premium",
+  },
+
+  numbers: {
+    title: "Numerology",
+    dayTitle: "Your daily forecast is ready",
+    monthTitle: "Monthly forecast is ready",
+    yearTitle: "Yearly forecast is ready",
+    daySubtitle: "Personal AI analysis of daily energies. Find out what fate has prepared.",
+    monthSubtitle: "Discover what opportunities and challenges this month holds for you.",
+    yearSubtitle: "Global energies of your personal year. Strategy for the future.",
+    watchAdToUnlock: "Watch Ad to Unlock",
+    orGetPremium: "Or get Premium",
+  },
+
+  premium: {
+    headerTitle: "PREMIUM",
+    youArePro: "You are PRO",
+    unlockYourDestiny: "Unlock Your Destiny",
+    heroSubtitle: "Get detailed analysis, forecasts, and recommendations without limits.",
+    featureCompatibility: "Unlimited Compatibility Analysis",
+    featureForecasts: "Daily, Monthly & Yearly Forecasts",
+    featureAnalysis: "Detailed Character Analysis",
+    featureAdFree: "Ad-Free Experience",
+    planWeekly: "Weekly",
+    planMonthly: "Monthly",
+    planYearly: "Yearly",
+    planWeeklyPeriod: "/ week",
+    planMonthlyPeriod: "/ month",
+    planYearlyPeriod: "/ year",
+    planWeeklySubtitle: "Cancel anytime",
+    planMonthlySave: "SAVE 50%",
+    planYearlySubtext: "$2.50 / month",
+    planYearlyBestValue: "BEST VALUE",
+    continue: "Continue",
+    loading: "Loading...",
+    subscriptionDisclaimer: "Subscription renews automatically. Cancel in Store settings.",
+    manageSubscription: "Manage Subscription",
+    terms: "Terms",
+    restore: "Restore",
+    privacy: "Privacy",
+    success: "Success",
+    subscriptionUpdated: "Subscription status updated!",
+    restoreTitle: "Restore",
+    restoreSuccess: "Your subscription has been successfully restored!",
+
+    title: 'Premium',
+    subtitle: 'Unlock all secrets of your destiny',
+    benefits: {
+      compatibility: 'Full Matrix of Destiny compatibility',
+      horoscope: 'Personal daily horoscope',
+      karma: 'Karmic Tail deciphering',
+      ads: 'No ads and limits',
+    },
+    plans: {
+      year: '1 Year',
+      month: '1 Month',
+      priceYear: '$29.99 / year',
+      priceMonth: '$4.99 / mo',
+      save: 'Save 50%',
+    },
+    disclaimer: 'Subscription auto-renews. Cancel anytime.',
+    ctaTry: 'Try for Free',
+  },
+
+  premiumTeaser: {
+    title: "Unlock full analysis?",
+    description: "Discover karmic tasks, hidden talents, and detailed recommendations.",
+    watchAd: "Watch Ad to Unlock",
+    or: "OR",
+    getPremium: "Get Premium",
   },
 };
 

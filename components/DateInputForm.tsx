@@ -134,7 +134,7 @@ export function DateInputForm({
             placeholderTextColor={COLORS.textSecondary}
             value={date}
             onChangeText={handleTextChange}
-            keyboardType="numbers-and-punctuation"
+            keyboardType="number-pad"
             maxLength={10}
             cursorColor={COLORS.accent}
             onFocus={() => setIsFocused(true)}
@@ -233,10 +233,6 @@ const styles = StyleSheet.create({
   inputFocused: {
     borderColor: COLORS.accent,
     borderWidth: 2,
-    backgroundColor: Platform.OS === 'ios' ? COLORS.cardFocused : '',
-    ...(Platform.OS === 'ios' && {
-      ...SHADOWS.inputFocused,
-    }),
   },
   inputError: {
     borderColor: COLORS.error,

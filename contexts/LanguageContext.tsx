@@ -5,7 +5,7 @@ import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProfile } from './ProfileContext';
 
-type Language = 'en' | 'ru' | 'ua';
+type Language = 'en' | 'ru' ;
 
 interface LanguageContextType {
   language: Language;
@@ -47,7 +47,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     (async () => {
       try {
         const saved = await AsyncStorage.getItem(LANGUAGE_KEY);
-        if (saved === 'en' || saved === 'ru' || saved === 'ua') {
+        if (saved === 'en' || saved === 'ru') {
           setLanguageState(saved);
           setLocale(saved);
           return;
@@ -56,7 +56,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const deviceLocale = Localization.getLocales()[0]?.languageCode || 'en';
         let detected: Language = 'en';
         if (deviceLocale.startsWith('uk') || deviceLocale.startsWith('ua')) {
-          detected = 'ua';
+          // detected = 'ua';
         } else if (deviceLocale.startsWith('ru')) {
           detected = 'ru';
         }

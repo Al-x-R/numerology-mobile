@@ -315,7 +315,7 @@ export default function EditProfileScreen() {
         </Modal>
       ) : showPicker && (
         <DateTimePicker
-          value={birthDate || new Date('2000-01-01')} // Для Android тоже стартуем с 2000
+          value={birthDate || new Date('2000-01-01')}
           mode="date"
           display="default"
           onChange={onDateChange}
