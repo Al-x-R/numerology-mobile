@@ -182,6 +182,15 @@ export default function EditProfileScreen() {
 
   const currentAvatar = localImage || user?.photoURL;
 
+  const getIOSLocale = (lang: string) => {
+    switch (lang) {
+      case 'ru': return 'ru-RU';
+      case 'uk': return 'uk-UA';
+      case 'zh-TW': return 'zh-Hant';
+      default: return 'en-US';
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
@@ -308,7 +317,7 @@ export default function EditProfileScreen() {
                 themeVariant="dark"
                 textColor="white"
                 style={{ backgroundColor: '#1A1A1A', height: 200, width: '100%' }}
-                locale={language === 'ru' ? 'ru' : 'en'}
+                locale={getIOSLocale(language)}
               />
             </View>
           </View>

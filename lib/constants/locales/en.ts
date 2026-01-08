@@ -2,6 +2,35 @@
 export const en = {
   title: 'Destiny Code',
 
+  zodiac: {
+    aries: 'Aries',
+    taurus: 'Taurus',
+    gemini: 'Gemini',
+    cancer: 'Cancer',
+    leo: 'Leo',
+    virgo: 'Virgo',
+    libra: 'Libra',
+    scorpio: 'Scorpio',
+    sagittarius: 'Sagittarius',
+    capricorn: 'Capricorn',
+    aquarius: 'Aquarius',
+    pisces: 'Pisces',
+  },
+
+  forecast: {
+    love: 'Love & Relationships',
+    finance: 'Career & Finance',
+    health: 'Health & Energy',
+    warning: 'Warning',
+    affirmation: 'MANTRA',
+    day: 'Daily Vibration',
+    month: 'Monthly Theme',
+    year: 'Yearly Strategy',
+    loading: 'Loading forecast...',
+    empty: 'No forecast data available',
+    titleDefault: 'Forecast',
+  },
+
   onboarding: {
     subtitle: 'Discover your Destiny Matrix\nand unlock your potential',
     guestButton: 'Continue as Guest',

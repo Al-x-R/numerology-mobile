@@ -1,11 +1,12 @@
 // lib/calculators/compatibilityCalculator.ts
 
-import { RU_NUMEROLOGY_CONTENT, EN_NUMEROLOGY_CONTENT, CompatibilityTexts } from '@/lib/constants/numerologyTexts';
+import { getContent } from '@/lib/constants/content';
+import { CompatibilityTexts } from '@/lib/constants/content/types';
 import { getCurrentLocale, t } from '@/lib/constants/locales';
 
 const getNumerologyContent = (): CompatibilityTexts => {
   const locale = getCurrentLocale();
-  return locale === 'ru' ? RU_NUMEROLOGY_CONTENT : EN_NUMEROLOGY_CONTENT;
+  return getContent(locale);
 };
 
 export type NumerologyPair = {
@@ -17,10 +18,8 @@ export type NumerologyPair = {
 export interface CompatibilityResult {
   lifePath1: number;
   lifePath2: number;
-  destinyNumber: number; // Число союза
+  destinyNumber: number;
   totalPct: number;
-
-  // Текстовые данные
   generalAnalysis: string;
   destinyInfo: {
     overview: string;
@@ -30,24 +29,26 @@ export interface CompatibilityResult {
     challenges: string[];
     advice: string;
   };
-
-  // Параметры психоматрицы
   energy: NumerologyPair;
   character: NumerologyPair;
   interest: NumerologyPair;
-
-  // Премиум параметры
   karma?: NumerologyPair;
   family?: NumerologyPair;
   talent?: NumerologyPair;
   spirituality?: NumerologyPair;
-
   fullTotalPct?: number;
   recommendations?: string[];
 }
 
 const reduceToSingleDigit = (num: number): number => {
   if (num === 11 || num === 22 || num === 33) return num;
+  while (num > 9) {
+    num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+  }
+  return num;
+};
+
+const forceSingleDigit = (num: number): number => {
   while (num > 9) {
     num = String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0);
   }
@@ -69,18 +70,16 @@ export const calculateLifePath = (dateString: string): number => {
   return reduceToSingleDigit(dayReduced + monthReduced + yearReduced);
 };
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-
 const calculateWorkingNumbers = (dateString: string, lp: number): number[] => {
   const dateNum = dateString.replace(/\./g, '');
   const numSum = dateNum.split('').reduce((sum, digit) => sum + parseInt(digit), 0);
   const day = parseInt(dateString.split('.')[0]);
 
   const P1 = numSum;
-  const P2 = reduceToSingleDigit(P1);
+  const P2 = forceSingleDigit(P1); // Обычно P2 - это сумма цифр P1 (например 38 -> 11 -> 2)
   const firstDigitOfDay = day >= 10 ? parseInt(String(day)[0]) : day;
-  const P3 = P1 - 2 * firstDigitOfDay;
-  const P4 = reduceToSingleDigit(P3);
+  const P3 = Math.abs(P1 - 2 * firstDigitOfDay); // Добавил Math.abs на всякий случай
+  const P4 = forceSingleDigit(P3);
 
   return [P1, P2, P3, P4];
 }
@@ -118,11 +117,14 @@ const calculatePct = (val1: number, val2: number): number => {
   return Math.min(100, Math.max(10, basePct));
 };
 
-// --- ПОЛУЧЕНИЕ ТЕКСТОВ ---
 
 const getLifePathCompatibilityAnalysis = (lp1: number, lp2: number): string => {
   const content = getNumerologyContent();
-  const [numA, numB] = lp1 < lp2 ? [lp1, lp2] : [lp2, lp1];
+
+  const simpleLp1 = forceSingleDigit(lp1);
+  const simpleLp2 = forceSingleDigit(lp2);
+
+  const [numA, numB] = simpleLp1 < simpleLp2 ? [simpleLp1, simpleLp2] : [simpleLp2, simpleLp1];
   const key = `${numA}-${numB}`;
   const analysis = content.lpAnalysis[key];
 
@@ -132,12 +134,17 @@ const getLifePathCompatibilityAnalysis = (lp1: number, lp2: number): string => {
       `⚠️ ${analysis.challenges}\n\n` +
       `💡 ${analysis.focus}`;
   }
-  return `Совместимость чисел ${numA} и ${numB} — анализ пока недоступен.`;
+
+  return t('common.errorDataNotFound') + ` (${numA}-${numB})`;
 };
 
 const getCompatibilityRecommendations = (lp1: number, lp2: number): string[] => {
   const content = getNumerologyContent();
-  const [numA, numB] = lp1 < lp2 ? [lp1, lp2] : [lp2, lp1];
+
+  const simpleLp1 = forceSingleDigit(lp1);
+  const simpleLp2 = forceSingleDigit(lp2);
+
+  const [numA, numB] = simpleLp1 < simpleLp2 ? [simpleLp1, simpleLp2] : [simpleLp2, simpleLp1];
   const key = `${numA}-${numB}`;
   return content.recommendations[key] || content.recommendations["default"] || [];
 };
@@ -154,7 +161,8 @@ const DESTINY_FALLBACK_KEYS = {
 const getDestinyInfo = (destinyNum: number): CompatibilityResult['destinyInfo'] => {
   const content = getNumerologyContent();
 
-  const info = content.destinyAnalysis[String(destinyNum)];
+  const key = String(forceSingleDigit(destinyNum));
+  const info = content.destinyAnalysis[key];
 
   if (info) return info;
 
@@ -168,9 +176,6 @@ const getDestinyInfo = (destinyNum: number): CompatibilityResult['destinyInfo'] 
   };
 };
 
-/**
- * ГЛАВНЫЙ РАСЧЕТ
- */
 export const calculateCompatibility = (
   date1: string,
   date2: string,
@@ -179,7 +184,6 @@ export const calculateCompatibility = (
   const lifePath1 = calculateLifePath(date1);
   const lifePath2 = calculateLifePath(date2);
 
-  // 1. Считаем Число Союза
   const destinyNumber = reduceToSingleDigit(lifePath1 + lifePath2);
 
   const matrix1 = calculatePsychomatrix(date1);
@@ -197,9 +201,8 @@ export const calculateCompatibility = (
     destinyNumber,
     totalPct: basicAvgPct,
 
-    // 2. Заполняем тексты из базы данных
     generalAnalysis: getLifePathCompatibilityAnalysis(lifePath1, lifePath2),
-    destinyInfo: getDestinyInfo(destinyNumber), // <--- Текст берется отсюда
+    destinyInfo: getDestinyInfo(destinyNumber),
 
     energy: { p1: matrix1[2], p2: matrix2[2], pct: energyPct },
     character: { p1: matrix1[1], p2: matrix2[1], pct: characterPct },

@@ -15,7 +15,7 @@ type PlanId = 'weekly' | 'monthly' | 'yearly';
 
 export default function PremiumScreen() {
   const insets = useSafeAreaInsets();
-  const { language, t } = useAppTranslation();
+  const { t } = useAppTranslation();
   const { user, setPremiumStatus } = useProfile();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('weekly');
   const [isLoading, setIsLoading] = useState(false);
@@ -115,9 +115,6 @@ export default function PremiumScreen() {
             <View style={styles.iconContainer}>
               <Ionicons name="diamond" size={48} color={COLORS.accent} />
             </View>
-            <Text style={styles.heroTitle}>
-              {isPremium ? t('premium.youArePro') : t('premium.unlockYourDestiny')}
-            </Text>
             <Text style={styles.heroSubtitle}>
               {t('premium.heroSubtitle')}
             </Text>

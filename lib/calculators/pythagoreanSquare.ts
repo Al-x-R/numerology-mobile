@@ -7,9 +7,7 @@ function sumDigits(n: number | string): number {
     .reduce((acc, digit) => acc + parseInt(digit, 10), 0);
 }
 
-// Вспомогательная функция для подсчета количества цифр в ячейке
 function countMatrixDigits(matrix: MatrixData, digitKey: keyof MatrixData): number {
-  // В отличие от string.length, этот метод корректно вернет 0, если ячейка пуста ('')
   return matrix[digitKey].length;
 }
 
@@ -24,11 +22,9 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
 
   const fullDateStr = dStr + mStr + yStr;
 
-  // --- Расчет Дополнительных Чисел (Рабочие числа) ---
   const sum1 = sumDigits(fullDateStr);
   const sum2 = sumDigits(sum1);
 
-  // Берем ПЕРВУЮ НЕ-НУЛЕВУЮ цифру дня рождения для классического Д3
   const nonZeroFirstDayDigit = parseInt(dStr.replace(/^0+/,'')[0], 10);
   const sum3 = sum1 - 2 * nonZeroFirstDayDigit;
 
@@ -36,7 +32,6 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
 
   const workingNumbers = [sum1, sum2, sum3, sum4];
 
-  // --- Формирование и Заполнение Матрицы ---
   const fullNumberSeries = fullDateStr + workingNumbers.map(String).join('');
 
   const matrix: MatrixData = {
@@ -49,9 +44,7 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
     }
   }
 
-  // --- Расчет Дополнительных Параметров ---
 
-  // Количество цифр в каждой ячейке:
   const C1 = countMatrixDigits(matrix, '1');
   const C2 = countMatrixDigits(matrix, '2');
   const C3 = countMatrixDigits(matrix, '3');
@@ -93,7 +86,6 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
     destinyNumber: sum2,
   };
 
-  console.log('additionalParams', additionalParams);
   return {
     matrix,
     workingNumbers,

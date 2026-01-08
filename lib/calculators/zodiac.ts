@@ -1,5 +1,7 @@
 // lib/calculators/zodiac.ts
 
+import { Locale, translations } from '@/lib/constants/locales';
+
 export type ZodiacSign = 'aries' | 'taurus' | 'gemini' | 'cancer' | 'leo' | 'virgo' | 'libra' | 'scorpio' | 'sagittarius' | 'capricorn' | 'aquarius' | 'pisces';
 
 export const getZodiacSign = (date: Date): ZodiacSign => {
@@ -20,20 +22,11 @@ export const getZodiacSign = (date: Date): ZodiacSign => {
   return 'pisces';
 };
 
-export const getZodiacName = (sign: ZodiacSign, language: 'ru' | 'en'): string => {
-  const names = {
-    aries: { ru: 'Овен', en: 'Aries' },
-    taurus: { ru: 'Телец', en: 'Taurus' },
-    gemini: { ru: 'Близнецы', en: 'Gemini' },
-    cancer: { ru: 'Рак', en: 'Cancer' },
-    leo: { ru: 'Лев', en: 'Leo' },
-    virgo: { ru: 'Дева', en: 'Virgo' },
-    libra: { ru: 'Весы', en: 'Libra' },
-    scorpio: { ru: 'Скорпион', en: 'Scorpio' },
-    sagittarius: { ru: 'Стрелец', en: 'Sagittarius' },
-    capricorn: { ru: 'Козерог', en: 'Capricorn' },
-    aquarius: { ru: 'Водолей', en: 'Aquarius' },
-    pisces: { ru: 'Рыбы', en: 'Pisces' },
-  };
-  return names[sign][language];
+export const getZodiacName = (sign: ZodiacSign, language: Locale): string => {
+  const localeData = translations[language];
+
+  // @ts-ignore
+  const name = localeData?.zodiac?.[sign];
+
+  return name || sign;
 };

@@ -1,3 +1,5 @@
+// app/profile/language/index.tsx
+
 import React from 'react';
 import {
   View,
@@ -17,9 +19,11 @@ export default function LanguageScreen() {
   const languages = [
     { code: 'en' as const, name: 'English', native: 'English', flag: '🇺🇸' },
     { code: 'ru' as const, name: 'Russian', native: 'Русский', flag: '🇷🇺' },
+    { code: 'uk' as const, name: 'Ukrainian', native: 'Українська', flag: '🇺🇦' },
+    { code: 'zh-TW' as const, name: 'Traditional Chinese', native: '繁體中文', flag: '🇹🇼' },
   ];
 
-  const handleSelect = async (lang: 'ru' | 'en') => {
+  const handleSelect = async (lang: 'ru' | 'en' | 'uk' | 'zh-TW') => {
     if (lang === language) return;
     await setLanguage(lang);
   };

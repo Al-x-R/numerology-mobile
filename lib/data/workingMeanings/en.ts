@@ -1,9 +1,4 @@
-// lib/data/workingNumberMeanings.en.ts
-/**
- * Full English interpretations for every possible working number (1–99).
- * Ready for UI display. Master numbers (11, 22, 33, etc.) are highlighted.
- */
-export const workingMeanings: Record<number, string> = {
+export const en: Record<number, string> = {
   1: 'One – leadership, independence, originality. You were born to initiate.',
   2: 'Two – diplomacy, partnership, sensitivity. Harmony in relationships.',
   3: 'Three – creativity, communication, joy. Life is a stage, and you’re the star.',

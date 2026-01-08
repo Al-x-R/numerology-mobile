@@ -1,8 +1,10 @@
 // constants/locales.ts
 import { ru } from './locales/ru';
 import { en } from './locales/en';
+import { uk } from './locales/uk';
+import { zhTW } from './locales/zh-TW';
 
-export type Locale = 'ru' | 'en' | 'ua';
+export type Locale = 'ru' | 'en' | 'uk' | 'zh-TW';
 
 type TranslationValue = string | ((...args: any[]) => string);
 type TranslationNode = TranslationValue | Translations | any[] | Record<string, any>;
@@ -15,17 +17,11 @@ interface LocaleData {
   [lang: string]: Translations;
 }
 
-// Placeholder for Ukrainian translations - can be added later
-const ua: Translations = {
-  // Ukrainian translations will be added here
-  // For now, fallback to Russian
-  ...ru,
-};
-
 export const translations: LocaleData = {
   ru,
   en,
-  ua,
+  uk,
+  'zh-TW': zhTW,
 };
 
 let currentLocale: Locale = 'en';

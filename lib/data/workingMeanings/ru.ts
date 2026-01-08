@@ -1,9 +1,4 @@
-// lib/data/workingNumberMeanings.ts
-/**
- * Full textual interpretations for every possible working number (1-99).
- * The text is written in a concise, numerological style – ready for UI.
- */
-export const workingMeanings: Record<number, string> = {
+export const ru: Record<number, string> = {
   1: 'Единица – лидерство, независимость, оригинальность. Вы рождены начинать.',
   2: 'Двойка – дипломатия, партнёрство, чувствительность. Гармония в отношениях.',
   3: 'Тройка – творчество, общение, радость. Жизнь как сцена, вы – актёр.',

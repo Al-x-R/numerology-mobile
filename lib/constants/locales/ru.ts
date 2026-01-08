@@ -2,6 +2,35 @@
 export const ru = {
   title: 'Код Даты',
 
+  zodiac: {
+    aries: 'Овен',
+    taurus: 'Телец',
+    gemini: 'Близнецы',
+    cancer: 'Рак',
+    leo: 'Лев',
+    virgo: 'Дева',
+    libra: 'Весы',
+    scorpio: 'Скорпион',
+    sagittarius: 'Стрелец',
+    capricorn: 'Козерог',
+    aquarius: 'Водолей',
+    pisces: 'Рыбы',
+  },
+
+  forecast: {
+    love: 'Любовь и Отношения',
+    finance: 'Работа и Финансы',
+    health: 'Здоровье и Энергия',
+    warning: 'Предостережение',
+    affirmation: 'МАНТРА',
+    day: 'Энергия Дня',
+    month: 'Тема Месяца',
+    year: 'Стратегия Года',
+    loading: 'Загрузка прогноза...',
+    empty: 'Данные еще не сформированы',
+    titleDefault: 'Прогноз',
+  },
+
   onboarding: {
     subtitle: 'Узнайте свою матрицу судьбы\nи раскройте потенциал',
     guestButton: 'Продолжить как гость',

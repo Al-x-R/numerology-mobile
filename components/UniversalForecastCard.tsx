@@ -3,7 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useAppTranslation } from '@/contexts/LanguageContext';
+import { Locale } from '@/lib/constants/locales';
 
 export interface ForecastSection {
   title: string;
@@ -24,33 +25,6 @@ interface Props {
   signName?: string;
 }
 
-const SECTION_TITLES = {
-  ru: {
-    love: 'Любовь и Отношения',
-    finance: 'Работа и Финансы',
-    health: 'Здоровье и Энергия',
-    warning: 'Предостережение',
-    affirmation: 'МАНТРА',
-    day: 'Энергия Дня',
-    month: 'Тема Месяца',
-    year: 'Стратегия Года',
-    loading: 'Загрузка прогноза...',
-    empty: 'Данные еще не сформированы'
-  },
-  en: {
-    love: 'Love & Relationships',
-    finance: 'Career & Finance',
-    health: 'Health & Energy',
-    warning: 'Warning',
-    affirmation: 'MANTRA',
-    day: 'Daily Vibration',
-    month: 'Monthly Theme',
-    year: 'Yearly Strategy',
-    loading: 'Loading forecast...',
-    empty: 'No forecast data available'
-  }
-};
-
 const ZODIAC_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
   aries: 'zodiac-aries',
   taurus: 'zodiac-taurus',
@@ -66,6 +40,15 @@ const ZODIAC_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap>
   pisces: 'zodiac-pisces',
 };
 
+const getIntlLocale = (locale: Locale): string => {
+  switch (locale) {
+    case 'ru': return 'ru-RU';
+    case 'uk': return 'uk-UA';
+    case 'zh-TW': return 'zh-TW';
+    default: return 'en-US';
+  }
+};
+
 export const UniversalForecastCard: React.FC<Props> = ({
   data,
   loading,
@@ -74,15 +57,13 @@ export const UniversalForecastCard: React.FC<Props> = ({
   zodiacSign,
   signName
 }) => {
-  const { language } = useLanguage();
-
-  const labels = SECTION_TITLES[language] || SECTION_TITLES.en;
+  const { t, language } = useAppTranslation();
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="small" color="#C4A484" />
-        <Text style={styles.loadingText}>{labels.loading}</Text>
+        <Text style={styles.loadingText}>{t('forecast.loading')}</Text>
       </View>
     );
   }
@@ -90,20 +71,24 @@ export const UniversalForecastCard: React.FC<Props> = ({
   if (!data) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>{labels.empty}</Text>
+        <Text style={styles.emptyText}>{t('forecast.empty')}</Text>
       </View>
     );
   }
 
   const getHeaderTitle = () => {
     const d = new Date();
-    const locale = language === 'ru' ? 'ru-RU' : 'en-US';
+    const localeCode = getIntlLocale(language as Locale);
 
-    switch (type) {
-      case 'day': return d.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
-      case 'month': return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
-      case 'year': return d.getFullYear().toString();
-      default: return '';
+    try {
+      switch (type) {
+        case 'day': return d.toLocaleDateString(localeCode, { day: 'numeric', month: 'long' });
+        case 'month': return d.toLocaleDateString(localeCode, { month: 'long', year: 'numeric' });
+        case 'year': return d.getFullYear().toString();
+        default: return '';
+      }
+    } catch (e) {
+      return d.toDateString();
     }
   };
 
@@ -113,10 +98,10 @@ export const UniversalForecastCard: React.FC<Props> = ({
     }
 
     switch (type) {
-      case 'day': return labels.day;
-      case 'month': return labels.month;
-      case 'year': return labels.year;
-      default: return 'Forecast';
+      case 'day': return t('forecast.day');
+      case 'month': return t('forecast.month');
+      case 'year': return t('forecast.year');
+      default: return t('forecast.titleDefault');
     }
   };
 
@@ -171,23 +156,23 @@ export const UniversalForecastCard: React.FC<Props> = ({
       <InfoSection
         icon="heart"
         color="#F87171"
-        title={labels.love}
+        title={t('forecast.love')}
         text={data.love}
       />
 
       {/* Финансы */}
       <InfoSection
-        icon="briefcase" // или "cash"
+        icon="briefcase"
         color="#34D399"
-        title={labels.finance}
+        title={t('forecast.finance')}
         text={data.finance}
       />
 
       {/* Здоровье */}
       <InfoSection
-        icon="flash" // или "fitness"
+        icon="flash"
         color="#60A5FA"
-        title={labels.health}
+        title={t('forecast.health')}
         text={data.health}
       />
 
@@ -195,26 +180,26 @@ export const UniversalForecastCard: React.FC<Props> = ({
       <View style={styles.warningContainer}>
         <View style={styles.sectionHeader}>
           <Ionicons name="warning" size={16} color="#FBBF24" />
-          <Text style={[styles.sectionTitle, { color: '#FBBF24' }]}>{labels.warning}</Text>
+          <Text style={[styles.sectionTitle, { color: '#FBBF24' }]}>{t('forecast.warning')}</Text>
         </View>
         <Text style={styles.warningText}>{data.warning}</Text>
       </View>
 
-      {/* --- МАНТРА --- */}
-      {/*<LinearGradient*/}
-      {/*  colors={['#4C1D95', '#6D28D9']}*/}
-      {/*  start={{ x: 0, y: 0 }}*/}
-      {/*  end={{ x: 1, y: 0 }}*/}
-      {/*  style={styles.affirmationContainer}*/}
-      {/*>*/}
-      {/*  <Text style={styles.affirmationLabel}>{labels.affirmation}</Text>*/}
-      {/*  <Text style={styles.affirmationText}>{data.affirmation}</Text>*/}
-      {/*</LinearGradient>*/}
+      {/*
+      <LinearGradient
+        colors={['#4C1D95', '#6D28D9']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.affirmationContainer}
+      >
+        <Text style={styles.affirmationLabel}>{t('forecast.affirmation')}</Text>
+        <Text style={styles.affirmationText}>{data.affirmation}</Text>
+      </LinearGradient>
+      */}
     </LinearGradient>
   );
 };
 
-// --- Компонент одной секции ---
 const InfoSection = ({ icon, color, title, text }: { icon: any, color: string, title: string, text: string }) => (
   <View style={styles.sectionContainer}>
     <View style={styles.sectionHeader}>
@@ -253,11 +238,11 @@ const styles = StyleSheet.create({
   summary: { color: '#E5E7EB', fontSize: 15, lineHeight: 22, marginBottom: 20 },
   divider: { height: 1, backgroundColor: '#374151', marginBottom: 20 },
 
-  // Sections (New Style)
+  // Sections
   sectionContainer: { marginBottom: 16 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   sectionTitle: { fontSize: 14, fontWeight: '700', marginLeft: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
-  sectionBody: { color: '#D1D5DB', fontSize: 14, lineHeight: 21, paddingLeft: 2 }, // Небольшой отступ текста
+  sectionBody: { color: '#D1D5DB', fontSize: 14, lineHeight: 21, paddingLeft: 2 },
 
   // Warning
   warningContainer: {

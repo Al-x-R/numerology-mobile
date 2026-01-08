@@ -5,7 +5,7 @@ import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useProfile } from './ProfileContext';
 
-type Language = 'en' | 'ru' ;
+type Language = 'en' | 'ru' | 'uk' | 'zh-TW';
 
 interface LanguageContextType {
   language: Language;
@@ -22,7 +22,9 @@ export const useAppTranslation = () => {
   const t = useCallback((key: string) => {
     const keys = key.split('.');
 
-    let value: any = translations[language];
+    // Ensure we use the correct key for zh-TW
+    const localeKey = language === 'zh-TW' ? 'zh-TW' : language;
+    let value: any = translations[localeKey];
 
     for (const k of keys) {
       if (value && typeof value === 'object') {
@@ -47,18 +49,20 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     (async () => {
       try {
         const saved = await AsyncStorage.getItem(LANGUAGE_KEY);
-        if (saved === 'en' || saved === 'ru') {
-          setLanguageState(saved);
-          setLocale(saved);
+        if (saved === 'en' || saved === 'ru' || saved === 'uk' || saved === 'zh-TW') {
+          setLanguageState(saved as Language);
+          setLocale(saved as Language);
           return;
         }
 
         const deviceLocale = Localization.getLocales()[0]?.languageCode || 'en';
         let detected: Language = 'en';
         if (deviceLocale.startsWith('uk') || deviceLocale.startsWith('ua')) {
-          // detected = 'ua';
+          detected = 'uk';
         } else if (deviceLocale.startsWith('ru')) {
           detected = 'ru';
+        } else if (deviceLocale.startsWith('zh')) {
+          detected = 'zh-TW';
         }
 
         setLanguageState(detected);
@@ -73,7 +77,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     // @ts-ignore
     const userLang = user?.language as Language | undefined;
 
-    if (userLang && (userLang === 'en' || userLang === 'ru' || userLang === 'ua') && userLang !== language) {
+    if (userLang && (userLang === 'en' || userLang === 'ru' || userLang === 'uk' || userLang === 'zh-TW') && userLang !== language) {
       console.log('Syncing language from user profile:', userLang);
       setLanguageState(userLang);
       setLocale(userLang);

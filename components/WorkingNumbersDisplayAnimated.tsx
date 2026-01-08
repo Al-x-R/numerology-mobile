@@ -9,13 +9,12 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import { workingMeanings } from '@/lib/data/workingNumberMeanings';
-import { workingMeanings as workingMeaningsEn } from '@/lib/data/workingNumberMeanings.en';
 import { getContextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types/calculation';
 import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
 import { getCurrentLocale } from '@/lib/constants/locales';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { getWorkingMeanings } from '@/lib/data/workingMeanings';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -33,7 +32,7 @@ function getFullWorkingInterpretation(
 
   const locale = getCurrentLocale();
 
-  const meanings = locale === 'en' ? workingMeaningsEn : workingMeanings;
+  const meanings = getWorkingMeanings(locale);
   const meaning = meanings[value];
 
   if (!context || !meaning) {
