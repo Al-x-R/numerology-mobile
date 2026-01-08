@@ -32,18 +32,18 @@ const getYearString = (shiftYears: number = 0): string => {
 };
 
 // --- ВАЛИДАТОРЫ ДАННЫХ ---
-// Эти функции спасут базу от неполных данных (например, если нет EN языка)
+// Теперь проверяем наличие 4 языков: RU, EN, UK, ZH-TW
 
 function isValidNumerologyData(data: any): boolean {
   if (!data || typeof data !== 'object') return false;
   const requiredKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const requiredLangs = ['ru', 'en', 'uk', 'zh-TW'];
 
   for (const key of requiredKeys) {
     if (!data[key]) return false;
-    // Обязательно проверяем наличие обоих языков
-    if (!data[key].ru || !data[key].en) return false;
-    // Можно добавить проверку полей, например title
-    if (!data[key].ru.title || !data[key].en.title) return false;
+    for (const lang of requiredLangs) {
+      if (!data[key][lang] || !data[key][lang].title) return false;
+    }
   }
   return true;
 }
@@ -51,11 +51,13 @@ function isValidNumerologyData(data: any): boolean {
 function isValidZodiacData(data: any): boolean {
   if (!data || typeof data !== 'object') return false;
   const zodiacKeys = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
+  const requiredLangs = ['ru', 'en', 'uk', 'zh-TW'];
 
   for (const key of zodiacKeys) {
     if (!data[key]) return false;
-    // Обязательно проверяем наличие обоих языков
-    if (!data[key].ru || !data[key].en) return false;
+    for (const lang of requiredLangs) {
+      if (!data[key][lang] || !data[key][lang].title) return false;
+    }
   }
   return true;
 }
@@ -86,31 +88,41 @@ async function generateGenericForecast(
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash", // Используем правильную модель
+        model: "gemini-2.5-flash",
         generationConfig: { responseMimeType: "application/json" },
       });
 
       const basePrompt = `
-        ACT AS: Modern, practical Numerologist and Life Coach.
-        TONE: Concise, grounded, professional.
+        ACT AS: Modern, empathetic Life Coach & Numerologist.
+        TONE: Inspiring, clear, practical. Avoid mystical jargon. Speak simply.
         
         TASK: Generate Forecasts for ALL Personal Numbers (1 through 9).
         CONTEXT: ${promptContext}
         
         REQUIREMENTS:
         1. JSON Format ONLY. keys "1" to "9".
-        2. EACH number MUST have "ru" AND "en" objects inside.
+        2. EACH number MUST have 4 languages: "ru", "en", "uk", "zh-TW".
+        3. "zh-TW" MUST be Traditional Chinese (Taiwan style).
         
-        CONTENT STRUCTURE (for each number, in "ru" and "en"):
-        - "title": 3-5 words.
-        - "summary": 2-3 sentences.
-        - "love": Relationship focus.
-        - "finance": Career/money focus.
-        - "health": Energy/well-being focus.
-        - "warning": What to watch out for.
-        - "affirmation": Short empowering mantra.
+        CONTENT STRUCTURE (for each number, in all 4 languages):
+        - "title": Short, catchy theme (3-5 words).
+        - "summary": 2-3 sentences. Focus on actionable advice, not theory.
+        - "love": Practical relationship advice.
+        - "finance": Career/money tip.
+        - "health": Energy/well-being tip.
+        - "warning": A gentle caution (1 sentence).
+        - "affirmation": Short, positive mantra.
 
-        Output: { "1": { "ru": {...}, "en": {...} }, ..., "9": {...} }
+        Output structure example: 
+        { 
+          "1": { 
+             "ru": { "title": "...", "summary": "...", ... }, 
+             "en": {...}, 
+             "uk": {...}, 
+             "zh-TW": {...} 
+          }, 
+          ... 
+        }
       `;
 
       const result = await model.generateContent(basePrompt);
@@ -125,7 +137,7 @@ async function generateGenericForecast(
 
       // --- ВАЛИДАЦИЯ ---
       if (!isValidNumerologyData(data)) {
-        throw new Error("Validation Failed: Missing keys or translation (ru/en)");
+        throw new Error("Validation Failed: Missing keys or languages (ru/en/uk/zh-TW)");
       }
 
       await docRef.set(data);
@@ -137,8 +149,7 @@ async function generateGenericForecast(
       if (attempt === MAX_RETRIES) {
         logger.error(`🔥 FATAL: Could not generate ${collectionName}/${docId} after ${MAX_RETRIES} attempts.`);
       } else {
-        // Ждем 1 секунду перед повтором
-        await new Promise(res => setTimeout(res, 1000));
+        await new Promise(res => setTimeout(res, 2000)); // Ждем 2 сек
       }
     }
   }
@@ -170,32 +181,47 @@ async function generateZodiacForecast(
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash", // Используем правильную модель
+        model: "gemini-2.5-flash",
         generationConfig: { responseMimeType: "application/json" },
       });
 
       const basePrompt = `
-        ACT AS: Professional Astrologer.
+        ACT AS: Friendly, practical Astrologer.
         TASK: Generate Forecasts for ALL 12 Zodiac Signs.
         KEYS: aries, taurus, gemini, cancer, leo, virgo, libra, scorpio, sagittarius, capricorn, aquarius, pisces.
         CONTEXT: ${promptContext}
         
-        CRITICAL INSTRUCTIONS:
-        1. REALISM: Use actual planetary transits.
-        2. TRANSLATION: "ru" MUST be Russian, "en" MUST be English.
-        3. COMPLETENESS: Do NOT skip any sign or language.
+        STYLE GUIDELINES (CRITICAL):
+        1. SIMPLE LANGUAGE: Do NOT use complex terms like "retrograde Mars in 2nd house" or "trine aspect". 
+        2. FOCUS ON LIFE: Translate astrology into real advice. Instead of "Mars is aggressive", say "You might feel a burst of energy today".
+        3. WARM TONE: Be supportive and helpful, like a wise friend.
         
-        CONTENT STRUCTURE (for each sign, in "ru" and "en"):
-        - "title": Short cosmic theme.
-        - "summary": Main astrological influence.
-        - "love": Relationships advice.
-        - "finance": Career/Money advice.
-        - "health": Vitality advice.
-        - "warning": Retrogrades/aspects to watch.
-        - "affirmation": Mantra.
+        LANGUAGES REQUIRED:
+        - "ru": Russian
+        - "en": English
+        - "uk": Ukrainian
+        - "zh-TW": Traditional Chinese
+        
+        CONTENT STRUCTURE (for each sign, in all 4 languages):
+        - "title": Short theme of the period.
+        - "summary": Main advice. What to do? What to expect? (2-3 sentences).
+        - "love": Simple advice for singles and couples.
+        - "finance": Practical money/work tip.
+        - "health": Vitality/rest tip.
+        - "warning": One specific thing to avoid.
+        - "affirmation": Positive thought for the day.
 
         OUTPUT FORMAT: JSON ONLY.
-        Structure: { "aries": { "ru": {...}, "en": {...} }, "taurus": {...}, ... }
+        Structure: 
+        { 
+          "aries": { 
+            "ru": {...}, 
+            "en": {...}, 
+            "uk": {...}, 
+            "zh-TW": {...} 
+          }, 
+          ... 
+        }
       `;
 
       const result = await model.generateContent(basePrompt);
@@ -209,7 +235,7 @@ async function generateZodiacForecast(
 
       // --- ВАЛИДАЦИЯ ---
       if (!isValidZodiacData(data)) {
-        throw new Error("Validation Failed: Missing signs or translations (ru/en)");
+        throw new Error("Validation Failed: Missing signs or languages (ru/en/uk/zh-TW)");
       }
 
       await docRef.set(data);
@@ -221,15 +247,13 @@ async function generateZodiacForecast(
       if (attempt === MAX_RETRIES) {
         logger.error(`🔥 FATAL: Could not generate ${collectionName}/${docId} after ${MAX_RETRIES} attempts.`);
       } else {
-        // Ждем 2 секунды перед повтором, чтобы API "остыло"
-        await new Promise(res => setTimeout(res, 2000));
+        await new Promise(res => setTimeout(res, 3000)); // Ждем 3 сек (контента больше)
       }
     }
   }
 }
 
 // --- 3. SCHEDULED FUNCTIONS (НУМЕРОЛОГИЯ) ---
-// Увеличили timeoutSeconds до 300 (5 минут), так как возможны повторы
 
 export const generateDaily = onSchedule(
   {
@@ -243,7 +267,7 @@ export const generateDaily = onSchedule(
     await generateGenericForecast(
       "daily_forecasts",
       targetDate,
-      `Period: DAILY forecast for Date: ${targetDate}. Focus on immediate energy.`,
+      `Period: DAILY forecast for Date: ${targetDate}. Focus: Immediate energy and daily tasks.`,
       geminiApiKey.value()
     );
   }
@@ -261,7 +285,7 @@ export const generateMonthly = onSchedule(
     await generateGenericForecast(
       "monthly_forecasts",
       targetMonth,
-      `Period: MONTHLY forecast for Month: ${targetMonth}. Focus on trends.`,
+      `Period: MONTHLY forecast for Month: ${targetMonth}. Focus: General trends and month-long goals.`,
       geminiApiKey.value()
     );
   }
@@ -272,14 +296,14 @@ export const generateYearly = onSchedule(
     schedule: "1 of dec 00:00",
     timeZone: "Etc/UTC",
     secrets: [geminiApiKey],
-    timeoutSeconds: 540, // 9 минут для годового (он сложнее)
+    timeoutSeconds: 540,
   },
   async () => {
     const targetYear = getYearString(1);
     await generateGenericForecast(
       "yearly_forecasts",
       targetYear,
-      `Period: YEARLY forecast for Year: ${targetYear}. Focus on global strategy.`,
+      `Period: YEARLY forecast for Year: ${targetYear}. Focus: Big picture, strategy, major life changes.`,
       geminiApiKey.value()
     );
   }
@@ -299,7 +323,7 @@ export const generateDailyZodiac = onSchedule(
     await generateZodiacForecast(
       "daily_zodiac",
       targetDate,
-      `Period: DAILY Horoscope for ${targetDate}. Focus on planetary transits of the day.`,
+      `Period: DAILY Horoscope for ${targetDate}. Focus: Mood, interactions, small events.`,
       geminiApiKey.value()
     );
   }
@@ -317,7 +341,7 @@ export const generateMonthlyZodiac = onSchedule(
     await generateZodiacForecast(
       "monthly_zodiac",
       targetMonth,
-      `Period: MONTHLY Horoscope for ${targetMonth}. Focus on major planetary shifts.`,
+      `Period: MONTHLY Horoscope for ${targetMonth}. Focus: Themes of the month, career shifts, relationship dynamics.`,
       geminiApiKey.value()
     );
   }
@@ -335,7 +359,7 @@ export const generateYearlyZodiac = onSchedule(
     await generateZodiacForecast(
       "yearly_zodiac",
       targetYear,
-      `Period: YEARLY Horoscope for ${targetYear}. Focus on Jupiter, Saturn, Pluto movements.`,
+      `Period: YEARLY Horoscope for ${targetYear}. Focus: Major growth, challenges, and long-term success.`,
       geminiApiKey.value()
     );
   }
@@ -346,21 +370,22 @@ export const generateYearlyZodiac = onSchedule(
 export const seedDatabase = onRequest(
   {
     secrets: [geminiApiKey],
-    timeoutSeconds: 600, // 10 минут, так как задач много и могут быть повторы
+    timeoutSeconds: 600,
   },
   async (req, res) => {
     const apiKey = geminiApiKey.value();
 
-    // 1. Нумерология (День, Месяц, Год - текущие)
-    // await generateGenericForecast("daily_forecasts", getDateString(0), `Period: DAILY (Seed) ${getDateString(0)}`, apiKey);
-    // await generateGenericForecast("monthly_forecasts", getMonthString(0), `Period: MONTHLY (Seed) ${getMonthString(0)}`, apiKey);
+
+    // 1. Нумерология
+    await generateGenericForecast("daily_forecasts", getDateString(0), `Period: DAILY (Seed) ${getDateString(0)}`, apiKey);
+    await generateGenericForecast("monthly_forecasts", getMonthString(0), `Period: MONTHLY (Seed) ${getMonthString(0)}`, apiKey);
     await generateGenericForecast("yearly_forecasts", getYearString(0), `Period: YEARLY (Seed) ${getYearString(0)}`, apiKey);
 
-    // 2. Зодиак (День, Месяц, Год - текущие)
-    // await generateZodiacForecast("daily_zodiac", getDateString(0), `Period: DAILY ZODIAC (Seed) ${getDateString(0)}`, apiKey);
-    // await generateZodiacForecast("monthly_zodiac", getMonthString(0), `Period: MONTHLY ZODIAC (Seed) ${getMonthString(0)}`, apiKey);
-    // await generateZodiacForecast("yearly_zodiac", getYearString(0), `Period: YEARLY ZODIAC (Seed) ${getYearString(0)}`, apiKey);
+    // 2. Зодиак
+    await generateZodiacForecast("daily_zodiac", getDateString(0), `Period: DAILY ZODIAC (Seed) ${getDateString(0)}`, apiKey);
+    await generateZodiacForecast("monthly_zodiac", getMonthString(0), `Period: MONTHLY ZODIAC (Seed) ${getMonthString(0)}`, apiKey);
+    await generateZodiacForecast("yearly_zodiac", getYearString(0), `Period: YEARLY ZODIAC (Seed) ${getYearString(0)}`, apiKey);
 
-    res.send(`✅ Database SEEDED completely (Numerology + Zodiac) for NOW.`);
+    res.send(`✅ Database SEEDED completely (Numerology + Zodiac) with 4 languages & Simple Style.`);
   }
 );

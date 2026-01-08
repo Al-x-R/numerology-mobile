@@ -1,5 +1,5 @@
 // hooks/useForecasts.ts
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -7,7 +7,7 @@ import { ForecastSection } from '@/components/UniversalForecastCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ForecastDataMap {
-  [key: string]: { ru: ForecastSection; en: ForecastSection };
+  [key: string]: { [lang: string]: ForecastSection };
 }
 
 export const useForecasts = (
@@ -15,90 +15,107 @@ export const useForecasts = (
   personalNumber: number
 ) => {
   const [data, setData] = useState<ForecastSection | null>(null);
+
+  const [fullDoc, setFullDoc] = useState<ForecastDataMap | null>(null);
+
   const [loading, setLoading] = useState(true);
   const { language } = useLanguage();
-  const [refreshKey, setRefreshKey] = useState(0);
 
-  const fetchForecast = useCallback(async (forceUpdate = false) => {
+  const loadedDocIdRef = useRef<string | null>(null);
+
+  const fetchMasterData = useCallback(async (forceUpdate = false) => {
     if (!personalNumber) {
-      setData(null);
+      setLoading(false);
+      return;
+    }
+
+    const today = new Date();
+    let collectionName = '';
+    let docId = '';
+
+    if (type === 'day') {
+      collectionName = 'daily_forecasts';
+      docId = today.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    } else if (type === 'month') {
+      collectionName = 'monthly_forecasts';
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      docId = `${today.getFullYear()}-${month}`;
+    } else if (type === 'year') {
+      collectionName = 'yearly_forecasts';
+      docId = `${today.getFullYear()}`;
+    }
+
+    if (!forceUpdate && loadedDocIdRef.current === docId) {
       setLoading(false);
       return;
     }
 
     setLoading(true);
+    const cacheKey = `@forecast_full_${collectionName}_${docId}`;
 
     try {
-      let collectionName = '';
-      let docId = '';
-      const today = new Date();
-
-      if (type === 'day') {
-        collectionName = 'daily_forecasts';
-        docId = today.toLocaleDateString('en-CA'); // YYYY-MM-DD
-      } else if (type === 'month') {
-        collectionName = 'monthly_forecasts';
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        docId = `${today.getFullYear()}-${month}`;
-      } else if (type === 'year') {
-        collectionName = 'yearly_forecasts';
-        docId = `${today.getFullYear()}`;
-      }
-
-      const cacheKey = `@forecast_${type}_${docId}_${personalNumber}_${language}`;
+      let fetchedData: ForecastDataMap | null = null;
 
       if (!forceUpdate) {
-        const cachedData = await AsyncStorage.getItem(cacheKey);
-        if (cachedData) {
-          console.log(`📦 Loaded from cache: ${cacheKey}`);
-          setData(JSON.parse(cachedData));
-          setLoading(false);
-          return;
+        const cachedJson = await AsyncStorage.getItem(cacheKey);
+        if (cachedJson) {
+          console.log(`📦 Cache hit (forecast): ${cacheKey}`);
+          fetchedData = JSON.parse(cachedJson);
         }
       }
 
-      console.log(`📡 Fetching ${collectionName}/${docId} for number ${personalNumber}...`);
+      if (!fetchedData) {
+        console.log(`📡 Firebase fetch: ${collectionName}/${docId}`);
+        const docRef = doc(db, collectionName, docId);
+        const docSnap = await getDoc(docRef);
 
-      const docRef = doc(db, collectionName, docId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const fullData = docSnap.data() as ForecastDataMap;
-        const numberData = fullData[String(personalNumber)];
-
-        if (numberData) {
-          const localized = numberData[language];
-          const finalData = localized || numberData['ru'] || Object.values(numberData)[0];
-
-          if (finalData) {
-            setData(finalData);
-            await AsyncStorage.setItem(cacheKey, JSON.stringify(finalData));
-          } else {
-            setData(null);
-          }
+        if (docSnap.exists()) {
+          fetchedData = docSnap.data() as ForecastDataMap;
+          await AsyncStorage.setItem(cacheKey, JSON.stringify(fetchedData));
         } else {
-          console.log('Number data not found in document');
-          setData(null);
+          console.log(`Forecast doc not found: ${collectionName}/${docId}`);
         }
-      } else {
-        console.log('Document not found in Firebase');
-        setData(null);
       }
+
+      if (fetchedData) {
+        setFullDoc(fetchedData);
+        loadedDocIdRef.current = docId;
+      } else {
+        setFullDoc(null);
+      }
+
     } catch (e) {
-      console.error('Error fetching forecast:', e);
+      console.error('Error fetching forecast master data:', e);
     } finally {
       setLoading(false);
     }
-  }, [type, personalNumber, language]);
+  }, [type, personalNumber]);
 
   useEffect(() => {
-    fetchForecast(false);
-  }, [fetchForecast, refreshKey]);
+    if (!fullDoc || !personalNumber) {
+      if (!loading) setData(null);
+      return;
+    }
+
+    const numberData = fullDoc[String(personalNumber)];
+
+    if (numberData) {
+      const localized = numberData[language];
+      const fallback = localized || numberData['en'] || numberData['ru'] || Object.values(numberData)[0];
+
+      setData(fallback || null);
+    } else {
+      setData(null);
+    }
+  }, [fullDoc, personalNumber, language]);
+
+  useEffect(() => {
+    fetchMasterData(false);
+  }, [fetchMasterData]);
 
   const refetch = useCallback(() => {
-
-    fetchForecast(true);
-  }, [fetchForecast]);
+    fetchMasterData(true);
+  }, [fetchMasterData]);
 
   return { data, loading, refetch };
 };
