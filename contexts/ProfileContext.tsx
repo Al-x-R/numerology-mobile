@@ -207,7 +207,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     console.log("Attempting Google Sign-In...");
 
     if (!GoogleSignin) {
-      throw new Error('Google Sign-In недоступен на этом устройстве');
+      throw new Error('Google Sign-In is not available on this device.');
     }
 
     try {
@@ -215,7 +215,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const userInfo = await GoogleSignin.signIn();
       const idToken = userInfo.idToken || userInfo.data?.idToken;
-      if (!idToken) throw new Error('Не удалось получить ID token от Google');
+      if (!idToken) throw new Error('Unable to obtain an ID token from Google');
 
       const credential = GoogleAuthProvider.credential(idToken);
       const userCredential = await signInWithCredential(auth, credential);

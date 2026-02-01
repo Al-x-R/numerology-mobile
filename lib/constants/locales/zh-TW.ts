@@ -325,6 +325,7 @@ export const zhTW = {
     done: '完成',
     save: '保存',
     back: '返回',
+    remove: '刪除',
     networkError: '網路錯誤，請檢查連接。',
   },
   profile: {

@@ -220,14 +220,13 @@ export default function NumbersScreen() {
           type={activeTab}
           number={currentNumber}
         />
-        <View style={{ height: 20 }} />
       </View>
     );
   };
 
   if (!user || !user.birthDate) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+      <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
         <LinearGradient colors={GRADIENTS.background} style={styles.background}>
           <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
         </LinearGradient>
@@ -237,7 +236,7 @@ export default function NumbersScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
       <LinearGradient colors={GRADIENTS.background} style={styles.background}>
         <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
       </LinearGradient>
@@ -247,7 +246,7 @@ export default function NumbersScreen() {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}

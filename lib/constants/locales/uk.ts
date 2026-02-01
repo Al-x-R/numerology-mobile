@@ -325,6 +325,7 @@ export const uk = {
     done: 'Готово',
     save: 'Зберегти',
     back: 'Назад',
+    remove: 'Видалити',
     networkError: 'Помилка мережі. Перевірте з’єднання.',
   },
   profile: {

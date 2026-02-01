@@ -325,6 +325,7 @@ export const ru = {
     done: 'Готово',
     save: 'Сохранить',
     back: 'Назад',
+    remove: 'Удалить',
     networkError: 'Ошибка сети. Проверьте подключение.',
   },
   profile: {

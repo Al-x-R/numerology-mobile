@@ -150,8 +150,6 @@ export const UniversalForecastCard: React.FC<Props> = ({
 
       <View style={styles.divider} />
 
-      {/* --- СЕКЦИИ С ЗАГОЛОВКАМИ --- */}
-
       {/* Любовь */}
       <InfoSection
         icon="heart"

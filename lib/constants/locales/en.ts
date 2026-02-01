@@ -320,6 +320,7 @@ export const en = {
     done: 'Done',
     save: 'Save',
     back: 'Back',
+    remove: 'Remove',
     networkError: 'Network error. Check your connection.',
   },
   profile: {
