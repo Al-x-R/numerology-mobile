@@ -1,6 +1,7 @@
 // app/profile/_layout.tsx
-import { router, Stack, useNavigation } from 'expo-router';
-import { COLORS } from '@/lib/constants/theme';
+import { router, Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
+import { COLORS, FONTS } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
 import React from 'react';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -13,12 +14,14 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t('profile.title'),
-          headerStyle: { backgroundColor: COLORS.headerBackground },
-          headerTintColor: COLORS.accent,
+          title: t('profile.title').toUpperCase(),
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
+          headerTitleStyle: FONTS.headerTitle,
+          headerTintColor: COLORS.text,
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <BackButton onPress={() => router.back()} style={{ marginLeft: 0 }} />
+            <BackButton onPress={() => router.back()} style={styles.headerButton} iconColor={COLORS.accent} />
           ),
         }}
       />
@@ -26,13 +29,15 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="edit"
         options={{
-          title: t('profile.editProfile'),
+          title: t('profile.editProfile').toUpperCase(),
           presentation: 'card',
-          headerStyle: { backgroundColor: COLORS.headerBackground },
-          headerTintColor: COLORS.accent,
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
+          headerTitleStyle: FONTS.headerTitle,
+          headerTintColor: COLORS.text,
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <BackButton onPress={() => router.back()} style={{ marginLeft: 0 }} />
+            <BackButton onPress={() => router.back()} style={styles.headerButton} iconColor={COLORS.accent} />
           ),
         }}
       />
@@ -40,13 +45,15 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="language/index"
         options={{
-          title: t('profile.changeLanguage'),
+          title: t('profile.changeLanguage').toUpperCase(),
           presentation: 'card',
-          headerStyle: { backgroundColor: COLORS.headerBackground },
-          headerTintColor: COLORS.accent,
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
+          headerTitleStyle: FONTS.headerTitle,
+          headerTintColor: COLORS.text,
           headerTitleAlign: 'center',
           headerLeft: () => (
-            <BackButton onPress={() => router.back()} style={{ marginLeft: 0 }} />
+            <BackButton onPress={() => router.back()} style={styles.headerButton} iconColor={COLORS.accent} />
           ),
         }}
       />
@@ -54,3 +61,8 @@ export default function ProfileLayout() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  // iOS wraps native header buttons in its own glass capsule
+  headerButton: { backgroundColor: COLORS.transparent },
+});

@@ -18,9 +18,8 @@ import { WorkingNumbersDisplayAnimated } from '@/components/WorkingNumbersDispla
 import { CalculationResult, Interpretation } from '@/lib/types/calculation';
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { InterpretationCard } from '@/components/InterpretationCard';
-import { COLORS, SPACING, FONTS } from '@/lib/constants/theme';
+import { COLORS, SPACING, TYPE } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
-import { AdditionalParamsDisplay } from '@/components/AdditionalParamsDisplay';
 
 interface ResultsDisplayProps {
   results: CalculationResult;
@@ -57,11 +56,12 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
   );
   return (
     <>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* 1. Psychomatrix (Pythagorean Square) */}
         <View style={styles.pythagorasSection}>
-          <Text style={styles.sectionTitle}>{t('section_psychomatrix')}</Text>
-          <View style={[styles.grid, { gap: GAP }]}>
+          <Text style={styles.sectionTitle}>{t('pythagorasTitle')}</Text>
+          <Text style={styles.sectionEyebrow}>{t('matrixEyebrow')}</Text>
+          <View style={[styles.grid, { rowGap: GAP + 4 }]}>
             {Object.entries(matrix).map(([id, value], index) => {
               const interpretationData = getInterpretation(id, value);
               const interpretationDataFull = {
@@ -119,6 +119,8 @@ export function ResultsDisplay({ results, date, onBack }: ResultsDisplayProps) {
 const styles = StyleSheet.create({
   scrollContent: {
     width: '100%',
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.xl,
   },
   // --- Sections ---
   section: {
@@ -128,8 +130,12 @@ const styles = StyleSheet.create({
 
   },
   sectionTitle: {
-    ...FONTS.sectionTitle,
-    marginBottom: SPACING.md,
+    ...TYPE.headlineLg,
+  },
+  sectionEyebrow: {
+    ...TYPE.labelSm,
+    marginTop: 2,
+    marginBottom: SPACING.lg,
   },
   // --- Pythagorean grid ---
   grid: {

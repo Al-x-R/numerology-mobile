@@ -1,24 +1,29 @@
 // app/_layout.tsx
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
+import { EBGaramond_500Medium, EBGaramond_500Medium_Italic, EBGaramond_600SemiBold } from '@expo-google-fonts/eb-garamond';
+import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { useEffect } from 'react';
 
-import LOGO_IMAGE from '../assets/images/NumericalCompass.png';
-import { COLORS, LAYOUT } from '@/lib/constants/theme';
+import { COLORS } from '@/lib/constants/theme';
 import { ProfileProvider } from '@/contexts/ProfileContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    'PlayfairDisplay-Bold': require('../assets/fonts/PlayfairDisplay-Bold.ttf'),
-    'PlayfairDisplay-Regular': require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
-    'Manrope-Bold': require('../assets/fonts/Manrope-Bold.ttf'),
-    'Manrope-Regular': require('../assets/fonts/Manrope-Regular.ttf'),
+    EBGaramond_500Medium,
+    EBGaramond_500Medium_Italic,
+    EBGaramond_600SemiBold,
+    Manrope_400Regular,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
   });
 
   useEffect(() => {
@@ -37,9 +42,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
           <View style={styles.root}>
-            <View style={styles.background}>
-              <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-            </View>
+            <AuraBackground />
             <View style={styles.navigation}>
               <Stack
                 screenOptions={{
@@ -70,25 +73,8 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.background },
-  background: {
-    ...StyleSheet.absoluteFill,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: '100%',
-    maxWidth: LAYOUT.logoMedium,
-    maxHeight: LAYOUT.logoMedium,
-    opacity: 1,
-  },
   navigation: {
     flex: 1,
     backgroundColor: COLORS.transparent,
-  },
-  restartContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

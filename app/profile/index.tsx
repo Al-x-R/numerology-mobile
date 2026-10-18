@@ -11,73 +11,58 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// import { t } from '@/lib/constants/locales';
-import { formatBirthDate } from '@/lib/utils/date';
-import { useNavigation, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useAppTranslation } from '@/contexts/LanguageContext';
+import Constants from 'expo-constants';
+import { useNavigation, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type Props = {
-  onClose: () => void;
+import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
+import { useAppTranslation } from '@/contexts/LanguageContext';
+import { COLORS, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { AuraBackground } from '@/components/ui/AuraBackground';
+import { formatBirthDate } from '@/lib/utils/date';
+import { getZodiacName, getZodiacSign } from '@/lib/calculators/zodiac';
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English (EN)',
+  ru: 'Русский (RU)',
+  uk: 'Українська (UK)',
 };
 
-interface MenuItemProps {
+interface MenuRowProps {
   icon: keyof typeof Ionicons.glyphMap;
-  text: string;
-  onPress?: () => void;
-  color?: string;
-  isPremiumAction?: boolean;
+  title: string;
+  value?: string;
+  onPress: () => void;
+  isLast?: boolean;
 }
 
-const MenuItem = ({
-  icon,
-  text,
-  onPress,
-  color = COLORS.text,
-  isPremiumAction = false
-}: MenuItemProps) => (
-  <TouchableOpacity
-    style={styles.menuItem}
-    onPress={onPress}
-    disabled={!onPress && !isPremiumAction}
-  >
-    <Ionicons name={icon} size={22} color={isPremiumAction ? COLORS.accent : COLORS.accent} />
-
-    <Text style={[styles.menuText, { color }]}>{text}</Text>
-
-    {isPremiumAction ? (
-      <LinearGradient
-        colors={GRADIENTS.button}
-        style={styles.upgradeButton}
-      >
-
-        <MaterialCommunityIcons name="crown" size={16} color={COLORS.blackText} />
-      </LinearGradient>
-    ) : (
-      <Ionicons name="chevron-forward" size={22} color={COLORS.textSecondary} />
-    )}
+const MenuRow = ({ icon, title, value, onPress, isLast }: MenuRowProps) => (
+  <TouchableOpacity style={[styles.row, !isLast && styles.rowDivider]} onPress={onPress} activeOpacity={0.7}>
+    <View style={styles.medallion}>
+      <Ionicons name={icon} size={20} color={COLORS.accent} />
+    </View>
+    <Text style={styles.rowTitle} numberOfLines={1}>{title}</Text>
+    {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+    <Ionicons name="chevron-forward" size={18} color={COLORS.chevron} />
   </TouchableOpacity>
 );
 
-export default function ProfileScreen({ onClose }: Props) {
+export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const navigation = useNavigation();
   const { activeProfile, isPremium, resetAppData } = useProfile();
   const { t, language } = useAppTranslation();
 
   const displayName = activeProfile?.name || t('profile.guest');
   const photoURL = getAvatarUri(activeProfile);
   const birthDate = activeProfile?.date || null;
+  const zodiac = birthDate ? getZodiacName(getZodiacSign(new Date(birthDate)), language) : null;
 
-  const navigation = useNavigation();
   useEffect(() => {
-    navigation.setOptions({
-      headerTitle: t('profile.title'),
-    });
-  }, [language, navigation]);
+    navigation.setOptions({ headerTitle: t('profile.title').toUpperCase() });
+  }, [language, navigation, t]);
 
   const handleResetData = () => {
     Alert.alert(t('alerts.resetDataTitle'), t('alerts.resetData'), [
@@ -94,87 +79,106 @@ export default function ProfileScreen({ onClose }: Props) {
     ]);
   };
 
-  const handleUpgrade = () => {
-    router.push('/premium/upgrade');
-  };
-
   return (
-    <View style={[styles.container]}>
-
-      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFill} />
+    <View style={styles.container}>
+      <AuraBackground />
 
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 60 },
-        ]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + SPACING.xl }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* --- HEADER --- */}
-        <View style={styles.header}>
-          <View style={styles.photoContainer}>
+        {/* --- IDENTITY --- */}
+        <View style={styles.identity}>
+          <View style={styles.avatarRing}>
             {photoURL ? (
-              <Image source={{ uri: photoURL }} style={styles.photo} />
+              <Image source={{ uri: photoURL }} style={styles.avatar} />
             ) : (
-              <View style={[styles.photo, styles.photoFallback]}>
-                <Ionicons name="person" size={56} color={COLORS.accent} />
+              <View style={[styles.avatar, styles.avatarFallback]}>
+                <Text style={styles.avatarInitial}>{displayName.charAt(0).toUpperCase()}</Text>
               </View>
             )}
-
-          </View>
-
-          {/*<Text style={styles.greeting}>{t('profile.hello')}</Text>*/}
-
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{displayName}</Text>
             {isPremium && (
-              <View style={styles.premiumBadgeContainer}>
-                <Text style={styles.premiumBadgeText}>PRO</Text>
+              <View style={styles.avatarBadge}>
+                <MaterialCommunityIcons name="star-four-points" size={12} color={COLORS.accent} />
               </View>
             )}
           </View>
 
+          <Text style={styles.name}>{displayName}</Text>
           {birthDate && (
-            <Text style={styles.birthDate}>{formatBirthDate(birthDate)}</Text>
+            <Text style={styles.meta}>
+              {formatBirthDate(birthDate)}{zodiac ? `  •  ${zodiac}` : ''}
+            </Text>
+          )}
+
+          {isPremium && (
+            <View style={styles.memberChip}>
+              <View style={styles.memberDot} />
+              <Text style={styles.memberText}>{t('profile.memberPro')}</Text>
+            </View>
           )}
         </View>
 
-        {/* --- MENU --- */}
-        <View style={styles.menu}>
-          <MenuItem
-            icon="person-outline"
-            text={t('profile.editProfile')}
-            onPress={() => router.push('/profile/edit')}
-          />
+        <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit')} activeOpacity={0.8}>
+          <Ionicons name="create-outline" size={18} color={COLORS.accent} />
+          <Text style={styles.editButtonText}>{t('profile.editProfile')}</Text>
+        </TouchableOpacity>
 
-          <MenuItem
+        {/* --- MEMBERSHIP --- */}
+        <TouchableOpacity
+          style={[styles.proCard, isPremium && styles.proCardActive]}
+          onPress={() => router.push('/premium/upgrade')}
+          activeOpacity={0.85}
+        >
+          <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 1, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+          <View style={styles.proHeader}>
+            <View style={styles.proLabelRow}>
+              <View style={styles.proIcon}>
+                <MaterialCommunityIcons name="crown-outline" size={18} color={COLORS.accent} />
+              </View>
+              <Text style={styles.proLabel}>{t('profile.proCardLabel')}</Text>
+            </View>
+            {isPremium && (
+              <View style={styles.proBadge}>
+                <Text style={styles.proBadgeText}>{t('profile.proActiveBadge')}</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.proTitle}>
+            {isPremium ? t('profile.proActiveTitle') : t('profile.proUpsellTitle')}
+          </Text>
+          <Text style={styles.proDescription}>
+            {isPremium ? t('profile.proActiveDescription') : t('profile.proUpsellDescription')}
+          </Text>
+          <Ionicons name="arrow-forward" size={20} color={COLORS.accent} style={styles.proArrow} />
+        </TouchableOpacity>
+
+        {/* --- SETTINGS --- */}
+        <Text style={styles.sectionLabel}>{t('profile.sectionSettings')}</Text>
+        <View style={styles.module}>
+          <MenuRow
             icon="globe-outline"
-            text={t('profile.changeLanguage')}
+            title={t('profile.changeLanguage')}
+            value={LANGUAGE_LABELS[language]}
             onPress={() => router.push('/profile/language')}
           />
-
-          {isPremium ? (
-            <MenuItem
-              icon="diamond"
-              text={t('profile.premiumActive')}
-              color={COLORS.accent}
-              onPress={() => { router.push('/premium/upgrade'); }}
-            />
-          ) : (
-            <MenuItem
-              icon="diamond-outline"
-              text={t('profile.getPremium')}
-              onPress={handleUpgrade}
-              isPremiumAction={true}
-            />
-          )}
+          <MenuRow
+            icon="diamond-outline"
+            title={t('profile.subscription')}
+            value={isPremium ? 'PRO' : t('profile.subscriptionFree')}
+            onPress={() => router.push('/premium/upgrade')}
+            isLast
+          />
         </View>
 
-        <View style={styles.divider} />
-
-        <TouchableOpacity style={styles.deleteItem} onPress={handleResetData}>
-          <Text style={styles.deleteText}>{t('profile.resetData')}</Text>
+        <TouchableOpacity style={styles.resetButton} onPress={handleResetData} activeOpacity={0.7}>
+          <Ionicons name="trash-outline" size={16} color={COLORS.error} />
+          <Text style={styles.resetText}>{t('profile.resetData')}</Text>
         </TouchableOpacity>
+
+        <Text style={styles.version}>
+          {t('profile.version')}: {Constants.expoConfig?.version}
+        </Text>
       </ScrollView>
     </View>
   );
@@ -182,73 +186,131 @@ export default function ProfileScreen({ onClose }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingTop: 60, paddingHorizontal: SPACING.xl },
+  scrollContent: { paddingTop: SPACING.lg, paddingHorizontal: SPACING.margin },
 
-  // --- HEADER ---
-  header: { alignItems: 'center', marginBottom: SPACING.xl },
-  photoContainer: { position: 'relative', marginBottom: SPACING.lg },
-  photo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
+  // --- IDENTITY ---
+  identity: { alignItems: 'center', marginBottom: SPACING.lg },
+  avatarRing: {
+    padding: 3,
+    borderRadius: 64,
+    borderWidth: 1.5,
+    borderColor: COLORS.borderSelected,
+    marginBottom: SPACING.md,
+    ...SHADOWS.goldenButtonSoft,
   },
-  photoFallback: {
+  avatar: { width: 112, height: 112, borderRadius: 56 },
+  avatarFallback: {
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarInitial: { ...TYPE.displayLg, fontSize: 44, lineHeight: 52, color: COLORS.accent },
+  avatarBadge: {
+    position: 'absolute',
+    right: 4,
+    bottom: 4,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.borderSelected,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  name: { ...TYPE.displayLg, textAlign: 'center' },
+  meta: { ...TYPE.bodyMd, marginTop: SPACING.xs, textAlign: 'center' },
+  memberChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.xs + 2,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentSoft,
+  },
+  memberDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
+  memberText: { ...TYPE.labelMd, color: COLORS.accent },
+
+  editButton: {
+    height: 54,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.borderSubtle,
+    marginBottom: SPACING.lg,
+  },
+  editButtonText: { ...TYPE.labelLg },
+
+  // --- MEMBERSHIP ---
+  proCard: {
+    overflow: 'hidden',
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.xl,
+  },
+  proCardActive: { borderColor: COLORS.borderAccent },
+  proHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
+  proLabelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  proIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: RADIUS.sm,
     backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.accent,
   },
-  greeting: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 4, fontSize: 14 },
-  nameContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { ...FONTS.title, color: COLORS.text, fontWeight: '700', fontSize: 24 },
+  proLabel: { ...TYPE.labelLg },
+  proBadge: {
+    paddingVertical: 3,
+    paddingHorizontal: SPACING.sm + 2,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentSoft,
+  },
+  proBadgeText: { ...TYPE.bodySm, color: COLORS.accent },
+  proTitle: { ...TYPE.headlineLg, marginBottom: SPACING.sm },
+  proDescription: { ...TYPE.bodyMd, color: COLORS.textTertiary, paddingRight: SPACING.lg },
+  proArrow: { alignSelf: 'flex-end', marginTop: SPACING.sm },
 
-  premiumBadgeContainer: {
-    backgroundColor: COLORS.accent,
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+  // --- SETTINGS ---
+  sectionLabel: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  module: {
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
   },
-  premiumBadgeText: {
-    color: COLORS.blackText,
-    fontWeight: '800',
-    fontSize: 10,
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, gap: SPACING.md },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
+  medallion: {
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  birthDate: { ...FONTS.body, color: COLORS.textSecondary, marginTop: SPACING.sm, fontSize: 14 },
+  rowTitle: { ...TYPE.titleMd, flex: 1 },
+  rowValue: { ...TYPE.bodyMd },
 
-  // --- MENU ---
-  menu: { marginBottom: SPACING.lg },
-  menuItem: {
+  resetButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    borderRadius: RADIUS.lg,
-    marginBottom: SPACING.sm,
-  },
-  menuText: {
-    ...FONTS.body,
-    color: COLORS.text,
-    flex: 1,
-    marginLeft: SPACING.md,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-
-  // Upgrade button (Gradient)
-  upgradeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
     justifyContent: 'center',
+    gap: SPACING.sm,
+    height: 54,
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    marginBottom: SPACING.md,
   },
-
-  divider: { height: 1, backgroundColor: COLORS.hairline, marginVertical: SPACING.lg },
-
-  deleteItem: { alignItems: 'center', marginTop: SPACING.md, paddingVertical: SPACING.md },
-  deleteText: { color: COLORS.error, fontSize: 14, fontWeight: '500', opacity: 0.8 },
+  resetText: { ...TYPE.labelLg, color: COLORS.error },
+  version: { ...TYPE.bodySm, color: COLORS.textMuted, textAlign: 'center' },
 });

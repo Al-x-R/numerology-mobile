@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, SPACING, TYPE } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 type Props = {
@@ -38,29 +38,29 @@ export const ProfileButton = ({ onPress }: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginRight: 16,
-    padding: 4, // enlarges the touch area
+    marginRight: SPACING.margin,
+    padding: 2,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(242, 202, 80, 0.3)',
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   avatarFallback: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.hairline,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.accent,
   },
   initial: {
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...TYPE.headlineMd,
+    fontSize: 17,
+    lineHeight: 20,
+    color: COLORS.accent,
   },
 });

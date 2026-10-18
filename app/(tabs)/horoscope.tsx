@@ -1,19 +1,21 @@
 // app/(tabs)/horoscope.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 
 import { UniversalForecastCard } from '@/components/UniversalForecastCard';
 import { ProfileButton } from '@/components/ui/ProfileButton';
+import { HeaderEmblem } from '@/components/ui/HeaderEmblem';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useZodiacForecast } from '@/hooks/useZodiacForecast';
 import { getZodiacSign, getZodiacName } from '@/lib/calculators/zodiac';
-import { COLORS, GRADIENTS, LAYOUT, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
-import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
+import { COLORS, LAYOUT, SPACING } from '@/lib/constants/theme';
+import { TAB_BAR_STYLE } from '@/lib/constants/navigation';
+import { AuraBackground } from '@/components/ui/AuraBackground';
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
+import { LockedForecast } from '@/components/ui/LockedForecast';
 import { BirthDateRequiredState } from '@/components/ui/BirthDateRequiredState';
 import { useRewarded } from '@/hooks/useAdMob';
 
@@ -78,10 +80,8 @@ export default function HoroscopeScreen() {
     navigation.setOptions({
       headerTitle: t('horoscopeTitle'),
       headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
-      headerLeft: () => null,
-      headerShadowVisible: false,
-      headerStyle: { backgroundColor: COLORS.headerBackground },
-      tabBarStyle: { display: 'flex', backgroundColor: COLORS.background, borderTopColor: COLORS.background },
+      headerLeft: () => <HeaderEmblem />,
+      tabBarStyle: TAB_BAR_STYLE,
     });
   }, [navigation, language, t]);
 
@@ -129,25 +129,14 @@ export default function HoroscopeScreen() {
       const premiumText = t('horoscope.orGetPremium');
 
       return (
-        <View style={styles.lockedContainer}>
-          <View style={styles.iconCircle}>
-            <Ionicons name={"moon"} size={32} color={COLORS.accent} />
-          </View>
-
-          <Text style={styles.lockedTitle}>{titles[activeTab]}</Text>
-          <Text style={styles.lockedSubtitle}>{subtitles[activeTab]}</Text>
-
-          {/* Advertising Button */}
-          <TouchableOpacity style={styles.unlockButton} onPress={handleUnlockCurrentTab}>
-            <Ionicons name="play-circle" size={24} color={COLORS.blackText} style={{ marginRight: 8 }} />
-            <Text style={styles.unlockButtonText}>{unlockText}</Text>
-          </TouchableOpacity>
-
-          {/* Premium Button */}
-          <TouchableOpacity style={styles.premiumButtonLink} onPress={() => router.push('/profile')}>
-            <Text style={styles.premiumLinkText}>{premiumText}</Text>
-          </TouchableOpacity>
-        </View>
+        <LockedForecast
+          icon="moon-outline"
+          title={titles[activeTab]}
+          subtitle={subtitles[activeTab]}
+          unlockText={unlockText}
+          premiumText={premiumText}
+          onUnlock={handleUnlockCurrentTab}
+        />
       );
     }
 
@@ -157,6 +146,7 @@ export default function HoroscopeScreen() {
           data={currentData.data}
           loading={currentData.loading}
           type={activeTab}
+          onRetry={currentData.refetch}
           zodiacSign={signKey || undefined}
           signName={signName}
         />
@@ -166,37 +156,21 @@ export default function HoroscopeScreen() {
   };
 
   const renderTabs = () => (
-    <View style={styles.tabsContainer}>
-      {(['day', 'month', 'year'] as TabType[]).map((tab) => {
-        const isActive = activeTab === tab;
-        const labels: Record<string, string> = {
-          day: t('tabs.day'),
-          month: t('tabs.month'),
-          year: t('tabs.year')
-        };
-        return (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setActiveTab(tab)}
-            style={[styles.tabButton, isActive && styles.activeTabButton]}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4}}>
-              <Text style={[styles.tabText, isActive && styles.activeTabText]}>
-                {labels[tab]}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
+    <SegmentedTabs
+      tabs={[
+        { key: 'day' as TabType, label: t('tabs.day') },
+        { key: 'month' as TabType, label: t('tabs.month') },
+        { key: 'year' as TabType, label: t('tabs.year') },
+      ]}
+      active={activeTab}
+      onChange={setActiveTab}
+    />
   );
 
   if (!birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
-        <LinearGradient colors={GRADIENTS.background} style={styles.background}>
-          <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-        </LinearGradient>
+        <AuraBackground />
         <BirthDateRequiredState />
       </SafeAreaView>
     );
@@ -204,9 +178,7 @@ export default function HoroscopeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
-      <LinearGradient colors={GRADIENTS.background} style={styles.background}>
-        <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-      </LinearGradient>
+      <AuraBackground />
 
       <View style={styles.mainContainer}>
         {renderTabs()}
@@ -230,80 +202,5 @@ export default function HoroscopeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  background: { ...StyleSheet.absoluteFill, alignItems: 'center' },
-  logo: { width: '150%', maxWidth: LAYOUT.logoLarge, maxHeight: LAYOUT.logoLarge, opacity: 0.1, position: 'absolute', top: 50 },
-  mainContainer: { flex: 1, paddingHorizontal: LAYOUT.contentPadding, paddingTop: 10 },
-
-  tabsContainer: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 10
-  },
-  tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
-  activeTabButton: { backgroundColor: COLORS.accent },
-  tabText: { color: COLORS.textSecondary, fontWeight: '600', fontSize: 14 },
-  activeTabText: { color: COLORS.blackText, fontWeight: 'bold' },
-
-  // --- Styles for Locked State (Copied from NumbersScreen for consistency) ---
-  lockedContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    // backgroundColor: COLORS.card,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.xl,
-    marginTop: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.hairline,
-    minHeight: 350,
-  },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: COLORS.accentSoft,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-  },
-  lockedTitle: {
-    ...FONTS.subtitle,
-    textAlign: 'center',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  lockedSubtitle: {
-    ...FONTS.body,
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xl,
-  },
-  unlockButton: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.accent,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: RADIUS.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  unlockButtonText: {
-    ...FONTS.button,
-    color: COLORS.blackText,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  premiumButtonLink: {
-    marginTop: SPACING.lg,
-    padding: SPACING.sm,
-  },
-  premiumLinkText: {
-    ...FONTS.body,
-    color: COLORS.accent,
-    textDecorationLine: 'underline',
-  },
+  mainContainer: { flex: 1, paddingHorizontal: LAYOUT.contentPadding, paddingTop: SPACING.md },
 });

@@ -1,12 +1,12 @@
 // components/ui/BirthDateRequiredState.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { useAppTranslation } from '@/contexts/LanguageContext';
-import { COLORS, GRADIENTS, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { GoldButton } from '@/components/ui/GoldButton';
 
 export const BirthDateRequiredState = () => {
   const { t } = useAppTranslation();
@@ -14,19 +14,18 @@ export const BirthDateRequiredState = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <MaterialCommunityIcons name="calendar-alert" size={64} color={COLORS.accent} />
+        <View style={styles.medallion}>
+          <Ionicons name="calendar-outline" size={28} color={COLORS.accent} />
+        </View>
 
         <Text style={styles.title}>{t('birthDateRequired.title')}</Text>
         <Text style={styles.description}>{t('birthDateRequired.description')}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/profile/edit')}>
-          <LinearGradient
-            colors={GRADIENTS.goldenButton}
-            style={styles.buttonGradient}
-          >
-            <Text style={styles.buttonText}>{t('birthDateRequired.button')}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <GoldButton
+          title={t('birthDateRequired.button')}
+          onPress={() => router.push('/profile/edit')}
+          style={styles.button}
+        />
       </View>
     </View>
   );
@@ -36,45 +35,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: SPACING.margin,
   },
   card: {
-    width: '100%',
     alignItems: 'center',
-    padding: SPACING.xl,
     backgroundColor: COLORS.surface,
-// backgroundColor: COLORS.card,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    borderColor: COLORS.hairline,
-  },
-  title: {
-    ...FONTS.sectionTitle,
-    color: COLORS.text,
-    marginTop: SPACING.md,
-    marginBottom: SPACING.sm,
-    textAlign: 'center',
-  },
-  description: {
-    ...FONTS.body,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 20,
-  },
-  button: {
-    width: '100%',
     borderRadius: RADIUS.lg,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.borderSubtle,
+    padding: SPACING.lg,
   },
-  buttonGradient: {
-    paddingVertical: SPACING.md,
+  medallion: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: SPACING.lg,
+    ...SHADOWS.goldenButtonSoft,
   },
-  buttonText: {
-    ...FONTS.button,
-    color: COLORS.blackText,
-    fontWeight: '600',
-  },
+  title: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
+  description: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.lg },
+  button: { alignSelf: 'stretch' },
 });

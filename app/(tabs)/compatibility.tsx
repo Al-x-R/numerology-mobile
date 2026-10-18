@@ -1,30 +1,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
 import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
 import { calculateCompatibility, CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
+import { COLORS, FONTS, LAYOUT, SPACING } from '@/lib/constants/theme';
+import { TAB_BAR_STYLE } from '@/lib/constants/navigation';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 import { ProfileButton } from '@/components/ui/ProfileButton';
+import { HeaderEmblem } from '@/components/ui/HeaderEmblem';
 import { useProfile } from '@/contexts/ProfileContext';
 import { BackButton } from '@/components/ui/BackButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
 
 export default function CompatibilityScreen() {
-  const [dateString1, setDateString1] = useState<string>('');
+  const { activeProfile, isPremium } = useProfile();
+  // Profile stores YYYY-MM-DD, the form expects DD.MM.YYYY
+  const profileDate = activeProfile?.date ? activeProfile.date.split('-').reverse().join('.') : '';
+  const [dateString1, setDateString1] = useState<string>(profileDate);
   const [dateString2, setDateString2] = useState<string>('');
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
   const [isAdUnlocked, setIsAdUnlocked] = useState(false);
 
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
-  const { isPremium } = useProfile();
   const { t, language } = useAppTranslation();
   const { showRewarded } = useRewarded();
   const { showInterstitial } = useInterstitial();
@@ -33,10 +36,10 @@ export default function CompatibilityScreen() {
 
   const handleBack = useCallback(() => {
     setCompatibilityResult(null);
-    setDateString1('');
+    setDateString1(profileDate);
     setDateString2('');
     setIsAdUnlocked(false);
-  }, []);
+  }, [profileDate]);
 
   useEffect(() => {
     if (hasResults) {
@@ -53,13 +56,9 @@ export default function CompatibilityScreen() {
     } else {
       navigation.setOptions({
         headerTitle: t('compatibilityTitle'),
-        headerLeft: () => null,
+        headerLeft: () => <HeaderEmblem />,
         headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
-        tabBarStyle: {
-          display: 'flex',
-          backgroundColor: COLORS.background,
-          borderTopColor: COLORS.background
-        },
+        tabBarStyle: TAB_BAR_STYLE,
       });
     }
   }, [navigation, hasResults, handleBack, language]);
@@ -80,13 +79,11 @@ export default function CompatibilityScreen() {
     showInterstitial(() => calculateResult(dateString1, dateString2, false));
   };
 
-  const paddingTop = hasResults ? LAYOUT.topMarginLarge / 2 : LAYOUT.topMarginLarge;
+  const paddingTop = hasResults ? SPACING.md : SPACING.lg;
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
-      <LinearGradient colors={GRADIENTS.background} style={styles.background}>
-        <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-      </LinearGradient>
+      <AuraBackground />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -129,10 +126,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  background: {
-    ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-  },
   scrollContent: {
     flexGrow: 1,
   },
@@ -141,13 +134,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.contentPadding,
     alignItems: 'center',
     // paddingTop: LAYOUT.topMarginLarge,
-  },
-  logo: {
-    width: '150%',
-    maxWidth: LAYOUT.logoLarge,
-    maxHeight: LAYOUT.logoLarge,
-    opacity: 0.1,
-    position: 'absolute',
-    top: -50,
   },
 });

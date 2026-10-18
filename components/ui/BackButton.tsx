@@ -1,7 +1,7 @@
 // components/ui/BackButton.tsx
 
 import React from 'react';
-import { TouchableOpacity, StyleSheet, ViewStyle, Platform } from 'react-native';
+import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '@/lib/constants/theme';
@@ -11,13 +11,15 @@ interface BackButtonProps {
   style?: ViewStyle;
   iconColor?: string;
   size?: number;
+  icon?: keyof typeof Ionicons.glyphMap;
 }
 
 export const BackButton = ({
   onPress,
   style,
   iconColor = COLORS.text,
-  size = 35
+  size = 40,
+  icon = 'chevron-back',
 }: BackButtonProps) => {
   const router = useRouter();
 
@@ -41,36 +43,22 @@ export const BackButton = ({
       onPress={handlePress}
       activeOpacity={0.7}
     >
-      {/* marginRight: 2 — for optical centering of the chevron in the circle */}
+      {/* marginRight: 2 optically centres the chevron in the circle */}
       <Ionicons
-        name="chevron-back"
-        size={size * 0.55}
+        name={icon}
+        size={size * 0.5}
         color={iconColor}
-        style={{ marginRight: 2 }}
+        style={icon === 'chevron-back' ? { marginRight: 2 } : undefined}
       />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  // Frosted glass navigation control
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    // Glass effect (Glassmorphism)
-    backgroundColor: COLORS.card,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    // Volume shadows
-    ...Platform.select({
-      ios: {
-        shadowColor: COLORS.boxShadow,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    backgroundColor: COLORS.glass,
   },
 });

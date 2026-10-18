@@ -1,26 +1,11 @@
 // components/DoubleDateInputForm.tsx
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Animated, Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Animated, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import {
-  COLORS,
-  FONTS,
-  FORM_STYLES,
-  GRADIENTS,
-  LAYOUT,
-  RADIUS,
-  SHADOWS,
-  SPACING
-} from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -48,6 +33,8 @@ export function DoubleDateInputForm({
   setDate2,
 }: DoubleDateInputFormProps) {
   const { t } = useAppTranslation();
+  const { activeProfile } = useProfile();
+  const profileDate = activeProfile?.date ? activeProfile.date.split('-').reverse().join('.') : '';
 
   const [isFocused1, setIsFocused1] = useState(false);
   const [isFocused2, setIsFocused2] = useState(false);
@@ -171,23 +158,30 @@ export function DoubleDateInputForm({
 
   return (
     <View style={styles.container}>
+      <View style={styles.chip}>
+        <MaterialCommunityIcons name="star-four-points" size={11} color={COLORS.accent} />
+        <Text style={styles.chipText}>{t('compatibility.eyebrow')}</Text>
+      </View>
+      <Text style={styles.title}>{t('compatibility.heroTitle')}</Text>
       <Text style={styles.subtitle}>{t('compatibility.subtitle')}</Text>
 
       {/* Partner 1 */}
-      <Animated.View style={[styles.inputContainer, { opacity: input1Opacity, transform: [{ translateY: input1Y }] }]}>
-        <Text style={styles.label}>{t('compatibility.partner1Label')}</Text>
-        <View style={styles.inputWrapper}>
+      <Animated.View style={[styles.card, { opacity: input1Opacity, transform: [{ translateY: input1Y }] }]}>
+        <View style={styles.cardHeader}>
+          <View style={styles.medallion}>
+            <Ionicons name="person-outline" size={18} color={COLORS.accent} />
+          </View>
+          <Text style={styles.cardLabel}>{t('compatibility.youLabel')}</Text>
+          {!!profileDate && date1 === profileDate && (
+            <Text style={styles.cardHint}>{t('compatibility.fromProfile')}</Text>
+          )}
+        </View>
+        <Text style={styles.fieldLabel}>{t('profile.birthDate')}</Text>
+          <View style={[styles.inputBox, isFocused1 && styles.inputFocused, !!localError1 && styles.inputError]}>
           <TextInput
-            style={[
-              styles.input,
-              isFocused1 && styles.inputFocused,
-              localError1 && styles.inputError,
-              date1.length > 0
-                ? { textAlign: 'left', paddingLeft: 20 }
-                : { textAlign: 'center' }
-            ]}
-            placeholder={t('compatibility.partner1Placeholder')}
-            placeholderTextColor={COLORS.textSecondary}
+            style={styles.input}
+            placeholder={t('datePlaceholder')}
+            placeholderTextColor={COLORS.placeholder}
             value={date1}
             onChangeText={handleTextChange1}
             keyboardType="number-pad"
@@ -196,38 +190,37 @@ export function DoubleDateInputForm({
             onBlur={() => setIsFocused1(false)}
             cursorColor={COLORS.accent}
           />
-        </View>
-
-        {localError1 && (
-          <Animated.Text
-            style={[
-              styles.errorText,
-              {
-                opacity: error1Opacity,
-                transform: [{ translateY: error1Y }],
-              },
-            ]}
-          >
-            {localError1}
-          </Animated.Text>
-        )}
+            {isValidRussianDate(date1) ? (
+              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.accent} />
+            ) : (
+              <Ionicons name="calendar-clear-outline" size={20} color={COLORS.textMuted} />
+            )}
+          </View>
+          {localError1 && (
+            <Animated.Text style={[styles.errorText, { opacity: error1Opacity, transform: [{ translateY: error1Y }] }]}>
+              {localError1}
+            </Animated.Text>
+          )}
       </Animated.View>
 
+      <View style={styles.connector}>
+        <MaterialCommunityIcons name="infinity" size={20} color={COLORS.accent} />
+      </View>
+
       {/* Partner 2 */}
-      <Animated.View style={[styles.inputContainer, { opacity: input2Opacity, transform: [{ translateY: input2Y }] }]}>
-        <Text style={styles.label}>{t('compatibility.partner2Label')}</Text>
-        <View style={styles.inputWrapper}>
+      <Animated.View style={[styles.card, { opacity: input2Opacity, transform: [{ translateY: input2Y }] }]}>
+        <View style={styles.cardHeader}>
+          <View style={styles.medallion}>
+            <Ionicons name="heart" size={18} color={COLORS.accent} />
+          </View>
+          <Text style={styles.cardLabel}>{t('compatibility.partnerLabel')}</Text>
+        </View>
+        <Text style={styles.fieldLabel}>{t('profile.birthDate')}</Text>
+          <View style={[styles.inputBox, isFocused2 && styles.inputFocused, !!localError2 && styles.inputError]}>
           <TextInput
-            style={[
-              styles.input,
-              isFocused2 && styles.inputFocused,
-              localError2 && styles.inputError,
-              date2.length > 0
-                ? { textAlign: 'left', paddingLeft: 20 }
-                : { textAlign: 'center' }
-            ]}
-            placeholder={t('compatibility.partner2Placeholder')}
-            placeholderTextColor={COLORS.textSecondary}
+            style={styles.input}
+            placeholder={t('datePlaceholder')}
+            placeholderTextColor={COLORS.placeholder}
             value={date2}
             onChangeText={handleTextChange2}
             keyboardType="number-pad"
@@ -236,22 +229,27 @@ export function DoubleDateInputForm({
             onBlur={() => setIsFocused2(false)}
             cursorColor={COLORS.accent}
           />
-        </View>
-
-        {localError2 && (
-          <Animated.Text
-            style={[
-              styles.errorText,
-              {
-                opacity: error2Opacity,
-                transform: [{ translateY: error2Y }],
-              },
-            ]}
-          >
-            {localError2}
-          </Animated.Text>
-        )}
+            {isValidRussianDate(date2) ? (
+              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.accent} />
+            ) : (
+              <Ionicons name="calendar-clear-outline" size={20} color={COLORS.textMuted} />
+            )}
+          </View>
+          {localError2 && (
+            <Animated.Text style={[styles.errorText, { opacity: error2Opacity, transform: [{ translateY: error2Y }] }]}>
+              {localError2}
+            </Animated.Text>
+          )}
       </Animated.View>
+
+      <View style={styles.tags}>
+        {[t('compatibility.chipMatrix'), t('compatibility.chipUnion'), t('compatibility.chipKarma')].map((label) => (
+          <View key={label} style={styles.tag}>
+            <View style={styles.tagDot} />
+            <Text style={styles.tagText}>{label}</Text>
+          </View>
+        ))}
+      </View>
 
       <Animated.View
         style={[
@@ -267,23 +265,26 @@ export function DoubleDateInputForm({
           style={styles.button}
           disabled={isLoading}
         >
-          <LinearGradient
-            colors={isLoading ? GRADIENTS.goldenButton : GRADIENTS.goldenButton}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.buttonGradient}
-          >
+          <LinearGradient colors={GRADIENTS.goldenButton} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.buttonGradient}>
             {isLoading ? (
               <View style={styles.loadingContent}>
-                <ActivityIndicator size="small" color={COLORS.text} />
+                <ActivityIndicator size="small" color={COLORS.blackText} />
                 <Text style={styles.loadingText}>{t('compatibility.loadingText')}</Text>
               </View>
             ) : (
-              <Text style={styles.buttonText}>{t('compatibility.buttonText')}</Text>
+              <View style={styles.loadingContent}>
+                <Ionicons name="sparkles-outline" size={18} color={COLORS.blackText} />
+                <Text style={styles.buttonText}>{t('compatibility.buttonText')}</Text>
+              </View>
             )}
           </LinearGradient>
         </TouchableOpacity>
       </Animated.View>
+
+      <View style={styles.footer}>
+        <Ionicons name="lock-closed-outline" size={14} color={COLORS.textMuted} />
+        <Text style={styles.footerText}>{t('compatibility.footer')}</Text>
+      </View>
     </View>
   );
 }
@@ -293,84 +294,100 @@ const styles = StyleSheet.create({
     width: LAYOUT.formWidth,
     maxWidth: LAYOUT.formMaxWidth,
     alignItems: 'center',
-    backgroundColor: COLORS.transparent,
   },
-  title: {
-    ...FONTS.title,
-    color: COLORS.accent,
-  },
-  subtitle: {
-    ...FORM_STYLES.subtitle,
-    marginTop: SPACING.subtitleMargin,
-    marginBottom: SPACING.subtitleMarginBottom,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    width: '100%',
+  chip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative' as const,
-    marginBottom: SPACING.lg,
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentSoft,
+    marginBottom: SPACING.md,
   },
-  label: {
-    ...FONTS.button,
-    fontSize: 16,
-    color: COLORS.accent,
-    marginBottom: SPACING.sm,
-    alignSelf: 'flex-start',
-  },
-  inputWrapper: {
+  chipText: { ...TYPE.labelMd, color: COLORS.accent },
+  title: { ...TYPE.displayLg, textAlign: 'center' },
+  subtitle: { ...TYPE.bodyMd, textAlign: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
+  card: {
     width: '100%',
-    marginBottom: 0,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
   },
-  input: {
-    ...FONTS.input,
-    backgroundColor: COLORS.card,
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginBottom: SPACING.md },
+  medallion: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardLabel: { ...TYPE.labelLg, flex: 1 },
+  cardHint: { ...TYPE.bodySm },
+  fieldLabel: { ...TYPE.bodySm, marginBottom: SPACING.sm },
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 56,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.transparent,
+    paddingHorizontal: SPACING.md + 4,
+  },
+  input: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.sans.medium, letterSpacing: 3, flex: 1, height: '100%' },
+  inputFocused: { borderColor: COLORS.accent },
+  inputError: { borderColor: COLORS.error },
+  errorText: { ...FONTS.error, marginTop: SPACING.sm },
+  connector: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginVertical: -10,
+    zIndex: 1,
+    backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
     borderColor: COLORS.border,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...SHADOWS.goldenButtonSoft,
   },
-  inputFocused: {
-    borderColor: COLORS.accent,
-    borderWidth: 2,
+  tags: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: SPACING.sm, marginTop: SPACING.lg },
+  tag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: SPACING.gutterSm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surface,
   },
-  inputError: {
-    borderColor: COLORS.error,
-    borderWidth: 2,
-  },
-  errorText: {
-    ...FONTS.error,
-    position: 'absolute' as const,
-    bottom: -24,
-    left: 0,
-    right: 0,
-  },
+  tagDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
+  tagText: { ...TYPE.bodySm, color: COLORS.textTertiary },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginTop: SPACING.md },
+  footerText: { ...TYPE.bodySm, textAlign: 'center', flexShrink: 1 },
   buttonContainer: {
     width: '100%',
-    marginTop: SPACING.formGap,
+    marginTop: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.button,
   },
   button: {
     width: '100%',
     borderRadius: RADIUS.lg,
-    overflow: 'hidden' as const,
+    overflow: 'hidden',
   },
   buttonGradient: {
-    paddingVertical: SPACING.lg,
+    height: LAYOUT.buttonHeight,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonText: {
-    ...FONTS.button,
-    color: COLORS.blackText,
-  },
+  buttonText: FONTS.button,
   loadingContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.loadingContentGap,
+    gap: SPACING.sm,
   },
-  loadingText: {
-    ...FONTS.loading,
-    color: COLORS.blackText
-  },
+  loadingText: { ...FONTS.button },
 });
-

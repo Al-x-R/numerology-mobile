@@ -1,14 +1,16 @@
 // app/(auth)/onboarding.tsx
 
-import React, {  } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
+import { COLORS, SPACING, TYPE } from '@/lib/constants/theme';
+import { GoldButton } from '@/components/ui/GoldButton';
+import { Ionicons } from '@expo/vector-icons';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 
@@ -25,7 +27,7 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={GRADIENTS.background} style={styles.background} />
+      <AuraBackground />
 
       <SafeAreaView style={styles.content}>
 
@@ -53,20 +55,12 @@ export default function OnboardingScreen() {
           entering={FadeInUp.delay(600).duration(800)}
           style={styles.bottomSection}
         >
-          <TouchableOpacity
-            style={styles.mainButtonContainer}
-            activeOpacity={0.8}
+          <GoldButton
+            title={t('onboarding.startButton')}
             onPress={handleStart}
-          >
-            <LinearGradient
-              colors={GRADIENTS.goldenButton}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.mainButton}
-            >
-              <Text style={styles.mainButtonText}>{t('onboarding.startButton')}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            icon={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+            style={styles.mainButton}
+          />
 
           <Text style={styles.legalText}>
             {t('onboarding.legal')}
@@ -81,18 +75,13 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background, // Fallback color
-  },
-  background: {
-    ...StyleSheet.absoluteFill,
+    backgroundColor: COLORS.background,
   },
   content: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.margin,
   },
-
   topSection: {
     flex: 1,
     justifyContent: 'center',
@@ -100,59 +89,36 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginBottom: SPACING.xl,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
   },
   logo: {
-    width: width * 0.6,
-    height: width * 0.6,
+    width: width * 0.55,
+    height: width * 0.55,
   },
   title: {
-    ...FONTS.headerTitle,
-    fontSize: 42,
+    ...TYPE.displayLg,
+    fontSize: 40,
+    lineHeight: 48,
+    letterSpacing: 1,
     textAlign: 'center',
-    color: COLORS.text,
     marginBottom: SPACING.md,
   },
   subtitle: {
-    ...FONTS.body,
-    fontSize: 16,
-    textAlign: 'center',
+    ...TYPE.bodyLg,
     color: COLORS.textSecondary,
-    lineHeight: 24,
+    textAlign: 'center',
   },
-
   bottomSection: {
     width: '100%',
     alignItems: 'center',
     paddingBottom: SPACING.lg,
   },
-  mainButtonContainer: {
-    width: '100%',
-    borderRadius: RADIUS.xl,
+  mainButton: {
+    alignSelf: 'stretch',
     marginBottom: SPACING.lg,
   },
-  mainButton: {
-    paddingVertical: 18,
-    borderRadius: RADIUS.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainButtonText: {
-    ...FONTS.button,
-    fontSize: 18,
-    color: COLORS.blackText,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
   legalText: {
-    ...FONTS.tooltip,
-    marginTop: 10,
+    ...TYPE.bodySm,
+    color: COLORS.textMuted,
     textAlign: 'center',
-    color: COLORS.textSecondary,
-    opacity: 0.5,
-    fontSize: 10,
   },
 });

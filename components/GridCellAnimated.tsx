@@ -12,7 +12,8 @@ import Animated, {
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { getHighlightType } from '@/lib/utils/highlight';
 import { getTooltipText } from '@/lib/utils/tooltip';
-import { COLORS, FONTS, SPACING, RADIUS, FONT_SIZES } from '@/lib/constants/theme';
+import { COLORS, FONTS, FONT_FAMILY, SPACING, RADIUS, FONT_SIZES, SHADOWS, TYPE } from '@/lib/constants/theme';
+import { t } from '@/lib/constants/locales';
 
 
 interface GridCellProps {
@@ -87,6 +88,7 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
 
   const displayValue = value && value.length > 6 ? value.slice(0, 6) : (value || '—');
   const valueFontSize = maxLength > 4 ? FONT_SIZES.cellValueMedium : FONT_SIZES.cellValueLarge;
+  const level = value ? Math.min(value.length, 6) : 0;
 
   return (
     <Animated.View style={[containerStyle]}>
@@ -94,36 +96,33 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
         onPress={onPress}
         style={[
           styles.cell,
-          { width: cellSize },
-          highlight === 'weak' && styles.cellWeak,
+          { width: cellSize, minHeight: cellSize * 0.95 },
           highlight === 'strong' && styles.cellStrong,
         ]}
         activeOpacity={0.8}
       >
-
-        <Animated.Text style={[styles.cellLabel, labelStyle]}>
-          {title}
-        </Animated.Text>
+        <View style={styles.labelRow}>
+          <Animated.Text style={[styles.cellLabel, labelStyle]} numberOfLines={1}>
+            {title}
+          </Animated.Text>
+          <View style={[styles.dot, highlight === 'strong' && styles.dotStrong]} />
+        </View>
 
         <Animated.Text
-          style={[
-            styles.cellValue,
-            valueStyle,
-            { fontSize: valueFontSize },
-          ]}
+          style={[styles.cellValue, valueStyle, { fontSize: valueFontSize }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
         >
-          {displayValue || '—'}
+          {displayValue}
         </Animated.Text>
 
-        {/* Tooltip */}
+        <Text style={styles.caption}>{level} / 6 {t('cellLevel')}</Text>
+
         {highlight !== 'none' && (
           <Animated.View style={[styles.tooltipWrapper, tooltipStyle]}>
-            <View style={[
-              styles.tooltip,
-              highlight === 'weak' ? styles.tooltipWeak : styles.tooltipStrong,
-            ]}>
-              <Text style={styles.tooltipText}>
-                {getTooltipText(id, value)}
+            <View style={[styles.tooltip, highlight === 'weak' ? styles.tooltipWeak : styles.tooltipStrong]}>
+              <Text numberOfLines={1} style={[styles.tooltipText, highlight === 'weak' ? styles.tooltipTextWeak : styles.tooltipTextStrong]}>
+                {highlight === 'weak' ? t('chipAttention') : getTooltipText(id, value)}
               </Text>
             </View>
           </Animated.View>
@@ -135,67 +134,73 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
 
 const styles = StyleSheet.create({
   cell: {
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
-    backgroundColor: COLORS.cardBackground,
-    borderColor: COLORS.cardBorder,
-    borderRadius: RADIUS.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-    padding: SPACING.xs,
+    borderColor: COLORS.transparent,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.gutterSm,
+    justifyContent: 'space-between',
     position: 'relative',
-    // overflow: 'hidden',
-  },
-  cellAccent: {
-    backgroundColor: COLORS.accentCardBorder,
-    borderColor: COLORS.primary,
-  },
-  cellWeak: {
-    borderColor: COLORS.highlightWeak,
-    backgroundColor: COLORS.weakHighlightBackground,
   },
   cellStrong: {
-    borderColor: COLORS.highlightStrong,
-    backgroundColor: COLORS.strongHighlightBackground,
+    backgroundColor: COLORS.surfaceSelected,
+    borderColor: COLORS.borderAccent,
+    ...SHADOWS.goldenButtonSoft,
   },
-  pulseOverlay: {
-    backgroundColor: COLORS.pulseOverlay,
-    borderRadius: RADIUS.md,
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   cellLabel: {
     ...FONTS.cellLabel,
-    textAlign: 'center' as const,
-    paddingTop: SPACING.cellLabelPaddingTop
+    flex: 1,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: COLORS.textMuted,
+  },
+  dotStrong: {
+    backgroundColor: COLORS.accent,
   },
   cellValue: {
     ...FONTS.cellValue,
-    textAlign: 'center' as const,
+    marginVertical: SPACING.xs,
   },
-  textAccent: {
-    color: COLORS.accent,
+  caption: {
+    ...TYPE.bodySm,
+    fontSize: 11,
   },
-  // TOOLTIPS
+  // TOOLTIPS: chips on the top border
   tooltipWrapper: {
     position: 'absolute',
-    top: -8,
+    top: -9,
+    left: 0,
+    right: 0,
     alignItems: 'center',
     zIndex: 10,
   },
   tooltip: {
-    paddingHorizontal: SPACING.tooltipPadding,
-    paddingVertical: SPACING.tooltipPaddingVertical,
-    borderRadius: RADIUS.sm,
-    minWidth: 50,
-    alignItems: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: RADIUS.full,
   },
   tooltipWeak: {
-    backgroundColor: COLORS.highlightWeak,
+    backgroundColor: COLORS.warningChip,
   },
   tooltipStrong: {
-    backgroundColor: COLORS.highlightStrong,
+    backgroundColor: COLORS.accent,
   },
   tooltipText: {
-    ...FONTS.tooltip,
-    textAlign: 'center' as const,
+    ...TYPE.labelSm,
+    fontFamily: FONT_FAMILY.sans.bold,
+  },
+  tooltipTextWeak: {
+    color: COLORS.warningChipText,
+  },
+  tooltipTextStrong: {
+    color: COLORS.blackText,
   },
 });

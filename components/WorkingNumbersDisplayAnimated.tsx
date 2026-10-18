@@ -11,7 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getContextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types/calculation';
-import { FONTS, SPACING, COLORS, RADIUS } from '@/lib/constants/theme';
+import { FONTS, SPACING, COLORS, RADIUS, GRADIENTS, TYPE } from '@/lib/constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentLocale } from '@/lib/constants/locales';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { getWorkingMeanings } from '@/lib/data/workingMeanings';
@@ -104,7 +106,7 @@ const WorkingNumberCard: React.FC<{
   return (
     <Animated.View style={animatedStyle}>
       <TouchableOpacity style={styles.numberCard} onPress={() => onPress(interpretationData)}>
-        <Text style={styles.numberLabel}>
+        <Text style={styles.numberLabel} numberOfLines={2}>
           {t('workingNumberLabel').replace('{number}', (index + 1).toString())}
         </Text>
         <Text style={styles.numberValue}>{num}</Text>
@@ -149,17 +151,24 @@ const FateCard: React.FC<{
         style={styles.fateCardFinal}
         onPress={() => onPress(interpretationData)}
       >
-        <Text style={styles.numberLabel}>{t('destinyNumberLabel')}</Text>
-        <Text style={[styles.numberValue, styles.fateValue, textAccentStyle]}>
-          {value}
-        </Text>
+        <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 1, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+        <View style={styles.fateMedallion}>
+          <MaterialCommunityIcons name="infinity" size={26} color={COLORS.accent} />
+        </View>
+        <View style={styles.fateTextBlock}>
+          <Text style={styles.fateEyebrow}>{t('fateEyebrow')}</Text>
+          <Text style={styles.fateTitle}>
+            {t('destinyNumberLabel')}: <Text style={textAccentStyle}>{value}</Text>
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={COLORS.accent} />
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  numbersSection: { marginTop: SPACING.xl, },
+  numbersSection: { marginTop: SPACING.xl },
   sectionTitle: {
     ...FONTS.sectionTitle,
     marginBottom: SPACING.md,
@@ -168,36 +177,46 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: SPACING.numberCardGap,
+    gap: SPACING.gutterSm,
   },
   numberCard: {
-    width: (Dimensions.get('window').width - 48) / 2,
-    backgroundColor: COLORS.cardBackground,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
-    borderRadius: RADIUS.md,
-    padding: SPACING.cardPadding,
+    width: (Dimensions.get('window').width - SPACING.margin * 2 - SPACING.gutterSm) / 2,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: SPACING.sm,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: SPACING.gutterSm,
   },
   numberLabel: {
     ...FONTS.workingLabel,
-    marginBottom: SPACING.xs,
+    flex: 1,
   },
   numberValue: {
     ...FONTS.workingValue,
   },
   fateCardFinal: {
     width: '100%',
-    backgroundColor: COLORS.accentCardBackground,
-    borderColor: COLORS.borderAccent,
-    borderWidth: 1,
-    borderRadius: RADIUS.md,
-    marginTop: SPACING.numberCardGap,
-    paddingVertical: SPACING.cardPadding,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.contentPadding,
+    gap: SPACING.md,
+    overflow: 'hidden',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md + 2,
   },
-  fateValue: {
-    ...FONTS.fateValue,
+  fateMedallion: {
+    width: 52,
+    height: 52,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
+  fateTextBlock: { flex: 1 },
+  fateEyebrow: { ...TYPE.labelSm, marginBottom: 4 },
+  fateTitle: { ...TYPE.titleLg },
 });

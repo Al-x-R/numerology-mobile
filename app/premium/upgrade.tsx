@@ -2,12 +2,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 
-import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { BackButton } from '@/components/ui/BackButton';
+import { GoldButton } from '@/components/ui/GoldButton';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -17,7 +19,7 @@ export default function PremiumScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useAppTranslation();
   const { isPremium, setPremiumStatus } = useProfile();
-  const [selectedPlan, setSelectedPlan] = useState<PlanId>('weekly');
+  const [selectedPlan, setSelectedPlan] = useState<PlanId>('yearly');
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -85,214 +87,246 @@ export default function PremiumScreen() {
 
   const openLink = (url: string) => Linking.openURL(url);
 
+  const features = [
+    { icon: 'grid-outline' as const, title: t('premium.featureAnalysis'), description: t('premium.featureAnalysisDesc') },
+    { icon: 'sparkles-outline' as const, title: t('premium.featureForecasts'), description: t('premium.featureForecastsDesc') },
+    { icon: 'infinite-outline' as const, title: t('premium.featureCompatibility'), description: t('premium.featureCompatibilityDesc') },
+    { icon: 'ban-outline' as const, title: t('premium.featureAdFree'), description: t('premium.featureAdFreeDesc') },
+  ];
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      <LinearGradient colors={GRADIENTS.background} style={styles.background} />
+      <AuraBackground />
 
-      <View style={[styles.mainWrapper, { paddingTop: insets.top }]}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.closeButton}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            >
-              <Ionicons name="close" size={24} color={COLORS.textSecondary} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>{t('premium.headerTitle')}</Text>
-            <View style={{ width: 40 }} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + SPACING.sm, paddingBottom: insets.bottom + SPACING.lg }]}
+      >
+        <BackButton onPress={() => router.back()} icon="close" />
+
+        {/* --- HERO --- */}
+        <View style={styles.hero}>
+          <View style={styles.heroMedallion}>
+            <Ionicons name="diamond-outline" size={28} color={COLORS.accent} />
           </View>
-
-          {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="diamond" size={48} color={COLORS.accent} />
-            </View>
-            <Text style={styles.heroSubtitle}>
-              {t('premium.heroSubtitle')}
-            </Text>
+          <View style={styles.chip}>
+            <MaterialCommunityIcons name="star-four-points" size={11} color={COLORS.accent} />
+            <Text style={styles.chipText}>{t('premium.badge')}</Text>
           </View>
+          <Text style={styles.heroTitle}>DESTINY CODE PRO</Text>
+          <Text style={styles.heroSubtitle}>{t('premium.heroSubtitle')}</Text>
+        </View>
 
-          {/* Features */}
-          <View style={styles.featuresContainer}>
-            {[
-              t('premium.featureCompatibility'),
-              t('premium.featureForecasts'),
-              t('premium.featureAnalysis'),
-              t('premium.featureAdFree'),
-            ].map((feat, index) => (
-              <View key={index} style={styles.featureRow}>
-                <Ionicons name="checkmark-circle" size={20} color={COLORS.accent} style={{ marginRight: 12 }} />
-                <Text style={styles.featureText}>{feat}</Text>
+        {/* --- FEATURES --- */}
+        <View style={styles.module}>
+          {features.map((feature, index) => (
+            <View key={feature.title} style={[styles.featureRow, index < features.length - 1 && styles.featureDivider]}>
+              <View style={styles.featureCheck}>
+                <Ionicons name="checkmark" size={14} color={COLORS.accent} />
               </View>
-            ))}
-          </View>
+              <View style={styles.featureTextBlock}>
+                <Text style={styles.featureTitle}>{feature.title}</Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
 
-          {/* Plans Selection */}
-          <View style={styles.plansContainer}>
-            {(['weekly', 'monthly', 'yearly'] as PlanId[]).map((id) => {
-              const plan = plansData[id];
-              const isSelected = selectedPlan === id;
+        {/* --- PLANS --- */}
+        <View style={styles.plans}>
+          {(['weekly', 'monthly', 'yearly'] as PlanId[]).map((id) => {
+            const plan = plansData[id];
+            const isSelected = selectedPlan === id;
+            const badge = plan.bestValue || plan.save;
 
-              return (
-                <TouchableOpacity
-                  key={id}
-                  activeOpacity={0.9}
-                  style={[styles.planCard, isSelected && styles.selectedCard]}
-                  onPress={() => setSelectedPlan(id)}
-                >
-                  {plan.save && <View style={styles.badgeContainer}><Text style={styles.badgeText}>{plan.save}</Text></View>}
-                  {id === 'yearly' && plan.bestValue && (
-                    <View style={[styles.badgeContainer, { backgroundColor: COLORS.accent }]}>
-                      <Text style={[styles.badgeText, { color: COLORS.blackText }]}>{plan.bestValue}</Text>
-                    </View>
+            return (
+              <TouchableOpacity
+                key={id}
+                activeOpacity={0.9}
+                style={[styles.planCard, isSelected && styles.planCardSelected]}
+                onPress={() => setSelectedPlan(id)}
+              >
+                {badge && (
+                  <View style={styles.planBadge}>
+                    <Text style={styles.planBadgeText}>{badge}</Text>
+                  </View>
+                )}
+
+                <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                  {isSelected && <Ionicons name="checkmark" size={14} color={COLORS.blackText} />}
+                </View>
+
+                <View style={styles.planInfo}>
+                  <Text style={styles.planTitle}>{plan.title}</Text>
+                  {!!(plan.subtitle || plan.subtext) && (
+                    <Text style={[styles.planSubtitle, isSelected && id === 'yearly' && styles.planSubtitleAccent]}>
+                      {plan.subtitle || plan.subtext}
+                    </Text>
                   )}
+                </View>
 
-                  <View style={styles.planInfo}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Text style={[styles.planTitle, isSelected && styles.selectedText]}>{plan.title}</Text>
-                      {isSelected && <Ionicons name="checkmark-circle" size={18} color={COLORS.accent} style={{ marginLeft: 8 }} />}
-                    </View>
-                    <Text style={styles.planSubtitle}>{plan.subtitle || plan.subtext}</Text>
-                  </View>
-
-                  <View style={styles.priceContainer}>
-                    <Text style={[styles.priceText, isSelected && styles.selectedText]}>{plan.price}</Text>
-                    <Text style={styles.periodText}>{plan.period}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Action Button */}
-          <View style={styles.actionSection}>
-            {!isPremium ? (
-              <>
-                <TouchableOpacity style={styles.ctaButton} onPress={handlePurchase} disabled={isLoading}>
-                  <LinearGradient colors={GRADIENTS.goldenButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.ctaGradient}>
-                    <Text style={styles.ctaText}>{isLoading ? t('premium.loading') : t('premium.continue')}</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-                <Text style={styles.disclaimer}>
-                  {t('premium.subscriptionDisclaimer')}
-                </Text>
-              </>
-            ) : (
-              <TouchableOpacity style={styles.manageButton} onPress={handleManageSubscription}>
-                <Text style={styles.manageButtonText}>{t('premium.manageSubscription')}</Text>
+                <View style={styles.priceBlock}>
+                  <Text style={styles.price}>{plan.price}</Text>
+                  <Text style={styles.period}>{plan.period}</Text>
+                </View>
               </TouchableOpacity>
-            )}
-          </View>
+            );
+          })}
+        </View>
 
-          {/* Footer Links */}
-          <View style={styles.footer}>
-            <TouchableOpacity onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')}>
-              <Text style={styles.footerLink}>{t('premium.terms')}</Text>
-            </TouchableOpacity>
+        {/* --- ACTION --- */}
+        {!isPremium ? (
+          <>
+            <GoldButton
+              title={isLoading ? t('premium.loading') : t('premium.continue')}
+              onPress={handlePurchase}
+              loading={isLoading}
+              icon={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+            />
+            <Text style={styles.disclaimer}>{t('premium.subscriptionDisclaimer')}</Text>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.manageButton} onPress={handleManageSubscription}>
+            <Text style={styles.manageButtonText}>{t('premium.manageSubscription')}</Text>
+          </TouchableOpacity>
+        )}
 
-            <Text style={styles.footerDivider}>|</Text>
-
-            <TouchableOpacity onPress={handleRestore}>
-              <Text style={styles.footerLink}>{t('premium.restore')}</Text>
-            </TouchableOpacity>
-
-            <Text style={styles.footerDivider}>|</Text>
-
-            <TouchableOpacity onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')}>
-              <Text style={styles.footerLink}>{t('premium.privacy')}</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
+        {/* --- FOOTER --- */}
+        <View style={styles.footer}>
+          <TouchableOpacity onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')}>
+            <Text style={styles.footerLink}>{t('premium.terms')}</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerDot}>·</Text>
+          <TouchableOpacity onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')}>
+            <Text style={styles.footerLink}>{t('premium.privacy')}</Text>
+          </TouchableOpacity>
+          <Text style={styles.footerDot}>·</Text>
+          <TouchableOpacity onPress={handleRestore}>
+            <Text style={[styles.footerLink, styles.footerLinkAccent]}>{t('premium.restore')}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  mainWrapper: { flex: 1 },
-  background: { ...StyleSheet.absoluteFill },
-  scrollContent: { paddingHorizontal: 0 },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    height: 50,
-  },
-  closeButton: {
-    padding: 8,
-    width: 40,
-    height: 40,
-    backgroundColor: COLORS.hairline,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: { ...FONTS.button, color: COLORS.accent, letterSpacing: 2, fontSize: 14 },
-  heroSection: { alignItems: 'center', marginVertical: SPACING.lg, paddingHorizontal: SPACING.lg },
-  iconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: COLORS.accentSoft,
+  container: { flex: 1, backgroundColor: COLORS.background },
+  scrollContent: { paddingHorizontal: SPACING.margin },
+
+  // --- HERO ---
+  hero: { alignItems: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
+  heroMedallion: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.accentCardBorder,
+    ...SHADOWS.goldenButtonSoft,
   },
-  heroTitle: { ...FONTS.title, fontSize: 24, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.xs, fontWeight: 'bold' },
-  heroSubtitle: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', fontSize: 14, lineHeight: 20 },
-  featuresContainer: { paddingHorizontal: SPACING.xl, marginBottom: SPACING.lg },
-  featureRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  featureText: { ...FONTS.body, color: COLORS.text, fontSize: 15 },
-  plansContainer: { paddingHorizontal: SPACING.md, gap: 10, marginBottom: SPACING.xl },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentSoft,
+    marginBottom: SPACING.md,
+  },
+  chipText: { ...TYPE.labelMd, color: COLORS.accent },
+  heroTitle: { ...TYPE.displayLg, fontSize: 32, letterSpacing: 1.5, textAlign: 'center', marginBottom: SPACING.sm },
+  heroSubtitle: { ...TYPE.bodyLg, color: COLORS.textTertiary, textAlign: 'center', paddingHorizontal: SPACING.md },
+
+  // --- FEATURES ---
+  module: {
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, paddingVertical: SPACING.md },
+  featureDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
+  featureCheck: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.accentSoft,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  featureTextBlock: { flex: 1 },
+  featureTitle: { ...TYPE.titleMd },
+  featureDescription: { ...TYPE.bodyMd, marginTop: 2 },
+
+  // --- PLANS ---
+  plans: { gap: SPACING.md, marginBottom: SPACING.lg },
   planCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    gap: SPACING.md,
+    padding: SPACING.md + 2,
     borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.hairline,
-    position: 'relative',
-    overflow: 'hidden'
   },
-  selectedCard: { borderColor: COLORS.accent, backgroundColor: COLORS.accentSoft },
-  planInfo: { flex: 1 },
-  planTitle: { ...FONTS.subtitle, color: COLORS.text, fontSize: 17, fontWeight: 'bold' },
-  planSubtitle: { ...FONTS.body, color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
-  priceContainer: { alignItems: 'flex-end' },
-  priceText: { ...FONTS.subtitle, color: COLORS.text, fontSize: 19, fontWeight: 'bold' },
-  selectedText: { color: COLORS.accent },
-  periodText: { ...FONTS.body, color: COLORS.textSecondary, fontSize: 11 },
-  badgeContainer: {
+  planCardSelected: {
+    backgroundColor: COLORS.surfaceSelected,
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
+    ...SHADOWS.goldenButtonSoft,
+  },
+  planBadge: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: COLORS.accent,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderBottomLeftRadius: 8
+    top: -10,
+    right: SPACING.md,
+    paddingVertical: 3,
+    paddingHorizontal: SPACING.sm + 2,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentAmber,
   },
-  badgeText: { fontSize: 10, fontWeight: 'bold', color: COLORS.text },
-  actionSection: { paddingHorizontal: SPACING.xl },
-  ctaButton: { borderRadius: RADIUS.xl, overflow: 'hidden' },
-  ctaGradient: { paddingVertical: 16, alignItems: 'center' },
-  ctaText: { ...FONTS.button, color: COLORS.blackText, fontSize: 17, fontWeight: 'bold' },
-  disclaimer: { textAlign: 'center', color: COLORS.textSecondary, fontSize: 11, marginTop: SPACING.sm, marginBottom: SPACING.md },
-  manageButton: { paddingVertical: 16, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.accent, alignItems: 'center' },
-  manageButtonText: { ...FONTS.button, color: COLORS.accent, fontWeight: 'bold' },
-  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: SPACING.lg },
-  footerLink: { color: COLORS.textSecondary, fontSize: 12, textDecorationLine: 'underline' },
-  footerDivider: { color: COLORS.textSecondary, marginHorizontal: 10, fontSize: 12 },
+  planBadgeText: { ...TYPE.labelSm, fontFamily: FONT_FAMILY.sans.bold, color: COLORS.blackText },
+  radio: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.hairline,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioSelected: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
+  planInfo: { flex: 1 },
+  planTitle: { ...TYPE.titleLg },
+  planSubtitle: { ...TYPE.bodyMd, marginTop: 2 },
+  planSubtitleAccent: { color: COLORS.accent },
+  priceBlock: { alignItems: 'flex-end' },
+  price: { ...TYPE.titleLg, fontSize: 20 },
+  period: { ...TYPE.bodySm, marginTop: 2 },
+
+  // --- ACTION ---
+  disclaimer: { ...TYPE.bodySm, textAlign: 'center', marginTop: SPACING.md },
+  manageButton: {
+    height: 54,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  manageButtonText: { ...TYPE.labelLg },
+
+  // --- FOOTER ---
+  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.xl },
+  footerLink: { ...TYPE.bodySm },
+  footerLinkAccent: { color: COLORS.accent },
+  footerDot: { ...TYPE.bodySm, color: COLORS.textMuted },
 });

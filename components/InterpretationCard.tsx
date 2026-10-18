@@ -4,8 +4,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types/calculation';
-import { COLORS, SPACING, RADIUS, FONTS, LAYOUT } from '@/lib/constants/theme';
-import { getCurrentLocale } from '@/lib/constants/locales';
+import { COLORS, SPACING, RADIUS, LAYOUT, SHADOWS, TYPE } from '@/lib/constants/theme';
+import { getCurrentLocale, t } from '@/lib/constants/locales';
 
 interface InterpretationCardProps {
   interpretation: Interpretation;
@@ -30,40 +30,28 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
     return Math.min(match[0].length, 6);
   })();
 
-  const fillPercent = (strength / 6) * 100;
-
-  const getFillColor = () => {
-    if (strength === 0) return COLORS.battery.empty;
-    // if (strength < 2) return COLORS.highlightWeak;
-    return COLORS.battery.full;
-  };
-
   return (
     <View style={styles.card}>
-      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-        <Ionicons name="close" size={LAYOUT.closeIconSize} color={COLORS.textSecondary} />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Ionicons name="close" size={20} color={COLORS.text} />
+        </TouchableOpacity>
+      </View>
 
-      <Text style={styles.title}>{title}</Text>
-
-      {showBattery && strength !== null && (
-        <View style={styles.batteryContainer}>
-          <View style={[
-            styles.batteryOutline,
-            { borderColor: strength === 0 ? COLORS.battery.empty : COLORS.border }
-          ]}>
-            <View
-              style={[
-                styles.batteryFill,
-                { width: fillPercent, backgroundColor: getFillColor() }
-              ]}
-            />
-            <View style={styles.batteryCap} />
+      {showBattery && (
+        <View style={styles.potential}>
+          <View style={styles.potentialHeader}>
+            <Text style={styles.potentialLabel}>{t('potentialLabel')}</Text>
+            <Text style={[styles.potentialValue, strength === 0 && styles.potentialValueEmpty]}>{strength} / 6</Text>
           </View>
-          <Text style={styles.batteryLabel}>{strength}/6</Text>
+          <View style={styles.segments}>
+            {Array.from({ length: 6 }, (_, i) => (
+              <View key={i} style={[styles.segment, i < strength && styles.segmentFilled]} />
+            ))}
+          </View>
         </View>
       )}
-
 
       <Text style={styles.description}>{description}</Text>
     </View>
@@ -72,58 +60,62 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.headerBackground,
-    borderRadius: RADIUS.lg,
-    borderWidth: 2,
-    borderColor: COLORS.borderFocused,
+    backgroundColor: COLORS.surfaceRaised,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     padding: SPACING.lg,
+    ...SHADOWS.card,
   },
-  closeButton: {
-    position: 'absolute',
-    top: SPACING.sm,
-    right: SPACING.sm,
-    zIndex: 1,
-  },
-  title: {
-    ...FONTS.cardTitle,
-    marginBottom: SPACING.sm,
-    paddingRight: LAYOUT.paddingRightLarge,
-  },
-  batteryContainer: {
+  header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: SPACING.md,
     marginBottom: SPACING.md,
   },
-  batteryOutline: {
-    width: LAYOUT.batteryWidth,
-    height: LAYOUT.batteryHeight,
-    borderRadius: RADIUS.sm,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.transparent,
-    position: 'relative',
-    overflow: 'hidden',
-    marginRight: SPACING.xs,
+  title: {
+    ...TYPE.headlineLg,
+    flex: 1,
   },
-  batteryFill: {
-    height: '100%',
-    backgroundColor: COLORS.accent,
-    borderRadius: RADIUS.battery,
+  closeButton: {
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: LAYOUT.iconButton / 2,
+    backgroundColor: COLORS.glass,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  batteryCap: {
-    position: 'absolute',
-    right: -6,
-    top: '50%',
-    transform: [{ translateY: -6 }],
-    width: LAYOUT.batteryCapWidth,
-    height: LAYOUT.batteryCapHeight,
-    backgroundColor: COLORS.border,
-    borderRadius: RADIUS.batteryCap,
+  potential: {
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.gutterSm,
+    marginBottom: SPACING.md,
   },
-  batteryLabel: {
-    ...FONTS.batteryLabel,
+  potentialHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  potentialLabel: TYPE.labelMd,
+  potentialValue: { ...TYPE.labelMd, color: COLORS.accent },
+  potentialValueEmpty: { color: COLORS.error },
+  segments: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  segment: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.surfaceRaised,
+  },
+  segmentFilled: {
+    backgroundColor: COLORS.accentLight,
   },
   description: {
-    ...FONTS.cardDescription,
+    ...TYPE.bodyLg,
+    color: COLORS.textTertiary,
   },
 });

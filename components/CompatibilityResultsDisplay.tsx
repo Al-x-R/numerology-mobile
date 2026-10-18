@@ -18,7 +18,8 @@ import Animated, {
 import { router } from 'expo-router';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -79,8 +80,9 @@ function GeneralAnalysisCard({
 
   return (
     <Animated.View style={[styles.analysisCard, animatedStyle]}>
+      <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
       <Text style={styles.datesText}>
-        {date1}  ↔  {date2}
+        {date1}  ⇄  {date2}
       </Text>
 
       <Text style={styles.analysisTitleLabel}>
@@ -90,7 +92,7 @@ function GeneralAnalysisCard({
         {lifePath1} + {lifePath2}
       </Text>
 
-
+      <Text style={styles.destinyNumber}>{destinyNumber}</Text>
       <Text style={styles.destinyTitle}>
         {t('compatibility.destinyTitle')} {destinyNumber}
       </Text>
@@ -150,6 +152,9 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
           <Text style={[styles.percentage, { color: percentageColor }]}>
             {pct}%
           </Text>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: percentageColor }]} />
+          </View>
         </View>
 
         <View style={styles.partnerValue}>
@@ -187,10 +192,11 @@ function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProp
 
   return (
     <Animated.View style={[styles.totalContainer, animatedStyle]}>
-      <LinearGradient colors={GRADIENTS.button} style={styles.totalCard}>
+      <View style={styles.totalCard}>
+        <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
         <Text style={styles.totalLabel}>{label}</Text>
         <Text style={[styles.totalValue, { color }]}>{value}%</Text>
-      </LinearGradient>
+      </View>
     </Animated.View>
   );
 }
@@ -207,21 +213,33 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
     <View style={[styles.section, styles.premiumConclusionSection]}>
       <Text style={styles.sectionTitle}>{t('compatibility.conclusionTitle')}</Text>
 
-      <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
+      <View style={styles.labelRow}>
+        <Ionicons name="compass-outline" size={18} color={COLORS.accent} />
+        <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
+      </View>
       <Text style={styles.missionText}>{destinyInfo.mission}</Text>
 
       {destinyInfo.purpose && (
         <View>
-          <Text style={styles.destinyPurposeLabel}>{t('compatibility.purposeLabel')}</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="flag-outline" size={18} color={COLORS.accent} />
+            <Text style={styles.destinyPurposeLabel}>{t('compatibility.purposeLabel')}</Text>
+          </View>
           <Text style={styles.purposeTextBody}>{destinyInfo.purpose}</Text>
         </View>
       )}
 
       {destinyInfo.challenges && destinyInfo.challenges.length > 0 && (
         <View style={styles.challengesList}>
-          <Text style={styles.challengesListTitle}>{t('compatibility.challengesLabel')}</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="warning-outline" size={18} color={COLORS.error} />
+            <Text style={styles.challengesListTitle}>{t('compatibility.challengesLabel')}</Text>
+          </View>
           {destinyInfo.challenges.map((challenge, i) => (
             <View key={i} style={styles.challengeItem}>
+              <View style={styles.challengeIcon}>
+                <Ionicons name="remove" size={12} color={COLORS.error} />
+              </View>
               <Text style={styles.challengeItemText}>{challenge}</Text>
             </View>
           ))}
@@ -239,7 +257,10 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
 
       {recommendations.length > 0 && (
         <View style={styles.recommendationsList}>
-          <Text style={styles.recommendationsListTitle}>{t('compatibility.recommendations')}:</Text>
+          <View style={styles.labelRow}>
+            <Ionicons name="bulb-outline" size={18} color={COLORS.accent} />
+            <Text style={styles.recommendationsListTitle}>{t('compatibility.recommendations')}</Text>
+          </View>
           {recommendations.map((rec, i) => (
             <View key={i} style={styles.recommendationItem}>
               <Text style={styles.recommendationBullet}>•</Text>
@@ -370,269 +391,142 @@ export function CompatibilityResultsDisplay({
 
 const styles = StyleSheet.create({
   scrollContent: {
-    padding: SPACING.xs,
-    paddingBottom: SPACING.xl * 2
+    paddingBottom: SPACING.xl * 2,
   },
   section: {
-    marginBottom: SPACING.xl
+    marginBottom: SPACING.xl,
   },
   sectionTitle: {
-    ...FONTS.sectionTitle,
-    fontSize: 20,
+    ...TYPE.headlineLg,
     marginBottom: SPACING.md,
   },
 
-  // --- GENERAL ANALYSIS CARD STYLES ---
+  // --- Union hero card ---
   analysisCard: {
-    backgroundColor: COLORS.card,
+    overflow: 'hidden',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.xl,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.lg,
   },
-  datesText: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-  },
-  analysisTitleLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 22,
-    color: COLORS.primary,
-    textAlign: 'center',
-    marginBottom: SPACING.xs * 0.5,
-  },
-  analysisTitleValues: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 26,
-    color: COLORS.primary,
-    textAlign: 'center',
-    marginBottom: SPACING.md,
-  },
-  destinyTitle: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 28,
+  datesText: { ...TYPE.labelMd, color: COLORS.text, letterSpacing: 1.6 },
+  analysisTitleLabel: { ...TYPE.labelSm, marginTop: SPACING.md },
+  analysisTitleValues: { ...TYPE.headlineMd, color: COLORS.accent, marginTop: SPACING.xs },
+  destinyNumber: {
+    fontFamily: FONT_FAMILY.serif.medium,
+    fontSize: 72,
+    lineHeight: 80,
     color: COLORS.accent,
-    textAlign: 'center',
-    marginBottom: SPACING.xs,
+    marginTop: SPACING.sm,
   },
-  destinyOverviewText: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 16,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginTop: SPACING.md,
-    lineHeight: 24,
-  },
+  destinyTitle: { ...TYPE.headlineMd, textAlign: 'center', marginBottom: SPACING.md },
+  destinyOverviewText: { ...TYPE.bodyMd, color: COLORS.textTertiary, textAlign: 'center' },
 
-  // --- LP ANALYSIS TEXT SECTION ---
-  lpAnalysisTextSection: {
-    backgroundColor: COLORS.card,
+  // --- Parameter cards ---
+  paramCard: {
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.xl,
-    marginBottom: SPACING.xl,
+    padding: SPACING.md,
+    marginBottom: SPACING.gutterSm,
   },
-  analysisTextTitle: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 18,
-    color: COLORS.primary,
-    marginBottom: SPACING.sm,
-  },
-  analysisTextBody: {
-    ...FONTS.body,
-    lineHeight: 26,
-  },
-
-  // --- PREMIUM CONCLUSION STYLES ---
-  premiumConclusionSection: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.xl,
-    marginBottom: SPACING.xl,
-  },
-  destinyMissionLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 16,
-    color: COLORS.accent,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.xs,
-    textAlign: 'left',
-  },
-  destinyPurposeLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 16,
-    color: COLORS.accent,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.xs,
-    textAlign: 'left',
-  },
-  missionText: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontStyle: 'italic',
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
-    marginBottom: SPACING.md,
-  },
-  purposeTextBody: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontStyle: 'italic',
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
-    marginBottom: SPACING.md,
-  },
-  summaryTextBody: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 15,
-    color: COLORS.text,
-    lineHeight: 22,
-    marginBottom: SPACING.md,
-  },
-  recommendationsList: {
-    marginTop: SPACING.lg,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.hairline,
-    paddingTop: SPACING.md,
-  },
-  recommendationsListTitle: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 18,
-    color: COLORS.primary,
-    marginBottom: SPACING.sm,
-  },
-  recommendationItem: {
+  paramTitle: { ...TYPE.titleMd, marginBottom: SPACING.sm },
+  paramValues: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.xs,
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
   },
-  recommendationBullet: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    color: COLORS.accent,
-    marginRight: SPACING.xs,
-    fontSize: 18,
-    lineHeight: 22,
+  partnerValue: { alignItems: 'center', minWidth: 64 },
+  partnerLabel: { ...TYPE.labelSm, marginBottom: 2 },
+  partnerNumber: { ...TYPE.titleLg },
+  percentageContainer: { flex: 1, alignItems: 'center', paddingHorizontal: SPACING.md },
+  percentage: { fontFamily: FONT_FAMILY.sans.bold, fontSize: 18, marginBottom: 6 },
+  progressTrack: {
+    width: '100%',
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.surfaceRaised,
+    overflow: 'hidden',
   },
-  recommendationItemText: {
-    ...FONTS.body,
-    flex: 1,
-    color: COLORS.text,
-    lineHeight: 22,
+  progressFill: { height: '100%', borderRadius: 2 },
+
+  // --- Total ---
+  totalContainer: { marginBottom: SPACING.xl },
+  totalCard: {
+    overflow: 'hidden',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceSelected,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
+    paddingVertical: SPACING.lg,
+    paddingHorizontal: SPACING.md,
+    ...SHADOWS.goldenButtonSoft,
   },
-  challengesList: {
-    marginTop: SPACING.xl,
-    paddingTop: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.hairline,
+  totalLabel: { ...TYPE.labelMd, color: COLORS.accent },
+  totalValue: { fontFamily: FONT_FAMILY.serif.medium, fontSize: 56, lineHeight: 64, marginTop: SPACING.xs },
+
+  // --- Free conclusion ---
+  lpAnalysisTextSection: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
   },
-  challengesListTitle: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 18,
-    color: COLORS.error,
-    marginBottom: SPACING.md,
+  analysisTextTitle: { ...TYPE.headlineMd, marginBottom: SPACING.sm },
+  analysisTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
+
+  // --- Premium conclusion ---
+  premiumConclusionSection: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md + 4,
   },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.lg, marginBottom: SPACING.sm },
+  destinyMissionLabel: { ...TYPE.titleMd, color: COLORS.accent },
+  destinyPurposeLabel: { ...TYPE.titleMd, color: COLORS.accent },
+  missionText: { ...TYPE.bodyLg, color: COLORS.textTertiary },
+  purposeTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
+  summaryTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
+  challengesList: {},
+  challengesListTitle: { ...TYPE.titleMd, color: COLORS.error },
   challengeItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: SPACING.md,
-  },
-  challengeItemText: {
-    ...FONTS.body,
-    flex: 1,
-    color: COLORS.text,
-    lineHeight: 22,
-    marginLeft: SPACING.sm,
-  },
-
-  // --- ADVICE STYLES ---
-  adviceContainer: {
-    marginTop: SPACING.xl,
-    marginBottom: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.accentSoft,
+    gap: SPACING.sm,
+    backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.accent,
-  },
-  adviceMotto: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontStyle: 'italic',
-    fontSize: 18,
-    color: COLORS.accent,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-
-  // --- PARAMETER CARD STYLES ---
-  paramCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.md,
-    padding: SPACING.lg,
-    marginBottom: SPACING.md,
-  },
-  paramTitle: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 17,
-    color: COLORS.text,
+    padding: SPACING.gutterSm,
     marginBottom: SPACING.sm,
   },
-  paramValues: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  challengeIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.warningChip,
+    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 1,
   },
-  partnerValue: {
-    alignItems: 'center',
-    flex: 1,
+  challengeItemText: { ...TYPE.bodyMd, color: COLORS.textTertiary, flex: 1 },
+  adviceContainer: {
+    marginTop: SPACING.lg,
+    borderLeftWidth: 2,
+    borderLeftColor: COLORS.accent,
+    backgroundColor: COLORS.background,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
   },
-  partnerLabel: {
-    fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  partnerNumber: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 28,
-    color: COLORS.primary,
-  },
-  percentageContainer: {
-    alignItems: 'center',
-    minWidth: 90,
-  },
-  percentage: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 40,
-    fontWeight: '800',
-  },
-
-  // --- TOTAL CARD STYLES ---
-  totalContainer: {
-    marginBottom: SPACING.xl,
-  },
-  totalCard: {
-    width: '100%',
-    alignItems: 'center',
-    borderRadius: RADIUS.xl,
-    paddingVertical: SPACING.lg,
-    paddingHorizontal: SPACING.xl,
-  },
-  totalLabel: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 18,
-    color: COLORS.text,
+  adviceMotto: {
+    fontFamily: FONT_FAMILY.serif.italic,
+    fontSize: 22,
+    lineHeight: 30,
+    color: COLORS.accent,
     textAlign: 'center',
-    opacity: 0.9,
   },
-  totalValue: {
-    fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 52,
-    fontWeight: '900',
-    color: COLORS.text,
-    marginTop: 6,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
+  recommendationsList: {},
+  recommendationsListTitle: { ...TYPE.titleMd, color: COLORS.accent },
+  recommendationItem: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.sm },
+  recommendationBullet: { ...TYPE.bodyLg, color: COLORS.accent },
+  recommendationItemText: { ...TYPE.bodyMd, color: COLORS.textTertiary, flex: 1 },
 });

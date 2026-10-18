@@ -2,9 +2,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { COLORS, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { GoldButton } from '@/components/ui/GoldButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 interface PremiumTeaserModalProps {
@@ -24,42 +24,28 @@ export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }
   const premiumButtonText = t('premiumTeaser.getPremium');
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <Pressable style={styles.backdrop} onPress={onClose} />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
         <View style={styles.modalContainer}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+            <Ionicons name="close" size={20} color={COLORS.text} />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="lock-closed" size={32} color={COLORS.accent} />
+            <Ionicons name="lock-closed-outline" size={26} color={COLORS.accent} />
           </View>
 
-          <Text style={styles.title}>
-            {title}
-          </Text>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.description}>{description}</Text>
 
-          <Text style={styles.description}>
-            {description}
-          </Text>
-
-          <TouchableOpacity
-            style={styles.adButton}
+          <GoldButton
+            title={adButtonText}
             onPress={onWatchAd}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="play-circle" size={24} color={COLORS.blackText} style={{ marginRight: 8 }} />
-            <Text style={styles.adButtonText}>
-              {adButtonText}
-            </Text>
-          </TouchableOpacity>
+            icon={<Ionicons name="play-circle-outline" size={20} color={COLORS.blackText} />}
+            style={styles.adButton}
+          />
 
           <View style={styles.dividerContainer}>
             <View style={styles.line} />
@@ -67,15 +53,8 @@ export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }
             <View style={styles.line} />
           </View>
 
-          <TouchableOpacity onPress={onGetPremium}>
-            <LinearGradient
-              colors={['transparent', 'transparent']}
-              style={styles.premiumLinkContainer}
-            >
-              <Text style={styles.premiumLinkText}>
-                {premiumButtonText}
-              </Text>
-            </LinearGradient>
+          <TouchableOpacity onPress={onGetPremium} style={styles.premiumLink}>
+            <Text style={styles.premiumLinkText}>{premiumButtonText}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -88,89 +67,56 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFill,
     backgroundColor: COLORS.modalBackdrop,
+    padding: SPACING.margin,
   },
   modalContainer: {
-    width: '85%',
-    maxWidth: 400,
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.xl,
-    padding: SPACING.xl,
+    width: '100%',
+    maxWidth: 420,
     alignItems: 'center',
+    backgroundColor: COLORS.surfaceRaised,
+    borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: COLORS.hairline,
+    borderColor: COLORS.borderAccent,
+    padding: SPACING.lg,
+    paddingTop: SPACING.xl,
+    ...SHADOWS.card,
   },
   closeButton: {
     position: 'absolute',
     top: SPACING.md,
     right: SPACING.md,
-    padding: 4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.glass,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iconContainer: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: COLORS.accentSoft,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.lg,
+    ...SHADOWS.goldenButtonSoft,
   },
-  title: {
-    ...FONTS.subtitle,
-    color: COLORS.text,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-    fontSize: 20,
-  },
-  description: {
-    ...FONTS.body,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: SPACING.xl,
-    lineHeight: 22,
-  },
-  adButton: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.accent,
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: RADIUS.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  adButtonText: {
-    ...FONTS.button,
-    color: COLORS.blackText,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  title: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
+  description: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.lg },
+  adButton: { alignSelf: 'stretch' },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
+    gap: SPACING.md,
     marginVertical: SPACING.lg,
+    alignSelf: 'stretch',
   },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.hairline,
-  },
-  orText: {
-    ...FONTS.body,
-    color: COLORS.textSecondary,
-    marginHorizontal: SPACING.md,
-    fontSize: 12,
-  },
-  premiumLinkContainer: {
-    paddingVertical: 4,
-  },
-  premiumLinkText: {
-    ...FONTS.button,
-    color: COLORS.accent,
-    fontSize: 15,
-    textDecorationLine: 'underline',
-  },
+  line: { flex: 1, height: 1, backgroundColor: COLORS.hairline },
+  orText: TYPE.labelSm,
+  premiumLink: { paddingVertical: SPACING.sm },
+  premiumLinkText: TYPE.labelLg,
 });

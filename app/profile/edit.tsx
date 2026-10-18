@@ -1,28 +1,16 @@
 // app/profile/edit.tsx
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Platform,
-  Modal,
-  StyleSheet,
-  KeyboardAvoidingView,
-  ScrollView,
-  Alert,
-  Image,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform, Modal, StyleSheet, KeyboardAvoidingView, ScrollView, Alert, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 
 import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
-import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
+import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { GoldButton } from '@/components/ui/GoldButton';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -157,7 +145,7 @@ export default function EditProfileScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFill} />
+      <AuraBackground />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -177,12 +165,12 @@ export default function EditProfileScreen() {
                 <Image source={{ uri: currentAvatar }} style={styles.avatarLarge} />
               ) : (
                 <View style={styles.avatarPlaceholderLarge}>
-                  <Ionicons name="person" size={50} color={COLORS.accent} />
+                  <Ionicons name="person-outline" size={44} color={COLORS.accent} />
                 </View>
               )}
 
               <TouchableOpacity style={styles.editIconBadge} onPress={handlePickImage}>
-                <Ionicons name="camera" size={18} color={COLORS.blackText} />
+                <Ionicons name="camera-outline" size={16} color={COLORS.accent} />
               </TouchableOpacity>
             </View>
 
@@ -205,13 +193,13 @@ export default function EditProfileScreen() {
             <View style={styles.field}>
               <Text style={styles.label}>{t('profile.name')}</Text>
               <View style={styles.inputWrapper}>
-                <Ionicons name="person-outline" size={20} color={COLORS.textSecondary} style={styles.inputIcon} />
+                <Ionicons name="person-outline" size={18} color={COLORS.accent} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={name}
                   onChangeText={setName}
                   placeholder={t('profile.enterName')}
-                  placeholderTextColor={COLORS.textSecondary}
+                  placeholderTextColor={COLORS.placeholder}
                   autoCapitalize="words"
                   maxLength={30}
                 />
@@ -223,36 +211,18 @@ export default function EditProfileScreen() {
               <Text style={styles.label}>{t('profile.birthDate')}</Text>
               <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="calendar-outline" size={20} color={COLORS.textSecondary} style={styles.inputIcon} />
+                  <Ionicons name="calendar-outline" size={18} color={COLORS.accent} style={styles.inputIcon} />
                   <Text style={birthDate ? styles.dateText : styles.placeholderText}>
                     {birthDate ? formatBirthDateFromDate(birthDate) : t('profile.selectDate')}
                   </Text>
                 </View>
-                <Ionicons name="chevron-down" size={20} color={COLORS.textSecondary} />
+                <Ionicons name="chevron-down" size={18} color={COLORS.chevron} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Save button */}
-          <TouchableOpacity
-            style={styles.goldenButtonContainer}
-            onPress={saveChanges}
-            disabled={isSaving}
-            activeOpacity={0.85}
-          >
-            <LinearGradient
-              colors={GRADIENTS.goldenButton}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.goldenButton}
-            >
-              {isSaving ? (
-                <ActivityIndicator color={COLORS.blackText} />
-              ) : (
-                <Text style={styles.goldenButtonText}>{t('common.save')}</Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+          <GoldButton title={t('common.save')} onPress={saveChanges} loading={isSaving} />
 
         </ScrollView>
       </KeyboardAvoidingView>
@@ -280,7 +250,7 @@ export default function EditProfileScreen() {
                 maximumDate={new Date()}
                 themeVariant="dark"
                 textColor="white"
-                style={{ backgroundColor: COLORS.surface, height: 200, width: '100%' }}
+                style={{ backgroundColor: COLORS.surfaceRaised, height: 200, width: '100%' }}
                 locale={getIOSLocale(language)}
               />
             </View>
@@ -303,94 +273,77 @@ export default function EditProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  content: { padding: SPACING.xl },
-  avatarSection: { alignItems: 'center', marginBottom: 30 },
-  avatarContainer: { position: 'relative' },
-  avatarLarge: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
+  content: { paddingHorizontal: SPACING.margin, paddingTop: SPACING.lg },
+  avatarSection: { alignItems: 'center', marginBottom: SPACING.xl },
+  avatarContainer: {
+    position: 'relative',
+    padding: 3,
+    borderRadius: 64,
+    borderWidth: 1.5,
+    borderColor: COLORS.borderSelected,
+    ...SHADOWS.goldenButtonSoft,
   },
+  avatarLarge: { width: 112, height: 112, borderRadius: 56 },
   avatarPlaceholderLarge: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.accentSoft,
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.accent,
-    borderStyle: 'dashed',
   },
   editIconBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: COLORS.accent,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    bottom: 2,
+    right: 2,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.borderSelected,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: COLORS.background,
   },
-  avatarActions: { marginTop: SPACING.md, alignItems: 'center' },
-  changePhotoText: { ...FONTS.button, color: COLORS.accent, fontSize: 16 },
-  removePhotoText: { ...FONTS.body, color: COLORS.error, fontSize: 14 },
-  formContainer: { marginBottom: 30 },
+  avatarActions: { marginTop: SPACING.md, alignItems: 'center', gap: SPACING.sm },
+  changePhotoText: TYPE.labelLg,
+  removePhotoText: { ...TYPE.labelMd, color: COLORS.error },
+  formContainer: { marginBottom: SPACING.lg },
   field: { marginBottom: SPACING.lg },
-  label: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 8, fontSize: 14, marginLeft: 4 },
+  label: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    height: 56,
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.hairline,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
   },
   inputIcon: { marginRight: SPACING.sm },
-  input: { flex: 1, paddingVertical: 16, ...FONTS.body, color: COLORS.text },
+  input: { ...TYPE.bodyLg, flex: 1, height: '100%' },
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
+    height: 56,
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.hairline,
+    borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
-    paddingVertical: 16,
   },
-  dateText: { ...FONTS.body, color: COLORS.text },
-  placeholderText: { ...FONTS.body, color: COLORS.textSecondary },
-  goldenButtonContainer: {
-    marginTop: SPACING.md,
-    borderRadius: RADIUS.xl,
-    overflow: 'hidden',
-  },
-  goldenButton: {
-    paddingVertical: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  goldenButtonText: {
-    ...FONTS.button,
-    fontSize: 18,
-    color: COLORS.blackText,
-    fontWeight: '700',
-  },
+  dateText: TYPE.bodyLg,
+  placeholderText: { ...TYPE.bodyLg, color: COLORS.placeholder },
   modalOverlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'flex-end' },
   pickerContainer: {
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingBottom: 30,
+    backgroundColor: COLORS.surfaceRaised,
+    borderTopLeftRadius: RADIUS.xl,
+    borderTopRightRadius: RADIUS.xl,
+    paddingBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: COLORS.hairline,
+    borderColor: COLORS.borderAccent,
     alignItems: 'center',
   },
   pickerHeader: {
@@ -399,11 +352,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.hairline,
-    backgroundColor: COLORS.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderBottomColor: COLORS.divider,
   },
-  cancelText: { color: COLORS.error, fontSize: 17, fontWeight: '600' },
-  doneText: { color: COLORS.accent, fontSize: 17, fontWeight: '600' },
+  cancelText: { ...TYPE.labelLg, color: COLORS.ghost },
+  doneText: TYPE.labelLg,
 });

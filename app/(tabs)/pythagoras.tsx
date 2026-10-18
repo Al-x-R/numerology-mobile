@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
 
 import { DateInputForm } from '@/components/DateInputForm';
@@ -9,8 +8,10 @@ import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
 import { CalculationResult } from '@/lib/types/calculation';
 import { ProfileButton } from '@/components/ui/ProfileButton';
-import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, FONTS, GRADIENTS, LAYOUT } from '@/lib/constants/theme';
+import { HeaderEmblem } from '@/components/ui/HeaderEmblem';
+import { COLORS, LAYOUT, TYPE } from '@/lib/constants/theme';
+import { TAB_BAR_STYLE } from '@/lib/constants/navigation';
+import { AuraBackground } from '@/components/ui/AuraBackground';
 import { BackButton } from '@/components/ui/BackButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
@@ -51,15 +52,18 @@ export default function HomeScreen() {
 
   const contentStyle: StyleProp<ViewStyle> = results ?
     { justifyContent: 'flex-start', alignItems: 'stretch' } :
-    {  alignItems: 'center', marginTop: LAYOUT.topMarginLarge };
+    { alignItems: 'stretch' };
 
   useEffect(() => {
     if (results) {
       navigation.setOptions({
         headerTitle: () => (
-          <View style={{ alignItems: 'center' }}>
-            <Text style={FONTS.headerTitle}>{t('analysisTitle')}</Text>
-            <Text style={FONTS.headerSubtitle}>{dateString}</Text>
+          <View style={styles.resultHeader}>
+            <Text style={styles.resultTitle}>{t('analysisTitle')}</Text>
+            <View style={styles.resultDateRow}>
+              <View style={styles.resultDot} />
+              <Text style={styles.resultDate}>{dateString}</Text>
+            </View>
           </View>
         ),
         headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
@@ -71,13 +75,9 @@ export default function HomeScreen() {
     } else {
       navigation.setOptions({
         headerTitle: t('tabs.pythagoras'),
-        headerLeft: () => null,
+        headerLeft: () => <HeaderEmblem />,
         headerRight: () => <ProfileButton onPress={() => router.push('/profile')} />,
-        tabBarStyle: {
-          display: 'flex',
-          backgroundColor: COLORS.background,
-          borderTopColor: COLORS.background
-        },
+        tabBarStyle: TAB_BAR_STYLE,
       });
     }
 
@@ -86,11 +86,9 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       style={styles.container}
-      edges={['bottom', 'left', 'right']}
+      edges={results ? ['bottom', 'left', 'right'] : ['left', 'right']}
     >
-      <LinearGradient colors={GRADIENTS.background} style={styles.background}>
-        <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
-      </LinearGradient>
+      <AuraBackground />
       <View style={[styles.content, contentStyle]}>
         {!results ? (
           <DateInputForm
@@ -107,24 +105,18 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  resultHeader: { alignItems: 'center' },
+  resultTitle: { ...TYPE.headlineMd },
+  resultDateRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  resultDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: COLORS.accent },
+  resultDate: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2 },
   container: {
     flex: 1,
     backgroundColor: COLORS.transparent,
-    paddingTop: 20
   },
   content: {
     flex: 1,
     paddingHorizontal: LAYOUT.contentPadding,
     alignItems: 'center',
-  },
-  background: {
-    ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-  },
-  logo: {
-    width: '150%',
-    maxWidth: LAYOUT.logoLarge,
-    maxHeight: LAYOUT.logoLarge,
-    opacity: 0.2,
   },
 });
