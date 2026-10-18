@@ -8,13 +8,15 @@ interface GoldButtonProps {
   title: string;
   onPress: () => void;
   icon?: React.ReactNode;
+  // Trailing icon, e.g. a forward arrow after the label
+  iconRight?: React.ReactNode;
   loading?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
 // Primary CTA: brushed gold gradient, uppercase label, ambient gold aura
-export const GoldButton = ({ title, onPress, icon, loading, disabled, style }: GoldButtonProps) => (
+export const GoldButton = ({ title, onPress, icon, iconRight, loading, disabled, style }: GoldButtonProps) => (
   <TouchableOpacity
     style={[styles.wrapper, (disabled || loading) && styles.disabled, style]}
     onPress={onPress}
@@ -28,6 +30,7 @@ export const GoldButton = ({ title, onPress, icon, loading, disabled, style }: G
         <View style={styles.content}>
           {icon}
           <Text style={styles.label}>{title}</Text>
+          {iconRight}
         </View>
       )}
     </LinearGradient>

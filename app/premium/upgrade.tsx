@@ -182,7 +182,7 @@ export default function PremiumScreen() {
               title={isLoading ? t('premium.loading') : t('premium.continue')}
               onPress={handlePurchase}
               loading={isLoading}
-              icon={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+              iconRight={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
             />
             <Text style={styles.disclaimer}>{t('premium.subscriptionDisclaimer')}</Text>
           </>

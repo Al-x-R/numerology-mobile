@@ -58,7 +58,7 @@ export default function OnboardingScreen() {
           <GoldButton
             title={t('onboarding.startButton')}
             onPress={handleStart}
-            icon={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+            iconRight={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
             style={styles.mainButton}
           />
 
