@@ -7,7 +7,9 @@ import { router } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { COLORS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
+import * as Linking from 'expo-linking';
 import { GoldButton } from '@/components/ui/GoldButton';
 import { Ionicons } from '@expo/vector-icons';
 import { AuraBackground } from '@/components/ui/AuraBackground';
@@ -15,6 +17,8 @@ import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useProfile } from '@/contexts/ProfileContext';
 
 const { width } = Dimensions.get('window');
+const EMBLEM_SIZE = width * 0.6;
+const TERMS_URL = 'https://telegra.ph/Terms-of-Use-EULA-01-03';
 
 export default function OnboardingScreen() {
   const { t } = useAppTranslation();
@@ -36,6 +40,17 @@ export default function OnboardingScreen() {
             entering={FadeInDown.delay(100).duration(800).springify()}
             style={styles.logoContainer}
           >
+            {/* Soft gold glow behind the emblem */}
+            <Svg style={styles.glow} pointerEvents="none">
+              <Defs>
+                <RadialGradient id="emblemGlow" cx="50%" cy="50%" r="50%">
+                  <Stop offset="0" stopColor={COLORS.accentLight} stopOpacity={0.35} />
+                  <Stop offset="0.45" stopColor={COLORS.accent} stopOpacity={0.12} />
+                  <Stop offset="1" stopColor={COLORS.accent} stopOpacity={0} />
+                </RadialGradient>
+              </Defs>
+              <Rect width="100%" height="100%" fill="url(#emblemGlow)" />
+            </Svg>
             <Image
               source={LOGO_IMAGE}
               style={styles.logo}
@@ -43,7 +58,11 @@ export default function OnboardingScreen() {
             />
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(300).duration(800)}>
+          <Animated.View entering={FadeInDown.delay(300).duration(800)} style={styles.textBlock}>
+            <View style={styles.badge}>
+              <View style={styles.badgeDot} />
+              <Text style={styles.badgeText}>{t('onboarding.badge')}</Text>
+            </View>
             <Text style={styles.title}>{t('title')}</Text>
             <Text style={styles.subtitle}>
               {t('onboarding.subtitle')}
@@ -58,12 +77,13 @@ export default function OnboardingScreen() {
           <GoldButton
             title={t('onboarding.startButton')}
             onPress={handleStart}
-            iconRight={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+            icon={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
             style={styles.mainButton}
           />
 
-          <Text style={styles.legalText}>
-            {t('onboarding.legal')}
+          <Text style={styles.legalText}>{t('onboarding.legalPrefix')}</Text>
+          <Text style={[styles.legalText, styles.legalLink]} onPress={() => Linking.openURL(TERMS_URL)}>
+            {t('onboarding.legalLink')}
           </Text>
         </Animated.View>
 
@@ -88,12 +108,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoContainer: {
+    width: EMBLEM_SIZE,
+    height: EMBLEM_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: SPACING.xl,
   },
-  logo: {
-    width: width * 0.55,
-    height: width * 0.55,
+  glow: {
+    position: 'absolute',
+    width: EMBLEM_SIZE * 1.5,
+    height: EMBLEM_SIZE * 1.5,
   },
+  logo: {
+    width: EMBLEM_SIZE,
+    height: EMBLEM_SIZE,
+  },
+  textBlock: {
+    alignItems: 'center',
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    marginBottom: SPACING.lg,
+  },
+  badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
+  badgeText: { ...TYPE.labelMd, color: COLORS.textTertiary, letterSpacing: 2.4 },
   title: {
     ...TYPE.displayLg,
     fontSize: 40,
@@ -120,5 +166,9 @@ const styles = StyleSheet.create({
     ...TYPE.bodySm,
     color: COLORS.textMuted,
     textAlign: 'center',
+  },
+  legalLink: {
+    color: COLORS.textSecondary,
+    textDecorationLine: 'underline',
   },
 });

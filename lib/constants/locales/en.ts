@@ -45,9 +45,11 @@ export const en = {
   },
 
   onboarding: {
+    badge: "Destiny matrix • Numerology",
+    legalPrefix: 'By tapping "Get Started", you agree',
+    legalLink: "to our Terms of Use",
     subtitle: 'Discover your Destiny Matrix\nand unlock your potential',
     startButton: 'Get Started',
-    legal: 'By tapping "Get Started", you agree\nto our Terms of Use',
   },
 
   subtitle: 'Calculate your Pythagorean Square',
