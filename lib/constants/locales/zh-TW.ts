@@ -33,9 +33,8 @@ export const zhTW = {
 
   onboarding: {
     subtitle: '探索您的命運矩陣\n釋放內在潛力',
-    guestButton: '以訪客身份繼續',
-    loginButton: '我已有帳號',
-    legal: '點擊「繼續」即表示您同意\n使用條款',
+    startButton: '開始',
+    legal: '點擊「開始」即表示您同意\n使用條款',
   },
 
   subtitle: '計算您的畢達哥拉斯方塊',
@@ -293,30 +292,6 @@ export const zhTW = {
   numbersDescription: '此處將計算手機號碼與車牌號碼。(PRO 功能)',
   changeLanguageAlert: '切換語言',
 
-  auth: {
-    welcome: '歡迎使用',
-    google: '使用 Google 繼續',
-    email: '電子郵件',
-    password: '密碼',
-    login: '登錄',
-    noAccount: '沒有帳號？立即註冊',
-    emailInvalid: '電子郵件格式無效',
-    passwordShort: '密碼長度需 ≥6 位',
-    birthDatePlaceholder: "日.月.年",
-    register: '註冊',
-    createAccount: '建立帳號',
-    haveAccount: '已有帳號？登錄',
-    forgotPassword: '忘記密碼？',
-    resetPassword: '重設密碼',
-    enterEmailToReset: '請輸入電子郵件以重設密碼。',
-    resetEmailSent: '密碼重設說明已發送至您的信箱。',
-    userNotFound: '找不到此電子郵件的用戶。',
-    displayName: "顯示名稱",
-    displayNameShort: '名稱長度需大於 2 個字元',
-    emailUsedRedirectLogin: '此電子郵件已註冊。要直接登錄嗎？',
-    goToLogin: '前往登錄',
-    wrongPasswordOrUserNotFound: '電子郵件或密碼錯誤。',
-  },
   common: {
     error: '錯誤',
     success: '成功',
@@ -345,20 +320,15 @@ export const zhTW = {
     changeLanguage: '切換語言',
     premiumActive: 'Premium 已啟用',
     getPremium: '購買 Premium',
-    addAccount: '添加帳號',
-    logout: '登出',
-    deleteAccount: '刪除帳號',
-    loginOrRegister: '登錄 / 註冊',
+    resetData: '重設資料',
     guest: '訪客',
     saved: '修改已成功保存',
   },
   alerts: {
-    logout: '確定要登出嗎？',
-    deleteAccount: '確定要刪除嗎？此操作無法撤銷。',
-    deleteAccountTitle: '刪除帳號',
+    resetDataTitle: '重設資料',
+    resetData: '您的個人檔案、出生日期和照片將從此裝置中刪除。此操作無法撤銷。',
     cancel: '取消',
-    logoutButton: '登出',
-    deleteButton: '刪除',
+    resetButton: '重設',
   },
   currentLanguage: 'zh-TW',
   date: {
@@ -372,13 +342,10 @@ export const zhTW = {
     notReady: "廣告載入中，請稍候再試"
   },
 
-  authRequired: {
-    loginRequired: "需要登錄",
-    birthDateMissing: "未填寫出生日期",
-    loginDescription: "請登錄帳號以獲取個人預測。",
-    birthDateDescription: "請在個人檔案中填寫出生日期以獲取精確計算。",
-    loginButton: "登錄帳號",
-    setBirthDateButton: "填寫出生日期",
+  birthDateRequired: {
+    title: "未填寫出生日期",
+    description: "請在個人檔案中填寫出生日期以獲取精確計算。",
+    button: "填寫出生日期",
   },
 
   horoscope: {

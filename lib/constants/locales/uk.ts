@@ -33,9 +33,8 @@ export const uk = {
 
   onboarding: {
     subtitle: 'Дізнайтеся свою матрицю долі\nта розкрийте потенціал',
-    guestButton: 'Продовжити як гість',
-    loginButton: 'У мене вже є акаунт',
-    legal: 'Натискаючи «Продовжити», ви погоджуєтеся\nз умовами використання',
+    startButton: 'Почати',
+    legal: 'Натискаючи «Почати», ви погоджуєтеся\nз умовами використання',
   },
 
   subtitle: 'Розрахуйте свій Квадрат Піфагора',
@@ -293,30 +292,6 @@ export const uk = {
   numbersDescription: 'Тут буде розрахунок номера телефону та номера автомобіля. (PRO-функція)',
   changeLanguageAlert: 'Змінити мову!',
 
-  auth: {
-    welcome: 'Ласкаво просимо',
-    google: 'Продовжити з Google',
-    email: 'Email',
-    password: 'Пароль',
-    login: 'Увійти',
-    noAccount: 'Немає акаунту? Зареєструйся',
-    emailInvalid: 'Email недійсний',
-    passwordShort: 'Пароль має бути ≥6 символів',
-    birthDatePlaceholder: "ДД.ММ.РРРР",
-    register: 'Реєстрація',
-    createAccount: 'Створити акаунт',
-    haveAccount: 'Вже є акаунт? Увійти',
-    forgotPassword: 'Забули пароль?',
-    resetPassword: 'Скидання пароля',
-    enterEmailToReset: 'Будь ласка, введіть ваш email для скидання пароля.',
-    resetEmailSent: 'Інструкції зі скидання пароля надіслано на ваш email.',
-    userNotFound: 'Користувача з таким email не знайдено.',
-    displayName: "Ім’я користувача",
-    displayNameShort: 'Ім’я має бути довшим за 2 символи',
-    emailUsedRedirectLogin: 'Цей email вже зареєстровано. Бажаєте увійти?',
-    goToLogin: 'Увійти',
-    wrongPasswordOrUserNotFound: 'Невірний email або пароль.',
-  },
   common: {
     error: 'Помилка',
     success: 'Успіх',
@@ -345,20 +320,15 @@ export const uk = {
     changeLanguage: 'Змінити мову',
     premiumActive: 'Premium активний',
     getPremium: 'Купити Premium',
-    addAccount: 'Додати акаунт',
-    logout: 'Вийти',
-    deleteAccount: 'Видалити акаунт',
-    loginOrRegister: 'Увійти / Реєстрація',
+    resetData: 'Скинути дані',
     guest: 'Гість',
     saved: 'Зміни успішно збережено',
   },
   alerts: {
-    logout: 'Вийти з акаунта?',
-    deleteAccount: 'Ви впевнені? Цю дію неможливо скасувати.',
-    deleteAccountTitle: 'Видалення акаунта',
+    resetDataTitle: 'Скидання даних',
+    resetData: 'Профіль, дату народження та фото буде видалено з цього пристрою. Цю дію неможливо скасувати.',
     cancel: 'Скасувати',
-    logoutButton: 'Вийти',
-    deleteButton: 'Видалити',
+    resetButton: 'Скинути',
   },
   currentLanguage: 'uk',
   date: {
@@ -372,13 +342,10 @@ export const uk = {
     notReady: "Реклама ще завантажується, спробуйте за мить"
   },
 
-  authRequired: {
-    loginRequired: "Потрібно увійти",
-    birthDateMissing: "Дата народження не вказана",
-    loginDescription: "Увійдіть в акаунт, щоб отримати персональний прогноз.",
-    birthDateDescription: "Вкажіть дату народження у профілі для точних розрахунків.",
-    loginButton: "Увійти в акаунт",
-    setBirthDateButton: "Вказати дату народження",
+  birthDateRequired: {
+    title: "Дата народження не вказана",
+    description: "Вкажіть дату народження у профілі для точних розрахунків.",
+    button: "Вказати дату народження",
   },
 
   horoscope: {

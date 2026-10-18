@@ -3,12 +3,11 @@ import { useProfile } from '@/contexts/ProfileContext';
 import { calculateDayNumber } from '@/lib/calculators/dayNumber';
 
 export const useDailyNumber = (profile: any) => {
-  const { user } = useProfile();
+  const { isPremium } = useProfile();
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   if (!profile) return null;
-  const isPremium = user?.isPremium;
   const last = profile.lastDayNumberDate;
 
   // Если не премиум — проверяем, прошло ли 7 дней

@@ -19,9 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.destinycode.app",
-      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "GIDClientID": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com",
         "NSPhotoLibraryUsageDescription": "Allow access to photos to upload your profile avatar.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       }
@@ -34,8 +32,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.destinycode.app",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.destinycode.app"
     },
     "web": {
       "output": "static",
@@ -57,13 +54,6 @@
       ],
       "expo-web-browser",
       [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4",
-          "iosClientId": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com"
-        }
-      ],
-      [
         "expo-image-picker",
         {
           "photosPermission": "The app needs access to your photos to let you set a profile picture."
@@ -83,14 +73,6 @@
       "reactCompiler": true
     },
     "extra": {
-      "firebaseApiKey": "AIzaSyDoEovuUSQpoY3BAImvgBgMcBRI-UshhyQ",
-      "firebaseAuthDomain": "destiny-code-cc093.firebaseapp.com",
-      "firebaseProjectId": "destiny-code-cc093",
-      "firebaseStorageBucket": "destiny-code-cc093.firebasestorage.app",
-      "firebaseMessagingSenderId": "654109542106",
-      "firebaseAppId": "1:654109542106:web:abcd1234efgh5678ijkl90",
-      "googleWebClientId": "654109542106-lfljsbb7khnoqqm8mlip8jrancdp5e6m.apps.googleusercontent.com",
-      "googleIosClientId": "654109542106-4skcg0u5vknugji8qml6aq0ua46n23n4.apps.googleusercontent.com",
       "router": {},
       "eas": {
         "projectId": "1ffcb12d-2e63-4b0a-95dd-8162848dd57b"

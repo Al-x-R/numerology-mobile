@@ -23,7 +23,7 @@ const REWARDED_ID = __DEV__
 }) || '';
 
 export const useInterstitial = () => {
-  const { user } = useProfile();
+  const { isPremium } = useProfile();
   const { isLoaded, isClosed, load, show } = useInterstitialAd(INTERSTITIAL_ID, {
     requestNonPersonalizedAdsOnly: true,
   });
@@ -32,10 +32,10 @@ export const useInterstitial = () => {
 
   // Авто-загрузка
   useEffect(() => {
-    if (!user?.isPremium && !isLoaded) {
+    if (!isPremium && !isLoaded) {
       load();
     }
-  }, [user?.isPremium, load, isLoaded]);
+  }, [isPremium, load, isLoaded]);
 
   // Обработка закрытия
   useEffect(() => {
@@ -44,14 +44,14 @@ export const useInterstitial = () => {
         onCloseCallback();
         setOnCloseCallback(null);
       }
-      if (!user?.isPremium) {
+      if (!isPremium) {
         load();
       }
     }
-  }, [isClosed, onCloseCallback, load, user?.isPremium]);
+  }, [isClosed, onCloseCallback, load, isPremium]);
 
   const showInterstitial = (nextAction: () => void) => {
-    if (user?.isPremium) {
+    if (isPremium) {
       nextAction();
       return;
     }
@@ -70,7 +70,7 @@ export const useInterstitial = () => {
 };
 
 export const useRewarded = () => {
-  const { user } = useProfile();
+  const { isPremium } = useProfile();
   const { t } = useAppTranslation();
   const { isLoaded, load, show, isEarnedReward, isClosed, error } = useRewardedAd(REWARDED_ID, {
     requestNonPersonalizedAdsOnly: true,
@@ -80,10 +80,10 @@ export const useRewarded = () => {
 
   // Авто-загрузка
   useEffect(() => {
-    if (!user?.isPremium && !isLoaded) {
+    if (!isPremium && !isLoaded) {
       load();
     }
-  }, [user?.isPremium, isLoaded, load]);
+  }, [isPremium, isLoaded, load]);
 
   // Обработка награды
   useEffect(() => {
@@ -97,9 +97,9 @@ export const useRewarded = () => {
   // Перезагрузка после закрытия
   useEffect(() => {
     if (isClosed) {
-      if (!user?.isPremium) load();
+      if (!isPremium) load();
     }
-  }, [isClosed, load, user?.isPremium]);
+  }, [isClosed, load, isPremium]);
 
   // Логирование ошибок
   useEffect(() => {
@@ -109,7 +109,7 @@ export const useRewarded = () => {
   }, [error]);
 
   const showRewarded = useCallback((onReward: () => void) => {
-    if (user?.isPremium) {
+    if (isPremium) {
       onReward();
       return;
     }
@@ -127,7 +127,7 @@ export const useRewarded = () => {
         ]
       );
     }
-  }, [isLoaded, user?.isPremium, show, load, t]);
+  }, [isLoaded, isPremium, show, load, t]);
 
   return { showRewarded, isLoaded };
 };

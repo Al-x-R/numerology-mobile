@@ -6,7 +6,7 @@ import { useProfile } from '@/contexts/ProfileContext';
 
 export default function InitialLoadScreen() {
   const router = useRouter();
-  const { user, isLoading } = useProfile();
+  const { isOnboarded, isLoading } = useProfile();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -16,10 +16,10 @@ export default function InitialLoadScreen() {
 
   useEffect(() => {
     if (ready && !isLoading) {
-      const targetRoute: Href = user ? '/(tabs)/pythagoras' : '/(auth)/onboarding';
+      const targetRoute: Href = isOnboarded ? '/(tabs)/pythagoras' : '/(auth)/onboarding';
       router.replace(targetRoute);
     }
-  }, [ready, isLoading, user, router]);
+  }, [ready, isLoading, isOnboarded, router]);
 
   if (!ready || isLoading) {
     return <LoadingScreen />;

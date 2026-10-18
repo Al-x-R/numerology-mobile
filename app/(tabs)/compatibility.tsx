@@ -24,7 +24,7 @@ export default function CompatibilityScreen() {
 
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
-  const { user } = useProfile();
+  const { isPremium } = useProfile();
   const { t, language } = useAppTranslation();
   const { showRewarded } = useRewarded();
   const { showInterstitial } = useInterstitial();
@@ -66,7 +66,7 @@ export default function CompatibilityScreen() {
 
   const calculateResult = (d1: string, d2: string, unlocked: boolean) => {
     try {
-      const effectivePremium = user?.isPremium || unlocked;
+      const effectivePremium = isPremium || unlocked;
       const result = calculateCompatibility(d1, d2, effectivePremium);
       setCompatibilityResult(result);
     } catch (e) {

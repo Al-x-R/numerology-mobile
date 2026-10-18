@@ -1,7 +1,6 @@
 // hooks/useZodiacForecast.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { fetchForecastDoc } from '@/lib/api/forecasts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -53,13 +52,10 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
       }
 
       if (!fetchedData) {
-        console.log(`📡 Firebase fetch: ${collectionName}/${docId}`);
-        const docRef = doc(db, collectionName, docId);
-        const snapshot = await getDoc(docRef);
+        console.log(`📡 CDN fetch: ${collectionName}/${docId}`);
+        fetchedData = await fetchForecastDoc<any>(collectionName, docId);
 
-        if (snapshot.exists()) {
-          fetchedData = snapshot.data();
-
+        if (fetchedData) {
           await AsyncStorage.setItem(cacheKey, JSON.stringify(fetchedData));
         }
       }

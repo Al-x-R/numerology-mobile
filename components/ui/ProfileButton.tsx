@@ -7,7 +7,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { useProfile } from '@/contexts/ProfileContext';
+import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
 import { COLORS } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
@@ -16,10 +16,10 @@ type Props = {
 };
 
 export const ProfileButton = ({ onPress }: Props) => {
-  const { activeProfile, user } = useProfile();
+  const { activeProfile } = useProfile();
 
-  const displayName = user?.displayName || activeProfile?.name || t('profile.guest');
-  const photoURL = user?.photoURL;
+  const displayName = activeProfile?.name || t('profile.guest');
+  const photoURL = getAvatarUri(activeProfile);
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container} activeOpacity={0.7}>

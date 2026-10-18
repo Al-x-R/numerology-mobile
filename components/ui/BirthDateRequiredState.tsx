@@ -1,55 +1,30 @@
-// components/ui/AuthRequiredState.tsx
+// components/ui/BirthDateRequiredState.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 
-import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { COLORS, GRADIENTS, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 
-export const AuthRequiredState = () => {
-  const { user } = useProfile();
-  const { t, language } = useAppTranslation();
-
-  const isLoggedIn = !!user;
-  const hasBirthDate = !!user?.birthDate;
-
-  if (isLoggedIn && hasBirthDate) return null;
-
-  const title = !isLoggedIn
-    ? t('authRequired.loginRequired')
-    : t('authRequired.birthDateMissing');
-
-  const description = !isLoggedIn
-    ? t('authRequired.loginDescription')
-    : t('authRequired.birthDateDescription');
-
-  const buttonText = !isLoggedIn
-    ? t('authRequired.loginButton')
-    : t('authRequired.setBirthDateButton');
-
-  const onPress = () => {
-    router.push(!isLoggedIn ? '/(auth)/login' : '/profile/edit');
-  };
-
-  const iconName = !isLoggedIn ? 'lock-outline' : 'calendar-alert';
+export const BirthDateRequiredState = () => {
+  const { t } = useAppTranslation();
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <MaterialCommunityIcons name={iconName} size={64} color={COLORS.accent} />
+        <MaterialCommunityIcons name="calendar-alert" size={64} color={COLORS.accent} />
 
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.title}>{t('birthDateRequired.title')}</Text>
+        <Text style={styles.description}>{t('birthDateRequired.description')}</Text>
 
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/profile/edit')}>
           <LinearGradient
             colors={GRADIENTS.goldenButton || ['#C4A484', '#A67C52']}
             style={styles.buttonGradient}
           >
-            <Text style={styles.buttonText}>{buttonText}</Text>
+            <Text style={styles.buttonText}>{t('birthDateRequired.button')}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>

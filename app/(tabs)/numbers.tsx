@@ -15,7 +15,7 @@ import { useForecasts } from '@/hooks/useForecasts';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { COLORS, GRADIENTS, LAYOUT, SPACING, RADIUS, FONTS } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
+import { BirthDateRequiredState } from '@/components/ui/BirthDateRequiredState';
 import { useRewarded } from '@/hooks/useAdMob';
 
 type TabType = 'day' | 'month' | 'year';
@@ -44,7 +44,8 @@ export default function NumbersScreen() {
 
   const navigation = useNavigation();
   const { language, t } = useAppTranslation();
-  const { user } = useProfile();
+  const { activeProfile, isPremium } = useProfile();
+  const birthDate = activeProfile?.date || null;
   const { showRewarded } = useRewarded();
 
   const getLocals = () => {
@@ -56,16 +57,16 @@ export default function NumbersScreen() {
   };
 
   const performCalculation = useCallback(() => {
-    if (!user || !user.birthDate) return;
+    if (!birthDate) return;
     try {
       const today = new Date();
-      setPDay(calculatePersonalDay(user.birthDate, today));
-      setPMonth(calculatePersonalMonth(user.birthDate, today));
-      setPYear(calculatePersonalYear(user.birthDate, today));
+      setPDay(calculatePersonalDay(birthDate, today));
+      setPMonth(calculatePersonalMonth(birthDate, today));
+      setPYear(calculatePersonalYear(birthDate, today));
     } catch (e) {
       console.error("Calculation error:", e);
     }
-  }, [user]);
+  }, [birthDate]);
 
   useFocusEffect(useCallback(() => { performCalculation(); }, [performCalculation]));
 
@@ -157,7 +158,7 @@ export default function NumbersScreen() {
     if (activeTab === 'month') isUnlocked = unlockedDates.month === monthStr;
     if (activeTab === 'year') isUnlocked = unlockedDates.year === yearStr;
 
-    const isLocked = !user?.isPremium && !isUnlocked;
+    const isLocked = !isPremium && !isUnlocked;
 
     if (isLocked) {
       const titles: Record<TabType, string> = {
@@ -224,13 +225,13 @@ export default function NumbersScreen() {
     );
   };
 
-  if (!user || !user.birthDate) {
+  if (!birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
         <LinearGradient colors={GRADIENTS.background} style={styles.background}>
           <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
         </LinearGradient>
-        <AuthRequiredState />
+        <BirthDateRequiredState />
       </SafeAreaView>
     );
   }

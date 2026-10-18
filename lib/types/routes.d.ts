@@ -4,6 +4,4 @@ export type AppRoute =
   | '/(tabs)/pythagoras'
   | '/(tabs)/compatibility'
   | '/(tabs)/daily-number'
-  | '/(auth)/onboarding'
-  | '/(auth)/login'
-  | '/(auth)/register';
+  | '/(auth)/onboarding';

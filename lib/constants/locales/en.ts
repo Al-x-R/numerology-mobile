@@ -33,9 +33,8 @@ export const en = {
 
   onboarding: {
     subtitle: 'Discover your Destiny Matrix\nand unlock your potential',
-    guestButton: 'Continue as Guest',
-    loginButton: 'I already have an account',
-    legal: 'By tapping "Continue", you agree\nto our Terms of Use',
+    startButton: 'Get Started',
+    legal: 'By tapping "Get Started", you agree\nto our Terms of Use',
   },
 
   subtitle: 'Calculate your Pythagorean Square',
@@ -288,30 +287,6 @@ export const en = {
   numbersScreenTitle: 'Destiny Numbers',
   numbersDescription: 'Phone number and car license plate calculations will be here. (PRO feature)',
 
-  auth: {
-    welcome: 'Welcome back',
-    google: 'Continue with Google',
-    email: 'Email',
-    password: 'Password',
-    login: 'Log in',
-    noAccount: 'Don\'t have an account? Sign up',
-    emailInvalid: 'Invalid email',
-    passwordShort: 'Password must be ≥6 characters',
-    birthDatePlaceholder: "DD.MM.YYYY",
-    register: 'Sign up',
-    createAccount: 'Create account',
-    haveAccount: 'Already have an account? Log in',
-    forgotPassword: 'Forgot password?',
-    resetPassword: 'Password Reset',
-    enterEmailToReset: 'Please enter your email to reset your password.',
-    resetEmailSent: 'Password reset instructions have been sent to your email.',
-    userNotFound: 'No user found with this email.',
-    displayName: "Username",
-    emailUsedRedirectLogin: 'This email is already registered. Would you like to log in?',
-    goToLogin: 'Log in',
-    displayNameShort: 'Name must be longer than 2 characters',
-    wrongPasswordOrUserNotFound: 'Invalid email or password.',
-  },
   common: {
     error: 'Error',
     success: 'Success',
@@ -340,20 +315,15 @@ export const en = {
     changeLanguage: 'Change Language',
     premiumActive: 'Premium Active',
     getPremium: 'Get Premium',
-    addAccount: 'Add Account',
-    logout: 'Log Out',
-    deleteAccount: 'Delete Account',
-    loginOrRegister: 'Log In / Sign Up',
+    resetData: 'Reset Data',
     guest: 'Guest',
     saved: 'Changes saved successfully',
   },
   alerts: {
-    logout: 'Log out of account?',
-    deleteAccount: 'Are you sure? This cannot be undone.',
-    deleteAccountTitle: 'Delete Account',
+    resetDataTitle: 'Reset Data',
+    resetData: 'Your profile, birth date and photo will be removed from this device. This cannot be undone.',
     cancel: 'Cancel',
-    logoutButton: 'Log Out',
-    deleteButton: 'Delete',
+    resetButton: 'Reset',
   },
   currentLanguage: 'en',
   date: {
@@ -367,13 +337,10 @@ export const en = {
     notReady: "Ad is still loading, please try again in a moment"
   },
 
-  authRequired: {
-    loginRequired: "Login Required",
-    birthDateMissing: "Birth Date Missing",
-    loginDescription: "Log in to get your personal forecast.",
-    birthDateDescription: "Set your birth date in profile for accurate calculations.",
-    loginButton: "Log In",
-    setBirthDateButton: "Set Birth Date",
+  birthDateRequired: {
+    title: "Birth Date Missing",
+    description: "Set your birth date in profile for accurate calculations.",
+    button: "Set Birth Date",
   },
 
   horoscope: {

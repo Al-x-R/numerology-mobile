@@ -14,7 +14,7 @@ import { useZodiacForecast } from '@/hooks/useZodiacForecast';
 import { getZodiacSign, getZodiacName } from '@/lib/calculators/zodiac';
 import { COLORS, GRADIENTS, LAYOUT, FONTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
-import { AuthRequiredState } from '@/components/ui/AuthRequiredState';
+import { BirthDateRequiredState } from '@/components/ui/BirthDateRequiredState';
 import { useRewarded } from '@/hooks/useAdMob';
 
 type TabType = 'day' | 'month' | 'year';
@@ -36,12 +36,13 @@ export default function HoroscopeScreen() {
   });
 
   const navigation = useNavigation();
-  const { user } = useProfile();
+  const { activeProfile, isPremium } = useProfile();
+  const birthDate = activeProfile?.date || null;
   const { t, language } = useAppTranslation();
 
   const { showRewarded } = useRewarded();
 
-  const signKey = user?.birthDate ? getZodiacSign(new Date(user.birthDate)) : null;
+  const signKey = birthDate ? getZodiacSign(new Date(birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
   const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
@@ -109,7 +110,7 @@ export default function HoroscopeScreen() {
     if (activeTab === 'month') isUnlocked = unlockedDates.month === monthStr;
     if (activeTab === 'year') isUnlocked = unlockedDates.year === yearStr;
 
-    const isLocked = !user?.isPremium && !isUnlocked;
+    const isLocked = !isPremium && !isUnlocked;
 
     if (isLocked) {
       const titles: Record<TabType, string> = {
@@ -190,13 +191,13 @@ export default function HoroscopeScreen() {
     </View>
   );
 
-  if (!user || !user.birthDate) {
+  if (!birthDate) {
     return (
       <SafeAreaView style={styles.container} edges={[ 'left', 'right']}>
         <LinearGradient colors={GRADIENTS.background} style={styles.background}>
           <Image source={LOGO_IMAGE} style={styles.logo} resizeMode="contain" />
         </LinearGradient>
-        <AuthRequiredState />
+        <BirthDateRequiredState />
       </SafeAreaView>
     );
   }

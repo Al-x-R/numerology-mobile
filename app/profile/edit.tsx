@@ -20,10 +20,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/lib/firebase';
 
-import { useProfile } from '@/contexts/ProfileContext';
+import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,11 +30,11 @@ import { useAppTranslation } from '@/contexts/LanguageContext';
 export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user, updateUserProfile, activeProfile } = useProfile();
+  const { updateProfile, activeProfile } = useProfile();
 
-  const [name, setName] = useState(user?.displayName || activeProfile?.name || '');
+  const [name, setName] = useState(activeProfile?.name || '');
   const [birthDate, setBirthDate] = useState<Date | null>(
-    user?.birthDate ? new Date(user.birthDate) : activeProfile?.date ? new Date(activeProfile.date) : null
+    activeProfile?.date ? new Date(activeProfile.date) : null
   );
 
   const [tempDate, setTempDate] = useState<Date>(new Date('2000-01-01'));
@@ -47,13 +45,11 @@ export default function EditProfileScreen() {
   const { t, language } = useAppTranslation();
 
   useEffect(() => {
-    setName(user?.displayName || activeProfile?.name || '');
-    if (user?.birthDate) {
-      setBirthDate(new Date(user.birthDate));
-    } else if (activeProfile?.date) {
+    setName(activeProfile?.name || '');
+    if (activeProfile?.date) {
       setBirthDate(new Date(activeProfile.date));
     }
-  }, [user, activeProfile]);
+  }, [activeProfile]);
 
   // --- Date Picker Logic ---
   const openDatePicker = () => {
@@ -104,22 +100,6 @@ export default function EditProfileScreen() {
     }
   };
 
-  const uploadImageAsync = async (uri: string) => {
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      const filename = `avatars/${user?.uid}/${Date.now()}.jpg`;
-      const storageRef = ref(storage, filename);
-
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-    } catch (e) {
-      console.error("Upload failed", e);
-      throw e;
-    }
-  };
   // ---------------------------
 
   const saveChanges = async () => {
@@ -130,12 +110,6 @@ export default function EditProfileScreen() {
 
     setIsSaving(true);
     try {
-      let photoURL = user?.photoURL;
-
-      if (localImage) {
-        photoURL = await uploadImageAsync(localImage);
-      }
-
       let dateString = undefined;
       if (birthDate) {
         const year = birthDate.getFullYear();
@@ -144,10 +118,10 @@ export default function EditProfileScreen() {
         dateString = `${year}-${month}-${day}`;
       }
 
-      await updateUserProfile({
-        displayName: name.trim(),
-        birthDate: dateString,
-        photoURL: photoURL,
+      await updateProfile({
+        name: name.trim(),
+        date: dateString,
+        ...(localImage ? { photoUri: localImage } : {}),
       });
 
       setTimeout(() => {
@@ -173,14 +147,14 @@ export default function EditProfileScreen() {
           style: 'destructive',
           onPress: async () => {
             setLocalImage(null);
-            await updateUserProfile({ photoURL: null });
+            await updateProfile({ photoUri: null });
           }
         }
       ]
     );
   };
 
-  const currentAvatar = localImage || user?.photoURL;
+  const currentAvatar = localImage || getAvatarUri(activeProfile);
 
   const getIOSLocale = (lang: string) => {
     switch (lang) {

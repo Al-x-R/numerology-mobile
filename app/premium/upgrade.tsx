@@ -16,11 +16,10 @@ type PlanId = 'weekly' | 'monthly' | 'yearly';
 export default function PremiumScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useAppTranslation();
-  const { user, setPremiumStatus } = useProfile();
+  const { isPremium, setPremiumStatus } = useProfile();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>('weekly');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isPremium = user?.isPremium;
 
   const plansData = {
     weekly: {

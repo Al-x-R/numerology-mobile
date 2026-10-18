@@ -20,7 +20,6 @@ import { router } from 'expo-router';
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
-import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 // --- INTERFACES ---
@@ -262,7 +261,6 @@ export function CompatibilityResultsDisplay({
   onUnlockRequest,
 }: CompatibilityResultsDisplayProps) {
   const { t } = useAppTranslation();
-  const { user } = useProfile();
 
   const getTotalColor = (pct: number) => {
     if (pct >= 85) return COLORS.battery.full;
@@ -293,11 +291,7 @@ export function CompatibilityResultsDisplay({
 
   const handleGetPremium = () => {
     setIsTeaserVisible(false);
-    if (user) {
-      router.push('/premium/upgrade');
-    } else {
-      router.push('/(auth)/register?redirect=/premium/upgrade');
-    }
+    router.push('/premium/upgrade');
   };
 
   const handleWatchAd = () => {

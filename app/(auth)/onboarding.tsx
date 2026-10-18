@@ -10,18 +10,17 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import LOGO_IMAGE from '@/assets/images/NumericalCompass.png';
 import { COLORS, FONTS, GRADIENTS, RADIUS, SPACING } from '@/lib/constants/theme';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { useProfile } from '@/contexts/ProfileContext';
 
 const { width } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
   const { t } = useAppTranslation();
+  const { completeOnboarding } = useProfile();
 
-  const handleContinueGuest = () => {
+  const handleStart = async () => {
+    await completeOnboarding();
     router.replace('/(tabs)/pythagoras');
-  };
-
-  const handleLogin = () => {
-    router.push('/(auth)/login');
   };
 
   return (
@@ -57,7 +56,7 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             style={styles.mainButtonContainer}
             activeOpacity={0.8}
-            onPress={handleContinueGuest}
+            onPress={handleStart}
           >
             <LinearGradient
               colors={GRADIENTS.goldenButton}
@@ -65,15 +64,8 @@ export default function OnboardingScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.mainButton}
             >
-              <Text style={styles.mainButtonText}>{t('onboarding.guestButton')}</Text>
+              <Text style={styles.mainButtonText}>{t('onboarding.startButton')}</Text>
             </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleLogin}
-          >
-            <Text style={styles.secondaryButtonText}>{t('onboarding.loginButton')}</Text>
           </TouchableOpacity>
 
           <Text style={styles.legalText}>
@@ -154,15 +146,6 @@ const styles = StyleSheet.create({
     color: COLORS.blackText,
     fontWeight: '700',
     letterSpacing: 0.5,
-  },
-  secondaryButton: {
-    paddingVertical: SPACING.sm,
-    marginBottom: SPACING.xl,
-  },
-  secondaryButtonText: {
-    ...FONTS.button,
-    color: COLORS.accent,
-    fontSize: 16,
   },
   legalText: {
     ...FONTS.tooltip,

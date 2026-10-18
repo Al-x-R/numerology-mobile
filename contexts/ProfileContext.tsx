@@ -1,359 +1,162 @@
 // contexts/ProfileContext.tsx
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { auth, db } from '@/lib/firebase';
-import {
-  onAuthStateChanged,
-  User,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithCredential,
-  GoogleAuthProvider,
-  signOut,
-  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
-  updateProfile,
-} from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  collection,
-  onSnapshot,
-  Unsubscribe,
-} from 'firebase/firestore';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, useSegments } from 'expo-router';
-import { Platform } from 'react-native';
-import { t } from '@/lib/constants/locales';
+import * as FileSystem from 'expo-file-system/legacy';
 
-let GoogleSignin: any = null;
-if (Platform.OS !== 'web') {
-  try {
-    GoogleSignin = require('@react-native-google-signin/google-signin').GoogleSignin;
-  } catch (e) {
-    console.log('Google Sign-In not initialized (web or setup missing)');
-  }
-}
+const ONBOARDED_KEY = '@onboarded';
+const PROFILES_KEY = '@profiles';
+const ACTIVE_PROFILE_KEY = '@active_profile_id';
+// Временный локальный флаг до подключения RevenueCat
+const PREMIUM_KEY = '@premium_status';
 
-const LAST_KNOWN_AUTH = '@last_known_auth';
-const GUEST_PROFILE_KEY = '@guest_profile';
+const AVATARS_DIR = `${FileSystem.documentDirectory}avatars/`;
 
 export interface Profile {
   id: string;
   name: string;
-  date: string;
-  isPremium?: boolean;
-  language?: 'en' | 'ru';
-}
-
-export interface CustomUser extends User {
-  birthDate?: string | null;
-  isPremium?: boolean;
-  language?: 'en' | 'ru';
+  date: string; // YYYY-MM-DD или ''
+  // Имя файла в AVATARS_DIR. Храним не полный путь: на iOS путь к контейнеру меняется после обновления приложения
+  photo?: string | null;
 }
 
 interface ProfileContextType {
-  user: CustomUser | null;
   profiles: Profile[];
   activeProfile: Profile | null;
   isLoading: boolean;
-  authInitialized: boolean;
+  isOnboarded: boolean;
+  isPremium: boolean;
 
-  sendPasswordResetEmail: (email: string) => Promise<void>;
-  loginWithEmail: (email: string, password: string) => Promise<void>;
-  registerWithEmail: (displayName: string, email: string, password: string, birthDate?: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
-  saveProfile: (data: { name: string; date: string }) => Promise<void>;
-  setActiveProfile: (profile: Profile) => void;
   completeOnboarding: () => Promise<void>;
-
+  updateProfile: (data: { name?: string; date?: string; photoUri?: string | null }) => Promise<void>;
+  setActiveProfile: (profile: Profile) => void;
   setPremiumStatus: (status: boolean) => Promise<void>;
-
-  updateUserProfile: (data: {
-    displayName?: string;
-    birthDate?: string;
-    photoURL?: string | null | undefined;
-    language?: 'en' | 'ru';
-  }) => Promise<void>;
+  resetAppData: () => Promise<void>;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<CustomUser | null>(null);
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [authInitialized, setAuthInitialized] = useState(false);
+export const getAvatarUri = (profile: Profile | null | undefined): string | null =>
+  profile?.photo ? AVATARS_DIR + profile.photo : null;
 
-  const router = useRouter();
-  const prevUserRef = useRef<User | null>(null);
+const createDefaultProfile = (): Profile => ({
+  id: Date.now().toString(),
+  name: '', // пустое имя показываем как «Гость» на текущем языке
+  date: '',
+  photo: null,
+});
+
+const saveAvatar = async (sourceUri: string): Promise<string> => {
+  await FileSystem.makeDirectoryAsync(AVATARS_DIR, { intermediates: true });
+  const filename = `avatar_${Date.now()}.jpg`;
+  await FileSystem.copyAsync({ from: sourceUri, to: AVATARS_DIR + filename });
+  return filename;
+};
+
+const deleteAvatar = async (filename: string | null | undefined) => {
+  if (!filename) return;
+  await FileSystem.deleteAsync(AVATARS_DIR + filename, { idempotent: true });
+};
+
+export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [activeProfile, setActiveProfileState] = useState<Profile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
-    let unsubProfiles: Unsubscribe | null = null;
+    (async () => {
+      try {
+        const [[, onboarded], [, profilesJson], [, activeId], [, premium]] = await AsyncStorage.multiGet([
+          ONBOARDED_KEY,
+          PROFILES_KEY,
+          ACTIVE_PROFILE_KEY,
+          PREMIUM_KEY,
+        ]);
 
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      const wasLoggedIn = prevUserRef.current !== null;
-      const isNowLoggedIn = firebaseUser !== null;
-
-      if (firebaseUser) {
-        await AsyncStorage.setItem(LAST_KNOWN_AUTH, 'user_' + firebaseUser.uid);
-        await AsyncStorage.removeItem(GUEST_PROFILE_KEY);
-
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        const customData = userDocSnap.exists() ? userDocSnap.data() : {};
-
-        setUser({
-          ...firebaseUser,
-          birthDate: customData.birthDate ?? null,
-          isPremium: customData.isPremium ?? false,
-          language: customData.language ?? null,
-        } as CustomUser);
-
-        unsubProfiles?.();
-        unsubProfiles = onSnapshot(
-          collection(db, 'users', firebaseUser.uid, 'profiles'),
-          (snap) => {
-            const loaded = snap.docs.map(d => ({ id: d.id, ...d.data() } as Profile));
-            setProfiles(loaded);
-
-            if (loaded.length > 0 && !activeProfile) {
-              setActiveProfile(loaded[0]);
-            }
-          },
-          (error) => {
-            console.error("Error fetching profiles snapshot:", error);
-          }
-        );
-
-        setAuthInitialized(true);
-        setIsLoading(false);
-
-      } else {
-        await handleGuestOrLogout(wasLoggedIn, isNowLoggedIn);
-        setAuthInitialized(true);
+        const loaded: Profile[] = profilesJson ? JSON.parse(profilesJson) : [];
+        setProfiles(loaded);
+        setActiveProfileState(loaded.find(p => p.id === activeId) ?? loaded[0] ?? null);
+        setIsOnboarded(onboarded === 'true');
+        setIsPremium(premium === 'true');
+      } catch (e) {
+        console.error('Error loading local profile data:', e);
+      } finally {
         setIsLoading(false);
       }
-
-      prevUserRef.current = firebaseUser;
-    });
-
-    return () => {
-      unsub();
-      unsubProfiles?.();
-    };
+    })();
   }, []);
 
-  const handleGuestOrLogout = async (wasLoggedIn: boolean, isNowLoggedIn: boolean) => {
-    const lastKnown = await AsyncStorage.getItem(LAST_KNOWN_AUTH);
-
-    if (lastKnown === 'guest') {
-      const json = await AsyncStorage.getItem(GUEST_PROFILE_KEY);
-      if (json) {
-        try {
-          const guest = JSON.parse(json);
-          setProfiles([guest]);
-          setActiveProfile(guest);
-        } catch (e) {
-          console.error("Error parsing guest profile:", e);
-          setProfiles([]);
-          setActiveProfile(null);
-        }
-      }
-    } else {
-      setProfiles([]);
-      setActiveProfile(null);
-    }
-
-    setUser(null);
-
-    if (wasLoggedIn && !isNowLoggedIn && authInitialized) {
-      router.replace('/(auth)/onboarding');
-    }
-  }
+  const persistProfiles = async (next: Profile[], active: Profile | null) => {
+    setProfiles(next);
+    setActiveProfileState(active);
+    await AsyncStorage.multiSet([
+      [PROFILES_KEY, JSON.stringify(next)],
+      [ACTIVE_PROFILE_KEY, active?.id ?? ''],
+    ]);
+  };
 
   const completeOnboarding = async () => {
-    const guest: Profile = { id: 'guest_1', name: t('profile.guest'), date: '' };
-    await AsyncStorage.multiSet([
-      [LAST_KNOWN_AUTH, 'guest'],
-      [GUEST_PROFILE_KEY, JSON.stringify(guest)],
-    ]);
-    setProfiles([guest]);
-    setActiveProfile(guest);
-
-    router.replace('/(tabs)/pythagoras');
-  };
-
-  const saveProfile = async ({ name, date }: { name: string; date: string }) => {
-    if (!user) {
-      const profile = { id: 'guest_' + Date.now(), name, date };
-      await AsyncStorage.setItem(GUEST_PROFILE_KEY, JSON.stringify(profile));
-      setProfiles([profile]);
-      setActiveProfile(profile);
-    } else {
-      const id = Date.now().toString();
-      try {
-        await setDoc(doc(db, 'users', user.uid, 'profiles', id), { id, name, date });
-      } catch (e) {
-        console.error("Error saving profile to Firestore:", e);
-        throw e;
-      }
+    if (profiles.length === 0) {
+      const profile = createDefaultProfile();
+      await persistProfiles([profile], profile);
     }
+    await AsyncStorage.setItem(ONBOARDED_KEY, 'true');
+    setIsOnboarded(true);
   };
 
-  const loginWithGoogle = async () => {
-    console.log("Attempting Google Sign-In...");
+  const updateProfile = async (data: { name?: string; date?: string; photoUri?: string | null }) => {
+    const current = activeProfile ?? createDefaultProfile();
+    const updated: Profile = { ...current };
 
-    if (!GoogleSignin) {
-      throw new Error('Google Sign-In is not available on this device.');
+    if (data.name !== undefined) updated.name = data.name.trim();
+    if (data.date !== undefined) updated.date = data.date;
+
+    // photoUri: строка — новое фото из галереи, null — удалить, undefined — не трогать
+    if (data.photoUri !== undefined) {
+      await deleteAvatar(current.photo);
+      updated.photo = data.photoUri ? await saveAvatar(data.photoUri) : null;
     }
 
-    try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-
-      const userInfo = await GoogleSignin.signIn();
-      const idToken = userInfo.idToken || userInfo.data?.idToken;
-      if (!idToken) throw new Error('Unable to obtain an ID token from Google');
-
-      const credential = GoogleAuthProvider.credential(idToken);
-      const userCredential = await signInWithCredential(auth, credential);
-      const user = userCredential.user;
-
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (!userDocSnap.exists()) {
-        await setDoc(userDocRef, {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: new Date(),
-          isPremium: false,
-          birthDate: null
-        });
-      }
-
-    } catch (error: any) {
-      console.error("Google Sign-In Error:", error);
-      throw error;
-    }
+    const exists = profiles.some(p => p.id === updated.id);
+    const next = exists ? profiles.map(p => (p.id === updated.id ? updated : p)) : [...profiles, updated];
+    await persistProfiles(next, updated);
   };
 
-  const loginWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+  const setActiveProfile = (profile: Profile) => {
+    setActiveProfileState(profile);
+    AsyncStorage.setItem(ACTIVE_PROFILE_KEY, profile.id);
   };
 
-  const registerWithEmail = async (displayName: string, email: string, password: string, birthDate?: string) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-    await updateProfile(cred.user, { displayName });
-
-    const userDocRef = doc(db, 'users', cred.user.uid);
-    await setDoc(userDocRef, {
-      email: email,
-      displayName: displayName,
-      photoURL: cred.user.photoURL,
-      createdAt: new Date(),
-      isPremium: false,
-      birthDate: birthDate || null
-    });
-  };
-
-  const logout = async () => {
-    await AsyncStorage.multiRemove([LAST_KNOWN_AUTH, GUEST_PROFILE_KEY]);
-    await signOut(auth);
-  };
-
-  // Метод для обновления премиума (используем его в PremiumScreen)
   const setPremiumStatus = async (status: boolean) => {
-    if (!user) return; // Гостям премиум не сохраняем в БД (можно в AsyncStorage, если нужно)
-
-    try {
-      // 1. Обновляем Firestore
-      await setDoc(doc(db, 'users', user.uid), { isPremium: status }, { merge: true });
-
-      // 2. Обновляем локальный стейт мгновенно
-      setUser(prev => prev ? { ...prev, isPremium: status } : null);
-
-    } catch (e) {
-      console.error("Error updating premium status:", e);
-      throw e;
-    }
+    setIsPremium(status);
+    await AsyncStorage.setItem(PREMIUM_KEY, String(status));
   };
 
-  const sendPasswordResetEmail = async (email: string) => {
-    try {
-      await firebaseSendPasswordResetEmail(auth, email);
-    } catch (error: any) {
-      console.error("Error sending reset email:", error);
-      throw error;
-    }
+  const resetAppData = async () => {
+    await FileSystem.deleteAsync(AVATARS_DIR, { idempotent: true });
+    // PRO-статус не сбрасываем: он принадлежит покупке, а не профилю
+    await AsyncStorage.multiRemove([ONBOARDED_KEY, PROFILES_KEY, ACTIVE_PROFILE_KEY]);
+    setProfiles([]);
+    setActiveProfileState(null);
+    setIsOnboarded(false);
   };
-
-
-  const updateUserProfile = async (data: {
-    displayName?: string;
-    birthDate?: string | undefined;
-    photoURL?: string | null;
-    language?: 'en' | 'ru';
-  }): Promise<void> => {
-    if (!user) return;
-
-    const updates: Record<string, any> = {};
-
-    if (data.displayName !== undefined) updates.displayName = data.displayName.trim();
-    if (data.birthDate !== undefined) updates.birthDate = data.birthDate;
-    if (data.photoURL !== undefined) updates.photoURL = data.photoURL;
-
-    if (Object.keys(updates).length === 0) return;
-
-    try {
-      await setDoc(doc(db, 'users', user.uid), updates, { merge: true });
-
-      setUser(prev => prev ? { ...prev, ...updates } : null);
-
-      if (data.displayName !== undefined || data.photoURL !== undefined) {
-        const authUpdates: { displayName?: string; photoURL?: string | null } = {};
-        if (data.displayName !== undefined) authUpdates.displayName = data.displayName;
-        if (data.photoURL !== undefined) authUpdates.photoURL = data.photoURL;
-
-        try {
-          await updateProfile(auth.currentUser!, authUpdates);
-          await auth.currentUser?.reload();
-        } catch (err) {
-          console.log('Auth profile update warning:', err);
-        }
-      }
-    } catch (error) {
-      console.error('updateUserProfile error:', error);
-      throw error;
-    }
-  };
-
 
   return (
     <ProfileContext.Provider
       value={{
-        user,
         profiles,
         activeProfile,
         isLoading,
-        authInitialized,
+        isOnboarded,
+        isPremium,
 
-        sendPasswordResetEmail,
-        loginWithEmail,
-        registerWithEmail,
-        loginWithGoogle,
-        logout,
-        saveProfile,
-        setActiveProfile,
         completeOnboarding,
-
+        updateProfile,
+        setActiveProfile,
         setPremiumStatus,
-
-        updateUserProfile
+        resetAppData,
       }}
     >
       {children}

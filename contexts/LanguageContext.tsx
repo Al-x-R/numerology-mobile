@@ -1,9 +1,8 @@
 // contexts/LanguageContext.tsx
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { setLocale, t, translations } from '@/lib/constants/locales';
 import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useProfile } from './ProfileContext';
 
 type Language = 'en' | 'ru' | 'uk' | 'zh-TW';
 
@@ -42,8 +41,6 @@ export const useAppTranslation = () => {
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>('en');
-  const { user, updateUserProfile } = useProfile();
-
 
   useEffect(() => {
     (async () => {
@@ -73,42 +70,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     })();
   }, []);
 
-  useEffect(() => {
-    // @ts-ignore
-    const userLang = user?.language as Language | undefined;
-
-    if (userLang && (userLang === 'en' || userLang === 'ru' || userLang === 'uk' || userLang === 'zh-TW') && userLang !== language) {
-      console.log('Syncing language from user profile:', userLang);
-      setLanguageState(userLang);
-      setLocale(userLang);
-      AsyncStorage.setItem(LANGUAGE_KEY, userLang);
-    }
-  }, [user]);
-
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const setLanguage = async (lang: Language) => {
 
     setLanguageState(lang);
     setLocale(lang);
     await AsyncStorage.setItem(LANGUAGE_KEY, lang);
-
-    if (user) {
-
-      if (saveTimerRef.current) {
-        clearTimeout(saveTimerRef.current);
-      }
-
-      // 2. Планируем новый запрос через 2 секунды
-      saveTimerRef.current = setTimeout(async () => {
-        try {
-          console.log(`⏳ Debounce: Saving language "${lang}" to Firestore...`);
-          // await updateUserProfile({ language: lang });
-        } catch (e) {
-          console.error('Failed to sync language to cloud:', e);
-        }
-      }, 20000);
-    }
   };
 
   return (

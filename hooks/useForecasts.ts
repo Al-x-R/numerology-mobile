@@ -1,7 +1,6 @@
 // hooks/useForecasts.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { fetchForecastDoc } from '@/lib/api/forecasts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -65,12 +64,10 @@ export const useForecasts = (
       }
 
       if (!fetchedData) {
-        console.log(`📡 Firebase fetch: ${collectionName}/${docId}`);
-        const docRef = doc(db, collectionName, docId);
-        const docSnap = await getDoc(docRef);
+        console.log(`📡 CDN fetch: ${collectionName}/${docId}`);
+        fetchedData = await fetchForecastDoc<ForecastDataMap>(collectionName, docId);
 
-        if (docSnap.exists()) {
-          fetchedData = docSnap.data() as ForecastDataMap;
+        if (fetchedData) {
           await AsyncStorage.setItem(cacheKey, JSON.stringify(fetchedData));
         } else {
           console.log(`Forecast doc not found: ${collectionName}/${docId}`);

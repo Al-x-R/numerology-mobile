@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useProfile } from '@/contexts/ProfileContext';
+import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, FONTS, RADIUS, GRADIENTS } from '@/lib/constants/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 // import { t } from '@/lib/constants/locales';
@@ -35,16 +35,11 @@ interface MenuItemProps {
 export default function ProfileScreen({ onClose }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user, logout, activeProfile } = useProfile();
+  const { activeProfile, isPremium, resetAppData } = useProfile();
   const { t, language } = useAppTranslation();
 
-  const isGuest = !user;
-  const displayName = isGuest
-    ? t('profile.guest')
-    : (user?.displayName || activeProfile?.name || t('profile.guest'));
-
-  const isPremium = user?.isPremium;
-  const photoURL = user?.photoURL;
+  const displayName = activeProfile?.name || t('profile.guest');
+  const photoURL = getAvatarUri(activeProfile);
   const birthDate = activeProfile?.date || null;
 
   const navigation = useNavigation();
@@ -54,33 +49,23 @@ export default function ProfileScreen({ onClose }: Props) {
     });
   }, [language, navigation]);
 
-  const handleLogout = () => {
-    Alert.alert(t('alerts.logout'), '', [
+  const handleResetData = () => {
+    Alert.alert(t('alerts.resetDataTitle'), t('alerts.resetData'), [
       { text: t('alerts.cancel'), style: 'cancel' },
       {
-        text: t('alerts.logoutButton'),
+        text: t('alerts.resetButton'),
         style: 'destructive',
         onPress: async () => {
-          await logout();
+          await resetAppData();
+          if (router.canDismiss()) router.dismissAll();
+          router.replace('/(auth)/onboarding');
         },
       },
     ]);
   };
 
-  const handleLogin = (redirectPath?: string) => {
-    if (redirectPath) {
-      router.push(`/(auth)/login?redirect=${redirectPath}`);
-    } else {
-      router.push('/(auth)/login');
-    }
-  };
-
   const handleUpgrade = () => {
-    if (isGuest) {
-      handleLogin('/premium/upgrade');
-    } else {
-      router.push('/premium/upgrade');
-    }
+    router.push('/premium/upgrade');
   };
 
   const MenuItem = ({
@@ -156,13 +141,11 @@ export default function ProfileScreen({ onClose }: Props) {
 
         {/* --- MENU --- */}
         <View style={styles.menu}>
-          {!isGuest && (
-            <MenuItem
-              icon="person-outline"
-              text={t('profile.editProfile')}
-              onPress={() => router.push('/profile/edit')}
-            />
-          )}
+          <MenuItem
+            icon="person-outline"
+            text={t('profile.editProfile')}
+            onPress={() => router.push('/profile/edit')}
+          />
 
           <MenuItem
             icon="globe-outline"
@@ -189,32 +172,9 @@ export default function ProfileScreen({ onClose }: Props) {
 
         <View style={styles.divider} />
 
-        {/* --- AUTH ACTIONS --- */}
-        <View style={styles.menu}>
-          {isGuest && (
-            <MenuItem
-              icon="log-in-outline"
-              text={t('profile.loginOrRegister')}
-              onPress={() => handleLogin()}
-              color={COLORS.accent}
-            />
-          )}
-
-          {!isGuest && (
-            <MenuItem
-              icon="log-out-outline"
-              text={t('profile.logout')}
-              onPress={handleLogout}
-              color="#FF3B30"
-            />
-          )}
-        </View>
-
-        {!isGuest && (
-          <TouchableOpacity style={styles.deleteItem}>
-            <Text style={styles.deleteText}>{t('profile.deleteAccount')}</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity style={styles.deleteItem} onPress={handleResetData}>
+          <Text style={styles.deleteText}>{t('profile.resetData')}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
