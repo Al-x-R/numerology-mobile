@@ -18,7 +18,7 @@ interface AdditionalParamsProps {
   onPress: (data: Interpretation) => void;
 }
 
-// Маппинг параметров к ячейкам матрицы для интерпретации
+// Maps parameters to matrix cells for interpretation
 const PARAM_TO_CELL_MAP: Record<string, { cellId: string; useMatrix?: boolean }> = {
   goal: { cellId: '1' },
   family: { cellId: '6' },
@@ -34,10 +34,10 @@ function getAdditionalParamInterpretation(
   label: string,
   t: (key: string) => string,
 ): Interpretation {
-  // Для параметров, которые соответствуют ячейкам матрицы
+  // Parameters that correspond to matrix cells
   const cellMapping = PARAM_TO_CELL_MAP[key];
   if (cellMapping && typeof value === 'number') {
-    // Преобразуем число в строку из повторяющихся цифр (например, 3 -> "111", 4 -> "2222")
+    // Convert the count into a string of repeated digits (e.g. 3 -> "111", 4 -> "2222")
     const digit = cellMapping.cellId;
     const valueString = value === 0 ? '' : digit.repeat(value);
     const matrixInterpretation = getInterpretation(cellMapping.cellId, valueString);
@@ -49,7 +49,7 @@ function getAdditionalParamInterpretation(
     };
   }
 
-  // Для остальных параметров (например, temperament) просто показываем значение
+  // Other parameters (e.g. temperament) just show the value
   return {
     title: label,
     description: `${label}: ${value}`,
@@ -61,7 +61,6 @@ function getAdditionalParamInterpretation(
 export function AdditionalParamsDisplay({ params, onPress }: AdditionalParamsProps) {
   const { t } = useAppTranslation();
 
-  // Формируем список параметров
   const paramItems = [
     { key: 'temperament', label: t('params.temperament'), value: params.temperament },
     { key: 'goal', label: t('params.goal'), value: params.goal },

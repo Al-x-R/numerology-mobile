@@ -54,7 +54,6 @@ export default function PremiumScreen() {
     }
   };
 
-  // Обработчики функций (без изменений логики)
   const handlePurchase = async () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -217,7 +216,7 @@ export default function PremiumScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  mainWrapper: { flex: 1 }, // Обертка для учета Insets
+  mainWrapper: { flex: 1 },
   background: { ...StyleSheet.absoluteFillObject },
   scrollContent: { paddingHorizontal: 0 },
   header: {

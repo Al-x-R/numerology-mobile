@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
   },
   inputIcon: { marginRight: SPACING.sm },
-  input: { flex: 1, paddingVertical: 16, ...FONTS.body, color: COLORS.text }, // Явно добавил color: COLORS.text
+  input: { flex: 1, paddingVertical: 16, ...FONTS.body, color: COLORS.text },
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',

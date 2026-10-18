@@ -7,7 +7,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 const ONBOARDED_KEY = '@onboarded';
 const PROFILES_KEY = '@profiles';
 const ACTIVE_PROFILE_KEY = '@active_profile_id';
-// Временный локальный флаг до подключения RevenueCat
+// Temporary local flag until RevenueCat is integrated
 const PREMIUM_KEY = '@premium_status';
 
 const AVATARS_DIR = `${FileSystem.documentDirectory}avatars/`;
@@ -15,8 +15,8 @@ const AVATARS_DIR = `${FileSystem.documentDirectory}avatars/`;
 export interface Profile {
   id: string;
   name: string;
-  date: string; // YYYY-MM-DD или ''
-  // Имя файла в AVATARS_DIR. Храним не полный путь: на iOS путь к контейнеру меняется после обновления приложения
+  date: string; // YYYY-MM-DD or ''
+  // File name inside AVATARS_DIR. Not a full path: on iOS the app container path changes after updates
   photo?: string | null;
 }
 
@@ -41,7 +41,7 @@ export const getAvatarUri = (profile: Profile | null | undefined): string | null
 
 const createDefaultProfile = (): Profile => ({
   id: Date.now().toString(),
-  name: '', // пустое имя показываем как «Гость» на текущем языке
+  name: '', // an empty name is shown as "Guest" in the current language
   date: '',
   photo: null,
 });
@@ -113,7 +113,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (data.name !== undefined) updated.name = data.name.trim();
     if (data.date !== undefined) updated.date = data.date;
 
-    // photoUri: строка — новое фото из галереи, null — удалить, undefined — не трогать
+    // photoUri: string = new photo from the gallery, null = remove, undefined = keep as is
     if (data.photoUri !== undefined) {
       await deleteAvatar(current.photo);
       updated.photo = data.photoUri ? await saveAvatar(data.photoUri) : null;
@@ -136,7 +136,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const resetAppData = async () => {
     await FileSystem.deleteAsync(AVATARS_DIR, { idempotent: true });
-    // PRO-статус не сбрасываем: он принадлежит покупке, а не профилю
+    // PRO status is kept: it belongs to the purchase, not the profile
     await AsyncStorage.multiRemove([ONBOARDED_KEY, PROFILES_KEY, ACTIVE_PROFILE_KEY]);
     setProfiles([]);
     setActiveProfileState(null);

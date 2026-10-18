@@ -56,32 +56,23 @@ export function calculatePythagoreanSquare(date: Date): CalculationResult {
   const C9 = countMatrixDigits(matrix, '9');
 
   const additionalParams: AdditionalParams = {
-    // Ячейка 1
     character: C1,
     goal: C1,
-    // Ячейка 2
     energy: matrix['2'],
     utilityMoney: C2,
-    // Ячейка 3
     interest: matrix['3'],
     talent: C3,
     spirituality: C3,
-    // Ячейка 4
     health: C4,
-    // Ячейка 5
     logic: C5,
     habits: C5,
-    // Ячейка 6
     labor: C6,
     family: C6,
-    // Ячейка 7
     luck: C7,
     selfEsteem: C7,
-    // Ячейка 8
     duty: matrix['8'],
-    // Ячейка 9
     memory: C9,
-    // Дополнительные вычисляемые параметры
+    // Derived parameters
     temperament: C3 + C5 + C7,
     destinyNumber: sum2,
   };

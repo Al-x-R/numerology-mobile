@@ -10,13 +10,13 @@ export const useDailyNumber = (profile: any) => {
   if (!profile) return null;
   const last = profile.lastDayNumberDate;
 
-  // Если не премиум — проверяем, прошло ли 7 дней
+  // Non-premium users get a new number once every 7 days
   if (!isPremium && last) {
     const lastDate = new Date(last);
     const diffTime = today.getTime() - lastDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 7) return null; // ещё не пора
+    if (diffDays < 7) return null;
   }
 
   const number = calculateDayNumber(profile.date, todayStr);

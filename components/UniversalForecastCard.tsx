@@ -131,7 +131,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
       end={{ x: 1, y: 1 }}
       style={styles.card}
     >
-      {/* --- ШАПКА КАРТОЧКИ --- */}
+      {/* --- CARD HEADER --- */}
       <View style={styles.header}>
         {badgeContent && (
           <View style={styles.numberBadge}>
@@ -145,12 +145,12 @@ export const UniversalForecastCard: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Основное саммари */}
+      {/* Summary */}
       <Text style={styles.summary}>{data.summary}</Text>
 
       <View style={styles.divider} />
 
-      {/* Любовь */}
+      {/* Love */}
       <InfoSection
         icon="heart"
         color="#F87171"
@@ -158,7 +158,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
         text={data.love}
       />
 
-      {/* Финансы */}
+      {/* Finance */}
       <InfoSection
         icon="briefcase"
         color="#34D399"
@@ -166,7 +166,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
         text={data.finance}
       />
 
-      {/* Здоровье */}
+      {/* Health */}
       <InfoSection
         icon="flash"
         color="#60A5FA"
@@ -174,7 +174,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
         text={data.health}
       />
 
-      {/* --- ПРЕДУПРЕЖДЕНИЕ --- */}
+      {/* --- WARNING --- */}
       <View style={styles.warningContainer}>
         <View style={styles.sectionHeader}>
           <Ionicons name="warning" size={16} color="#FBBF24" />

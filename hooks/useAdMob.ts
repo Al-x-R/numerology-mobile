@@ -30,14 +30,12 @@ export const useInterstitial = () => {
 
   const [onCloseCallback, setOnCloseCallback] = useState<(() => void) | null>(null);
 
-  // Авто-загрузка
   useEffect(() => {
     if (!isPremium && !isLoaded) {
       load();
     }
   }, [isPremium, load, isLoaded]);
 
-  // Обработка закрытия
   useEffect(() => {
     if (isClosed) {
       if (onCloseCallback) {
@@ -78,14 +76,12 @@ export const useRewarded = () => {
 
   const [onRewardCallback, setOnRewardCallback] = useState<(() => void) | null>(null);
 
-  // Авто-загрузка
   useEffect(() => {
     if (!isPremium && !isLoaded) {
       load();
     }
   }, [isPremium, isLoaded, load]);
 
-  // Обработка награды
   useEffect(() => {
     if (isEarnedReward && onRewardCallback) {
       console.log('User earned reward!');
@@ -94,14 +90,13 @@ export const useRewarded = () => {
     }
   }, [isEarnedReward, onRewardCallback]);
 
-  // Перезагрузка после закрытия
+  // Reload after the ad is closed
   useEffect(() => {
     if (isClosed) {
       if (!isPremium) load();
     }
   }, [isClosed, load, isPremium]);
 
-  // Логирование ошибок
   useEffect(() => {
     if (error) {
       console.log('Rewarded Ad failed to load: ', error);
@@ -118,7 +113,7 @@ export const useRewarded = () => {
       setOnRewardCallback(() => onReward);
       show();
     } else {
-      // Для Rewarded показываем алерт, так как контент ценный
+      // Rewarded ads show an alert, since the user explicitly asked for the content
       Alert.alert(
         t('common.error') || 'Error',
         t('ads.notReady') || 'Ad is loading, please try again in a moment.',

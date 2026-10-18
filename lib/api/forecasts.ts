@@ -1,7 +1,7 @@
 // lib/api/forecasts.ts
 
-// Статичные JSON-прогнозы с CDN: `${FORECASTS_URL}/${collection}/${docId}.json`
-// Пока URL не задан, прогнозы просто недоступны (как и с неподключённым Firebase)
+// Static JSON forecasts from the CDN: `${FORECASTS_URL}/${collection}/${docId}.json`
+// While the URL is not set, forecasts are simply unavailable
 const FORECASTS_URL = process.env.EXPO_PUBLIC_FORECASTS_URL;
 
 export const fetchForecastDoc = async <T>(collection: string, docId: string): Promise<T | null> => {

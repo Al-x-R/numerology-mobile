@@ -31,19 +31,18 @@ export const COLORS = {
   error: '#FF6B6B',
   boxShadow: '#000',
   shadowAccent: '#A78BFA',
-  // === НОВЫЕ: ПОДСВЕТКА ЯЧЕЕК ===
+  // === CELL HIGHLIGHT ===
   highlightWeak: '#FF9500',
   highlightStrong: '#8B5CF6',
 
   battery: {
-    empty: '#FF3B30',     // красный — пусто
-    full: '#34C759',      // зелёный — полный заряд
-    light: '#A8E6A1',     // светло-зелёный (для градиента)
+    empty: '#FF3B30',
+    full: '#34C759',
+    light: '#A8E6A1',     // used for the gradient
   },
-  textTertiary: '#D0D0D0',  // серый для описаний
-  loading: '#FFD700',      // золотой для ActivityIndicator
+  textTertiary: '#D0D0D0',
+  loading: '#FFD700',      // ActivityIndicator color
 
-  // RGBA значения для прозрачных фонов
   cardBackground: 'rgba(255, 255, 255, 0.05)',
   cardBorder: 'rgba(255, 255, 255, 0.1)',
   accentCardBackground: 'rgba(224, 184, 115, 0.1)',
@@ -78,7 +77,6 @@ export const SPACING = {
   numberCardGap: 5,
   tooltipPadding: 6,
   tooltipPaddingVertical: 2,
-  // Дополнительные отступы
   loadingContentGap: 12,
   cellLabelPaddingTop: 5,
   contentPadding: 20,
@@ -137,7 +135,6 @@ export const LAYOUT = {
   formMaxWidth: 450,
   formWidth: '100%' as DimensionValue,
   containerPadding: 50,
-  // Размеры из компонентов
   logoSmall: 200,
   logoMedium: 600,
   logoLarge: 700,
@@ -147,11 +144,9 @@ export const LAYOUT = {
   tabBarPaddingTop: 10,
   iconSize: 24,
   closeIconSize: 24,
-  // Позиционирование
   logoMarginBottom: 30,
   spinnerMarginTop: 20,
   languageButtonMarginRight: 15,
-  // Дополнительные размеры
   batteryWidth: 80,
   batteryHeight: 40,
   batteryCapWidth: 8,
@@ -295,7 +290,6 @@ export const FORM_STYLES = {
   },
 } as const;
 
-// Дополнительные константы для размеров шрифтов
 export const FONT_SIZES = {
   screenTitle: 24,
   screenSubtitle: 16,
@@ -336,7 +330,6 @@ export const GRID_CELL_ANIMATED = {
     position: 'relative' as const,
   }),
 
-  // Подсветка
   highlight: {
     weak: {
       borderColor: COLORS.highlightWeak,

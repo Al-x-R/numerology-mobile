@@ -1,7 +1,7 @@
 // lib/calculators/numerologyForecast.ts
 
 /**
- * Рекурсивное сведение к одной цифре (1-9).
+ * Repeatedly sums digits down to a single digit (1-9).
  */
 const reduceSum = (num: number): number => {
   let sum = num;
@@ -14,9 +14,8 @@ const reduceSum = (num: number): number => {
 };
 
 /**
- * Хелпер для получения Дня и Месяца из любого формата даты.
- * Поддерживает:
- * - "YYYY-MM-DD" (Firestore: "1985-07-02")
+ * Extracts day and month from any supported date format:
+ * - "YYYY-MM-DD" (stored: "1985-07-02")
  * - "DD.MM.YYYY" (Input: "02.07.1985")
  * - Date object
  */
@@ -27,17 +26,16 @@ const getDayAndMonth = (date: string | Date): { day: number, month: number } => 
     }
 
     if (typeof date === 'string') {
-      // Вариант 1: Формат базы данных "1985-07-02"
+      // Stored format "1985-07-02"
       if (date.includes('-')) {
         const parts = date.split('-'); // ["1985", "07", "02"]
-        // Обратите внимание: год-месяц-день
         return {
           day: Number(parts[2]),
           month: Number(parts[1])
         };
       }
 
-      // Вариант 2: Формат ввода "02.07.1985"
+      // Input format "02.07.1985"
       if (date.includes('.')) {
         const parts = date.split('.'); // ["02", "07", "1985"]
         return {
@@ -50,17 +48,16 @@ const getDayAndMonth = (date: string | Date): { day: number, month: number } => 
     console.error("Error parsing date:", date, e);
   }
 
-  return { day: 0, month: 0 }; // Fallback на случай ошибки
+  return { day: 0, month: 0 };
 };
 
 /**
- * Расчет Числа Персонального Года.
- * Формула: День рождения + Месяц рождения + Текущий год.
+ * Personal Year number.
+ * Formula: birth day + birth month + current year.
  */
 export const calculatePersonalYear = (birthDate: string | Date, targetDate: Date = new Date()): number => {
   const { day, month } = getDayAndMonth(birthDate);
 
-  // Если дата кривая — возвращаем 0
   if (!day || !month) return 0;
 
   const currentYear = targetDate.getFullYear();
@@ -70,8 +67,8 @@ export const calculatePersonalYear = (birthDate: string | Date, targetDate: Date
 };
 
 /**
- * Расчет Числа Персонального Месяца.
- * Формула: Персональный Год + Текущий Месяц.
+ * Personal Month number.
+ * Formula: Personal Year + current month.
  */
 export const calculatePersonalMonth = (birthDate: string | Date, targetDate: Date = new Date()): number => {
   const personalYear = calculatePersonalYear(birthDate, targetDate);
@@ -83,8 +80,8 @@ export const calculatePersonalMonth = (birthDate: string | Date, targetDate: Dat
 };
 
 /**
- * Расчет Числа Персонального Дня.
- * Формула: Персональный Месяц + Текущий День.
+ * Personal Day number.
+ * Formula: Personal Month + current day.
  */
 export const calculatePersonalDay = (birthDate: string | Date, targetDate: Date = new Date()): number => {
   const personalMonth = calculatePersonalMonth(birthDate, targetDate);

@@ -39,7 +39,7 @@ export const ProfileButton = ({ onPress }: Props) => {
 const styles = StyleSheet.create({
   container: {
     marginRight: 16,
-    padding: 4, // ← важно для кликабельности
+    padding: 4, // enlarges the touch area
   },
   avatar: {
     width: 36,

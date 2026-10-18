@@ -27,7 +27,6 @@ interface GridCellProps {
 export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLength }: GridCellProps) {
   const title = getInterpretation(id, value).title.split(' (')[0];
 
-  // Анимационные значения
   const containerOpacity = useSharedValue(0);
   const containerScale = useSharedValue(0.8);
   const labelOpacity = useSharedValue(0);

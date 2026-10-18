@@ -76,9 +76,9 @@ const calculateWorkingNumbers = (dateString: string, lp: number): number[] => {
   const day = parseInt(dateString.split('.')[0]);
 
   const P1 = numSum;
-  const P2 = forceSingleDigit(P1); // Обычно P2 - это сумма цифр P1 (например 38 -> 11 -> 2)
+  const P2 = forceSingleDigit(P1); // P2 is the digit sum of P1 (e.g. 38 -> 11 -> 2)
   const firstDigitOfDay = day >= 10 ? parseInt(String(day)[0]) : day;
-  const P3 = Math.abs(P1 - 2 * firstDigitOfDay); // Добавил Math.abs на всякий случай
+  const P3 = Math.abs(P1 - 2 * firstDigitOfDay);
   const P4 = forceSingleDigit(P3);
 
   return [P1, P2, P3, P4];

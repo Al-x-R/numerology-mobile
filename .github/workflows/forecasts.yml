@@ -1,0 +1,61 @@
+name: Generate forecasts
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # daily at 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forecasts
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # Generated forecasts live in the gh-pages branch served by GitHub Pages
+      - name: Checkout gh-pages into ./public
+        run: |
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git fetch --depth=1 origin gh-pages
+            git worktree add public origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages public
+          fi
+
+      - name: Generate
+        id: generate
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-2.5-flash
+        run: node scripts/forecasts/generate.ts public
+
+      # Publish whatever was generated, even if some forecasts failed
+      - name: Publish
+        working-directory: public
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing new to publish"
+          else
+            git commit -m "forecasts: $(date -u +%F)"
+            git push origin HEAD:gh-pages
+          fi
+
+      - name: Fail if generation failed
+        if: steps.generate.outcome == 'failure'
+        run: exit 1

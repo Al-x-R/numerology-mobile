@@ -24,7 +24,7 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
     let docId = '';
 
     if (type === 'day') {
-      docId = d.toISOString().split('T')[0];
+      docId = d.toLocaleDateString('en-CA'); // local YYYY-MM-DD, same as useForecasts
     } else if (type === 'month') {
       docId = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     } else if (type === 'year') {
