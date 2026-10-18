@@ -21,7 +21,7 @@ export const BirthDateRequiredState = () => {
 
         <TouchableOpacity style={styles.button} onPress={() => router.push('/profile/edit')}>
           <LinearGradient
-            colors={GRADIENTS.goldenButton || ['#C4A484', '#A67C52']}
+            colors={GRADIENTS.goldenButton}
             style={styles.buttonGradient}
           >
             <Text style={styles.buttonText}>{t('birthDateRequired.button')}</Text>
@@ -43,11 +43,11 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     padding: SPACING.xl,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-// backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: COLORS.surface,
+// backgroundColor: COLORS.card,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.hairline,
   },
   title: {
     ...FONTS.sectionTitle,
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...FONTS.button,
-    color: '#000',
+    color: COLORS.blackText,
     fontWeight: '600',
   },
 });

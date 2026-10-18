@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background, // Fallback color
   },
   background: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   content: {
     flex: 1,

@@ -130,8 +130,8 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
 
   const getColorForPercentage = (pct: number) => {
     if (pct >= 85) return COLORS.battery.full;
-    if (pct >= 70) return '#FFD700';
-    if (pct >= 50) return '#FFA500';
+    if (pct >= 70) return COLORS.accent;
+    if (pct >= 50) return COLORS.primaryDark;
     return COLORS.error;
   };
 
@@ -264,8 +264,8 @@ export function CompatibilityResultsDisplay({
 
   const getTotalColor = (pct: number) => {
     if (pct >= 85) return COLORS.battery.full;
-    if (pct >= 70) return '#FFD700';
-    if (pct >= 50) return '#FFA500';
+    if (pct >= 70) return COLORS.accent;
+    if (pct >= 50) return COLORS.primaryDark;
     return COLORS.error;
   };
 
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   recommendationsList: {
     marginTop: SPACING.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: COLORS.hairline,
     paddingTop: SPACING.md,
   },
   recommendationsListTitle: {
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xl,
     paddingTop: SPACING.md,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: COLORS.hairline,
   },
   challengesListTitle: {
     fontFamily: FONT_FAMILY.manrope.bold,
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.md,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: COLORS.accentSoft,
     borderRadius: RADIUS.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.accent,

@@ -252,7 +252,7 @@ export default function NumbersScreen() {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              tintColor="#C4A484"
+              tintColor={COLORS.accent}
             />
           }
         >
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background
   },
-  background: { ...StyleSheet.absoluteFillObject, alignItems: 'center' },
+  background: { ...StyleSheet.absoluteFill, alignItems: 'center' },
   logo: {
     width: '150%',
     maxWidth: LAYOUT.logoLarge,
@@ -286,36 +286,36 @@ const styles = StyleSheet.create({
 
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: COLORS.card,
     borderRadius: 12,
     padding: 4,
     marginBottom: 10,
     marginTop: 0
   },
   tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
-  activeTabButton: { backgroundColor: '#C4A484' },
-  tabText: { color: '#9CA3AF', fontWeight: '600', fontSize: 14 },
-  activeTabText: { color: '#000', fontWeight: 'bold' },
+  activeTabButton: { backgroundColor: COLORS.accent },
+  tabText: { color: COLORS.textSecondary, fontWeight: '600', fontSize: 14 },
+  activeTabText: { color: COLORS.blackText, fontWeight: 'bold' },
 
   // --- Styles for Locked State ---
   lockedContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(20, 20, 20, 0.6)',
-// backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: COLORS.surface,
+// backgroundColor: COLORS.card,
     borderRadius: RADIUS.xl,
     padding: SPACING.xl,
     marginTop: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.hairline,
     minHeight: 350,
   },
   iconCircle: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(196, 164, 132, 0.15)',
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,

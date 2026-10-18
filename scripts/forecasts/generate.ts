@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // scripts/forecasts/generate.ts
 // Generates forecasts with Gemini and writes them as static files `<outDir>/<collection>/<id>.json`.
 // Existing files are never regenerated, so the script is safe to run any number of times.
@@ -13,7 +14,7 @@ const OUT_DIR = path.resolve(process.argv[2] || 'public');
 const MAX_RETRIES = 3;
 const KEEP_DAILY_DAYS = 30;
 
-const LANGS = ['ru', 'en', 'uk', 'zh-TW'];
+const LANGS = ['ru', 'en', 'uk'];
 const NUMBER_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const ZODIAC_KEYS = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
 
@@ -64,11 +65,10 @@ const CONTENT_STRUCTURE = `
   - "affirmation": Short, positive mantra.`;
 
 const LANGUAGES_BLOCK = `
-  LANGUAGES REQUIRED (every item MUST have all 4):
+  LANGUAGES REQUIRED (every item MUST have all 3):
   - "ru": Russian
   - "en": English
-  - "uk": Ukrainian
-  - "zh-TW": Traditional Chinese (Taiwan style)`;
+  - "uk": Ukrainian`;
 
 const NUMEROLOGY_FOCUS: Record<Period, string> = {
   day: 'Immediate energy and daily tasks.',
@@ -94,10 +94,10 @@ const buildPrompt = (kind: Kind, period: Period, id: string): string => {
   CONTEXT: Period: ${PERIOD_LABEL[period]} forecast for ${id}. Focus: ${NUMEROLOGY_FOCUS[period]}
   ${LANGUAGES_BLOCK}
 
-  CONTENT STRUCTURE (for each number, in all 4 languages):${CONTENT_STRUCTURE}
+  CONTENT STRUCTURE (for each number, in all 3 languages):${CONTENT_STRUCTURE}
 
   OUTPUT FORMAT: JSON ONLY. Keys "1" to "9".
-  Structure: { "1": { "ru": { "title": "...", "summary": "...", ... }, "en": {...}, "uk": {...}, "zh-TW": {...} }, ... }
+  Structure: { "1": { "ru": { "title": "...", "summary": "...", ... }, "en": {...}, "uk": {...} }, ... }
 `;
   }
 
@@ -113,10 +113,10 @@ const buildPrompt = (kind: Kind, period: Period, id: string): string => {
   3. WARM TONE: Be supportive and helpful, like a wise friend.
   ${LANGUAGES_BLOCK}
 
-  CONTENT STRUCTURE (for each sign, in all 4 languages):${CONTENT_STRUCTURE}
+  CONTENT STRUCTURE (for each sign, in all 3 languages):${CONTENT_STRUCTURE}
 
   OUTPUT FORMAT: JSON ONLY.
-  Structure: { "aries": { "ru": {...}, "en": {...}, "uk": {...}, "zh-TW": {...} }, ... }
+  Structure: { "aries": { "ru": {...}, "en": {...}, "uk": {...} }, ... }
 `;
 };
 

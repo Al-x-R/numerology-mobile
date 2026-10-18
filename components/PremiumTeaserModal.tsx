@@ -90,18 +90,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    ...StyleSheet.absoluteFill,
+    backgroundColor: COLORS.modalBackdrop,
   },
   modalContainer: {
     width: '85%',
     maxWidth: 400,
-    backgroundColor: 'rgba(25, 25, 25, 0.95)',
+    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
     padding: SPACING.xl,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: COLORS.hairline,
   },
   closeButton: {
     position: 'absolute',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(196, 164, 132, 0.15)',
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.hairline,
   },
   orText: {
     ...FONTS.body,

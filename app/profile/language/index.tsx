@@ -17,13 +17,12 @@ export default function LanguageScreen() {
   const { t } = useAppTranslation();
 
   const languages = [
-    { code: 'en' as const, name: 'English', native: 'English', flag: '🇺🇸' },
-    { code: 'ru' as const, name: 'Russian', native: 'Русский', flag: '🇷🇺' },
-    { code: 'uk' as const, name: 'Ukrainian', native: 'Українська', flag: '🇺🇦' },
-    { code: 'zh-TW' as const, name: 'Traditional Chinese', native: '繁體中文', flag: '🇹🇼' },
+    { code: 'en' as const, name: 'English', native: 'English' },
+    { code: 'ru' as const, name: 'Russian', native: 'Русский' },
+    { code: 'uk' as const, name: 'Ukrainian', native: 'Українська' },
   ];
 
-  const handleSelect = async (lang: 'ru' | 'en' | 'uk' | 'zh-TW') => {
+  const handleSelect = async (lang: 'ru' | 'en' | 'uk') => {
     if (lang === language) return;
     await setLanguage(lang);
   };
@@ -32,7 +31,7 @@ export default function LanguageScreen() {
     <View style={styles.container}>
       <LinearGradient
         colors={GRADIENTS.background}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -50,13 +49,15 @@ export default function LanguageScreen() {
               >
                 {isSelected && (
                   <LinearGradient
-                    colors={['rgba(212, 175, 55, 0.15)', 'rgba(212, 175, 55, 0.05)']}
-                    style={StyleSheet.absoluteFillObject}
+                    colors={GRADIENTS.accentCard}
+                    style={StyleSheet.absoluteFill}
                   />
                 )}
 
                 <View style={styles.row}>
-                  <Text style={styles.flag}>{item.flag}</Text>
+                  <View style={[styles.monogram, isSelected && styles.monogramSelected]}>
+                    <Text style={styles.monogramText}>{item.code.toUpperCase()}</Text>
+                  </View>
 
                   <View style={styles.textContainer}>
                     <Text style={[styles.languageName, isSelected && styles.textSelected]}>
@@ -113,22 +114,35 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderColor: COLORS.hairline,
+    backgroundColor: COLORS.card,
     overflow: 'hidden',
   },
   cardActive: {
     borderColor: COLORS.accent,
-    backgroundColor: 'rgba(212, 175, 55, 0.05)',
+    backgroundColor: COLORS.accentSoft,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: SPACING.lg,
   },
-  flag: {
-    fontSize: 32,
+  monogram: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: SPACING.lg,
+  },
+  monogramSelected: {
+    borderColor: COLORS.accent,
+  },
+  monogramText: {
+    ...FONTS.cellLabel,
+    fontSize: 11,
   },
   textContainer: {
     flex: 1,

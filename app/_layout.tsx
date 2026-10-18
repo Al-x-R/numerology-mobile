@@ -19,7 +19,6 @@ export default function RootLayout() {
     'PlayfairDisplay-Regular': require('../assets/fonts/PlayfairDisplay-Regular.ttf'),
     'Manrope-Bold': require('../assets/fonts/Manrope-Bold.ttf'),
     'Manrope-Regular': require('../assets/fonts/Manrope-Regular.ttf'),
-    'Cinzel-Regular': require('../assets/fonts/Cinzel-Regular.ttf'),
   });
 
   useEffect(() => {
@@ -72,7 +71,7 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.background },
   background: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
   },
   restartContainer: {
     flex: 1,
-    backgroundColor: '#0F0A2E',
+    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

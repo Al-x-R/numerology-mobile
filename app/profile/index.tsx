@@ -32,6 +32,36 @@ interface MenuItemProps {
   isPremiumAction?: boolean;
 }
 
+const MenuItem = ({
+  icon,
+  text,
+  onPress,
+  color = COLORS.text,
+  isPremiumAction = false
+}: MenuItemProps) => (
+  <TouchableOpacity
+    style={styles.menuItem}
+    onPress={onPress}
+    disabled={!onPress && !isPremiumAction}
+  >
+    <Ionicons name={icon} size={22} color={isPremiumAction ? COLORS.accent : COLORS.accent} />
+
+    <Text style={[styles.menuText, { color }]}>{text}</Text>
+
+    {isPremiumAction ? (
+      <LinearGradient
+        colors={GRADIENTS.button}
+        style={styles.upgradeButton}
+      >
+
+        <MaterialCommunityIcons name="crown" size={16} color={COLORS.blackText} />
+      </LinearGradient>
+    ) : (
+      <Ionicons name="chevron-forward" size={22} color={COLORS.textSecondary} />
+    )}
+  </TouchableOpacity>
+);
+
 export default function ProfileScreen({ onClose }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -68,40 +98,10 @@ export default function ProfileScreen({ onClose }: Props) {
     router.push('/premium/upgrade');
   };
 
-  const MenuItem = ({
-    icon,
-    text,
-    onPress,
-    color = COLORS.text,
-    isPremiumAction = false
-  }: MenuItemProps) => (
-    <TouchableOpacity
-      style={styles.menuItem}
-      onPress={onPress}
-      disabled={!onPress && !isPremiumAction}
-    >
-      <Ionicons name={icon} size={22} color={isPremiumAction ? COLORS.accent : COLORS.accent} />
-
-      <Text style={[styles.menuText, { color }]}>{text}</Text>
-
-      {isPremiumAction ? (
-        <LinearGradient
-          colors={GRADIENTS.button}
-          style={styles.upgradeButton}
-        >
-
-          <MaterialCommunityIcons name="crown" size={16} color="#000" />
-        </LinearGradient>
-      ) : (
-        <Ionicons name="chevron-forward" size={22} color={COLORS.textSecondary} />
-      )}
-    </TouchableOpacity>
-  );
-
   return (
     <View style={[styles.container]}>
 
-      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
+      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFill} />
 
       <ScrollView
         contentContainerStyle={[
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accent,
   },
   photoFallback: {
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   premiumBadgeText: {
-    color: '#000',
+    color: COLORS.blackText,
     fontWeight: '800',
     fontSize: 10,
   },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: COLORS.card,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.lg,
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: SPACING.lg },
+  divider: { height: 1, backgroundColor: COLORS.hairline, marginVertical: SPACING.lg },
 
   deleteItem: { alignItems: 'center', marginTop: SPACING.md, paddingVertical: SPACING.md },
-  deleteText: { color: '#FF3B30', fontSize: 14, fontWeight: '500', opacity: 0.8 },
+  deleteText: { color: COLORS.error, fontSize: 14, fontWeight: '500', opacity: 0.8 },
 });

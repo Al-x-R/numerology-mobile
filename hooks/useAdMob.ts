@@ -24,20 +24,18 @@ const REWARDED_ID = __DEV__
 
 export const useInterstitial = () => {
   const { isPremium } = useProfile();
-  const { isLoaded, isClosed, load, show } = useInterstitialAd(INTERSTITIAL_ID, {
-    requestNonPersonalizedAdsOnly: true,
+  const { status, load, show } = useInterstitialAd({
+    adUnitId: INTERSTITIAL_ID,
+    requestOptions: { requestNonPersonalizedAdsOnly: true },
+    autoLoad: !isPremium,
   });
+  const isLoaded = status === 'loaded';
 
   const [onCloseCallback, setOnCloseCallback] = useState<(() => void) | null>(null);
 
+  // autoLoad only loads the first ad, so reload after each one is dismissed
   useEffect(() => {
-    if (!isPremium && !isLoaded) {
-      load();
-    }
-  }, [isPremium, load, isLoaded]);
-
-  useEffect(() => {
-    if (isClosed) {
+    if (status === 'closed') {
       if (onCloseCallback) {
         onCloseCallback();
         setOnCloseCallback(null);
@@ -46,7 +44,7 @@ export const useInterstitial = () => {
         load();
       }
     }
-  }, [isClosed, onCloseCallback, load, isPremium]);
+  }, [status, onCloseCallback, load, isPremium]);
 
   const showInterstitial = (nextAction: () => void) => {
     if (isPremium) {
@@ -70,32 +68,27 @@ export const useInterstitial = () => {
 export const useRewarded = () => {
   const { isPremium } = useProfile();
   const { t } = useAppTranslation();
-  const { isLoaded, load, show, isEarnedReward, isClosed, error } = useRewardedAd(REWARDED_ID, {
-    requestNonPersonalizedAdsOnly: true,
+  const { status, load, show, earnedReward, error } = useRewardedAd({
+    adUnitId: REWARDED_ID,
+    requestOptions: { requestNonPersonalizedAdsOnly: true },
+    autoLoad: !isPremium,
   });
+  const isLoaded = status === 'loaded';
 
   const [onRewardCallback, setOnRewardCallback] = useState<(() => void) | null>(null);
 
   useEffect(() => {
-    if (!isPremium && !isLoaded) {
-      load();
-    }
-  }, [isPremium, isLoaded, load]);
-
-  useEffect(() => {
-    if (isEarnedReward && onRewardCallback) {
+    if (earnedReward && onRewardCallback) {
       console.log('User earned reward!');
       onRewardCallback();
       setOnRewardCallback(null);
     }
-  }, [isEarnedReward, onRewardCallback]);
+  }, [earnedReward, onRewardCallback]);
 
   // Reload after the ad is closed
   useEffect(() => {
-    if (isClosed) {
-      if (!isPremium) load();
-    }
-  }, [isClosed, load, isPremium]);
+    if (status === 'closed' && !isPremium) load();
+  }, [status, load, isPremium]);
 
   useEffect(() => {
     if (error) {

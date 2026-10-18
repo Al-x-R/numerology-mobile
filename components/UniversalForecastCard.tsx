@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { Locale } from '@/lib/constants/locales';
+import { COLORS, GRADIENTS } from '@/lib/constants/theme';
 
 export interface ForecastSection {
   title: string;
@@ -44,7 +45,6 @@ const getIntlLocale = (locale: Locale): string => {
   switch (locale) {
     case 'ru': return 'ru-RU';
     case 'uk': return 'uk-UA';
-    case 'zh-TW': return 'zh-TW';
     default: return 'en-US';
   }
 };
@@ -62,7 +62,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#C4A484" />
+        <ActivityIndicator size="small" color={COLORS.accent} />
         <Text style={styles.loadingText}>{t('forecast.loading')}</Text>
       </View>
     );
@@ -115,7 +115,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
         <MaterialCommunityIcons
           name={ZODIAC_ICONS[zodiacSign]}
           size={28}
-          color="#1F2937"
+          color={COLORS.blackText}
         />
       );
     }
@@ -126,7 +126,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
 
   return (
     <LinearGradient
-      colors={['#1F2937', '#111827']}
+      colors={GRADIENTS.card}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.card}
@@ -153,7 +153,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
       {/* Love */}
       <InfoSection
         icon="heart"
-        color="#F87171"
+        color={COLORS.accent}
         title={t('forecast.love')}
         text={data.love}
       />
@@ -161,7 +161,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
       {/* Finance */}
       <InfoSection
         icon="briefcase"
-        color="#34D399"
+        color={COLORS.accent}
         title={t('forecast.finance')}
         text={data.finance}
       />
@@ -169,7 +169,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
       {/* Health */}
       <InfoSection
         icon="flash"
-        color="#60A5FA"
+        color={COLORS.accent}
         title={t('forecast.health')}
         text={data.health}
       />
@@ -177,15 +177,15 @@ export const UniversalForecastCard: React.FC<Props> = ({
       {/* --- WARNING --- */}
       <View style={styles.warningContainer}>
         <View style={styles.sectionHeader}>
-          <Ionicons name="warning" size={16} color="#FBBF24" />
-          <Text style={[styles.sectionTitle, { color: '#FBBF24' }]}>{t('forecast.warning')}</Text>
+          <Ionicons name="warning" size={16} color={COLORS.highlightWeak} />
+          <Text style={[styles.sectionTitle, { color: COLORS.highlightWeak }]}>{t('forecast.warning')}</Text>
         </View>
         <Text style={styles.warningText}>{data.warning}</Text>
       </View>
 
       {/*
       <LinearGradient
-        colors={['#4C1D95', '#6D28D9']}
+        colors={GRADIENTS.accentCard}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.affirmationContainer}
@@ -214,47 +214,47 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#374151',
+    borderColor: COLORS.hairline,
   },
   loadingContainer: { padding: 40, alignItems: 'center' },
-  loadingText: { marginTop: 10, color: '#9CA3AF', fontSize: 12 },
+  loadingText: { marginTop: 10, color: COLORS.textSecondary, fontSize: 12 },
   emptyContainer: { padding: 20, alignItems: 'center' },
-  emptyText: { color: '#6B7280', fontStyle: 'italic' },
+  emptyText: { color: COLORS.textMuted, fontStyle: 'italic' },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   numberBadge: {
     width: 48, height: 48, borderRadius: 24,
-    backgroundColor: '#C4A484', justifyContent: 'center', alignItems: 'center', marginRight: 14,
+    backgroundColor: COLORS.accent, justifyContent: 'center', alignItems: 'center', marginRight: 14,
   },
-  numberText: { color: '#000', fontWeight: '800', fontSize: 22 },
+  numberText: { color: COLORS.blackText, fontWeight: '800', fontSize: 22 },
   headerTextContainer: { flex: 1 },
-  dateTitle: { color: '#9CA3AF', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, fontWeight: '600' },
-  subTitle: { color: '#C4A484', fontSize: 12, marginBottom: 2, fontWeight: '500' },
-  mainTitle: { color: '#FFF', fontSize: 18, fontWeight: 'bold', lineHeight: 24 },
+  dateTitle: { color: COLORS.textSecondary, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, fontWeight: '600' },
+  subTitle: { color: COLORS.accent, fontSize: 12, marginBottom: 2, fontWeight: '500' },
+  mainTitle: { color: COLORS.text, fontSize: 18, fontWeight: 'bold', lineHeight: 24 },
 
-  summary: { color: '#E5E7EB', fontSize: 15, lineHeight: 22, marginBottom: 20 },
-  divider: { height: 1, backgroundColor: '#374151', marginBottom: 20 },
+  summary: { color: COLORS.text, fontSize: 15, lineHeight: 22, marginBottom: 20 },
+  divider: { height: 1, backgroundColor: COLORS.hairline, marginBottom: 20 },
 
   // Sections
   sectionContainer: { marginBottom: 16 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   sectionTitle: { fontSize: 14, fontWeight: '700', marginLeft: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
-  sectionBody: { color: '#D1D5DB', fontSize: 14, lineHeight: 21, paddingLeft: 2 },
+  sectionBody: { color: COLORS.textTertiary, fontSize: 14, lineHeight: 21, paddingLeft: 2 },
 
   // Warning
   warningContainer: {
-    backgroundColor: 'rgba(251, 191, 36, 0.08)',
+    backgroundColor: COLORS.weakHighlightBackground,
     padding: 12,
     borderRadius: 12,
     marginTop: 5,
     borderLeftWidth: 3,
-    borderLeftColor: '#FBBF24'
+    borderLeftColor: COLORS.highlightWeak
   },
-  warningText: { color: '#D1D5DB', fontSize: 13, lineHeight: 19, fontStyle: 'italic', marginTop: 4 },
+  warningText: { color: COLORS.textTertiary, fontSize: 13, lineHeight: 19, fontStyle: 'italic', marginTop: 4 },
 
   // Affirmation
   affirmationContainer: { marginTop: 20, padding: 16, borderRadius: 16, alignItems: 'center' },
-  affirmationLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 2 },
-  affirmationText: { color: '#FFF', fontSize: 16, fontWeight: '600', fontStyle: 'italic', textAlign: 'center', lineHeight: 24 },
+  affirmationLabel: { color: COLORS.textSecondary, fontSize: 10, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 2 },
+  affirmationText: { color: COLORS.text, fontSize: 16, fontWeight: '600', fontStyle: 'italic', textAlign: 'center', lineHeight: 24 },
 });

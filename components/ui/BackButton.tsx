@@ -4,6 +4,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '@/lib/constants/theme';
 
 interface BackButtonProps {
   onPress?: () => void;
@@ -15,7 +16,7 @@ interface BackButtonProps {
 export const BackButton = ({
   onPress,
   style,
-  iconColor = '#fff',
+  iconColor = COLORS.text,
   size = 35
 }: BackButtonProps) => {
   const router = useRouter();
@@ -56,13 +57,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     // Glass effect (Glassmorphism)
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderColor: COLORS.border,
     // Volume shadows
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: COLORS.boxShadow,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

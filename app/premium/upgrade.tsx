@@ -149,7 +149,7 @@ export default function PremiumScreen() {
                   {plan.save && <View style={styles.badgeContainer}><Text style={styles.badgeText}>{plan.save}</Text></View>}
                   {id === 'yearly' && plan.bestValue && (
                     <View style={[styles.badgeContainer, { backgroundColor: COLORS.accent }]}>
-                      <Text style={[styles.badgeText, { color: '#000' }]}>{plan.bestValue}</Text>
+                      <Text style={[styles.badgeText, { color: COLORS.blackText }]}>{plan.bestValue}</Text>
                     </View>
                   )}
 
@@ -217,7 +217,7 @@ export default function PremiumScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   mainWrapper: { flex: 1 },
-  background: { ...StyleSheet.absoluteFillObject },
+  background: { ...StyleSheet.absoluteFill },
   scrollContent: { paddingHorizontal: 0 },
   header: {
     flexDirection: 'row',
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     padding: 8,
     width: 40,
     height: 40,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: COLORS.hairline,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -242,12 +242,12 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
+    borderColor: COLORS.accentCardBorder,
   },
   heroTitle: { ...FONTS.title, fontSize: 24, color: COLORS.text, textAlign: 'center', marginBottom: SPACING.xs, fontWeight: 'bold' },
   heroSubtitle: { ...FONTS.body, color: COLORS.textSecondary, textAlign: 'center', fontSize: 14, lineHeight: 20 },
@@ -259,15 +259,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.hairline,
     position: 'relative',
     overflow: 'hidden'
   },
-  selectedCard: { borderColor: COLORS.accent, backgroundColor: 'rgba(196, 164, 132, 0.1)' },
+  selectedCard: { borderColor: COLORS.accent, backgroundColor: COLORS.accentSoft },
   planInfo: { flex: 1 },
   planTitle: { ...FONTS.subtitle, color: COLORS.text, fontSize: 17, fontWeight: 'bold' },
   planSubtitle: { ...FONTS.body, color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
@@ -279,12 +279,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: '#4CAF50',
+    backgroundColor: COLORS.accent,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderBottomLeftRadius: 8
   },
-  badgeText: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
+  badgeText: { fontSize: 10, fontWeight: 'bold', color: COLORS.text },
   actionSection: { paddingHorizontal: SPACING.xl },
   ctaButton: { borderRadius: RADIUS.xl, overflow: 'hidden' },
   ctaGradient: { paddingVertical: 16, alignItems: 'center' },

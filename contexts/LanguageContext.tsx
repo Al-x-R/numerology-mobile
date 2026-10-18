@@ -4,7 +4,7 @@ import { setLocale, t, translations } from '@/lib/constants/locales';
 import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Language = 'en' | 'ru' | 'uk' | 'zh-TW';
+type Language = 'en' | 'ru' | 'uk';
 
 interface LanguageContextType {
   language: Language;
@@ -21,9 +21,7 @@ export const useAppTranslation = () => {
   const t = useCallback((key: string) => {
     const keys = key.split('.');
 
-    // Ensure we use the correct key for zh-TW
-    const localeKey = language === 'zh-TW' ? 'zh-TW' : language;
-    let value: any = translations[localeKey];
+    let value: any = translations[language];
 
     for (const k of keys) {
       if (value && typeof value === 'object') {
@@ -46,7 +44,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     (async () => {
       try {
         const saved = await AsyncStorage.getItem(LANGUAGE_KEY);
-        if (saved === 'en' || saved === 'ru' || saved === 'uk' || saved === 'zh-TW') {
+        if (saved === 'en' || saved === 'ru' || saved === 'uk') {
           setLanguageState(saved as Language);
           setLocale(saved as Language);
           return;
@@ -58,8 +56,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           detected = 'uk';
         } else if (deviceLocale.startsWith('ru')) {
           detected = 'ru';
-        } else if (deviceLocale.startsWith('zh')) {
-          detected = 'zh-TW';
         }
 
         setLanguageState(detected);

@@ -1,6 +1,6 @@
 // app/profile/edit.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -44,27 +44,18 @@ export default function EditProfileScreen() {
   const [localImage, setLocalImage] = useState<string | null>(null);
   const { t, language } = useAppTranslation();
 
-  useEffect(() => {
-    setName(activeProfile?.name || '');
-    if (activeProfile?.date) {
-      setBirthDate(new Date(activeProfile.date));
-    }
-  }, [activeProfile]);
-
   // --- Date Picker Logic ---
   const openDatePicker = () => {
     setTempDate(birthDate || new Date('2000-01-01'));
     setShowPicker(true);
   };
 
-  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+  const onDateChange = (_event: unknown, selectedDate: Date) => {
     if (Platform.OS === 'ios') {
-      if (selectedDate) setTempDate(selectedDate);
+      setTempDate(selectedDate);
     } else {
       setShowPicker(false);
-      if (event.type === 'set' && selectedDate) {
-        setBirthDate(selectedDate);
-      }
+      setBirthDate(selectedDate);
     }
   };
 
@@ -160,14 +151,13 @@ export default function EditProfileScreen() {
     switch (lang) {
       case 'ru': return 'ru-RU';
       case 'uk': return 'uk-UA';
-      case 'zh-TW': return 'zh-Hant';
       default: return 'en-US';
     }
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFillObject} />
+      <LinearGradient colors={GRADIENTS.background} style={StyleSheet.absoluteFill} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -192,7 +182,7 @@ export default function EditProfileScreen() {
               )}
 
               <TouchableOpacity style={styles.editIconBadge} onPress={handlePickImage}>
-                <Ionicons name="camera" size={18} color="#000" />
+                <Ionicons name="camera" size={18} color={COLORS.blackText} />
               </TouchableOpacity>
             </View>
 
@@ -257,7 +247,7 @@ export default function EditProfileScreen() {
               style={styles.goldenButton}
             >
               {isSaving ? (
-                <ActivityIndicator color="#000" />
+                <ActivityIndicator color={COLORS.blackText} />
               ) : (
                 <Text style={styles.goldenButtonText}>{t('common.save')}</Text>
               )}
@@ -286,11 +276,11 @@ export default function EditProfileScreen() {
                 value={tempDate}
                 mode="date"
                 display="spinner"
-                onChange={onDateChange}
+                onValueChange={onDateChange}
                 maximumDate={new Date()}
                 themeVariant="dark"
                 textColor="white"
-                style={{ backgroundColor: '#1A1A1A', height: 200, width: '100%' }}
+                style={{ backgroundColor: COLORS.surface, height: 200, width: '100%' }}
                 locale={getIOSLocale(language)}
               />
             </View>
@@ -301,7 +291,8 @@ export default function EditProfileScreen() {
           value={birthDate || new Date('2000-01-01')}
           mode="date"
           display="default"
-          onChange={onDateChange}
+          onValueChange={onDateChange}
+          onDismiss={() => setShowPicker(false)}
           maximumDate={new Date()}
           themeVariant="dark"
         />
@@ -326,7 +317,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -348,17 +339,17 @@ const styles = StyleSheet.create({
   },
   avatarActions: { marginTop: SPACING.md, alignItems: 'center' },
   changePhotoText: { ...FONTS.button, color: COLORS.accent, fontSize: 16 },
-  removePhotoText: { ...FONTS.body, color: '#FF3B30', fontSize: 14 },
+  removePhotoText: { ...FONTS.body, color: COLORS.error, fontSize: 14 },
   formContainer: { marginBottom: 30 },
   field: { marginBottom: SPACING.lg },
   label: { ...FONTS.body, color: COLORS.textSecondary, marginBottom: 8, fontSize: 14, marginLeft: 4 },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: COLORS.hairline,
     paddingHorizontal: SPACING.md,
   },
   inputIcon: { marginRight: SPACING.sm },
@@ -367,10 +358,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: COLORS.hairline,
     paddingHorizontal: SPACING.md,
     paddingVertical: 16,
   },
@@ -389,17 +380,17 @@ const styles = StyleSheet.create({
   goldenButtonText: {
     ...FONTS.button,
     fontSize: 18,
-    color: '#000000',
+    color: COLORS.blackText,
     fontWeight: '700',
   },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'flex-end' },
   pickerContainer: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingBottom: 30,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: COLORS.hairline,
     alignItems: 'center',
   },
   pickerHeader: {
@@ -408,11 +399,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    backgroundColor: '#1A1A1A',
+    borderBottomColor: COLORS.hairline,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
-  cancelText: { color: '#FF453A', fontSize: 17, fontWeight: '600' },
+  cancelText: { color: COLORS.error, fontSize: 17, fontWeight: '600' },
   doneText: { color: COLORS.accent, fontSize: 17, fontWeight: '600' },
 });

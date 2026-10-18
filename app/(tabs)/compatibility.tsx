@@ -3,7 +3,7 @@ import { Image, StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvo
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useNavigation } from 'expo-router';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
 import { CompatibilityResultsDisplay } from '@/components/CompatibilityResultsDisplay';
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   background: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
   },
   scrollContent: {

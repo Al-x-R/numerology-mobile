@@ -2,9 +2,8 @@
 import { ru } from './locales/ru';
 import { en } from './locales/en';
 import { uk } from './locales/uk';
-import { zhTW } from './locales/zh-TW';
 
-export type Locale = 'ru' | 'en' | 'uk' | 'zh-TW';
+export type Locale = 'ru' | 'en' | 'uk';
 
 type TranslationValue = string | ((...args: any[]) => string);
 type TranslationNode = TranslationValue | Translations | any[] | Record<string, any>;
@@ -21,7 +20,6 @@ export const translations: LocaleData = {
   ru,
   en,
   uk,
-  'zh-TW': zhTW,
 };
 
 let currentLocale: Locale = 'en';

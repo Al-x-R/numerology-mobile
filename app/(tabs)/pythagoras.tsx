@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   background: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
   },
   logo: {

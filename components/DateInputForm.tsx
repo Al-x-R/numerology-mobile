@@ -1,6 +1,6 @@
 // components/ui/DateInputForm.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -41,11 +41,11 @@ export function DateInputForm({
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const inputOpacity = useRef(new Animated.Value(0)).current;
-  const inputY = useRef(new Animated.Value(30)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const buttonY = useRef(new Animated.Value(20)).current;
-  const buttonScale = useRef(new Animated.Value(1)).current;
+  const [inputOpacity] = useState(() => new Animated.Value(0));
+  const [inputY] = useState(() => new Animated.Value(30));
+  const [buttonOpacity] = useState(() => new Animated.Value(0));
+  const [buttonY] = useState(() => new Animated.Value(20));
+  const [buttonScale] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     Animated.stagger(200, [
@@ -100,8 +100,8 @@ export function DateInputForm({
     }, 2000);
   };
 
-  const errorOpacity = useRef(new Animated.Value(0)).current;
-  const errorY = useRef(new Animated.Value(-10)).current;
+  const [errorOpacity] = useState(() => new Animated.Value(0));
+  const [errorY] = useState(() => new Animated.Value(-10));
 
   useEffect(() => {
     if (localError) {

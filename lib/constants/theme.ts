@@ -9,57 +9,61 @@ export const FONT_FAMILY = {
     bold: 'Manrope-Bold',
     regular: 'Manrope-Regular',
   },
-  cinzel: {
-    regular: 'Cinzel-Regular',
-  },
 } as const;
 
+// Dark luxury palette: warm near-black, a single muted gold accent, warm ivory text
 export const COLORS = {
-  background: '#0D0F21',
-  headerBackground: '#1A1C33',
-  card: 'rgba(255, 255, 255, 0.04)',
-  cardFocused: 'rgba(167, 139, 250, 0.08)',
-  border: 'rgba(255, 255, 255, 0.2)',
-  borderFocused: '#A78BFA',
-  borderAccent: '#E0B873',
-  text: '#FFFFFF',
-  blackText: '#000000',
-  textSecondary: '#A0A0A0',
-  accent: '#E0B873',
-  primary: '#A78BFA',
-  primaryDark: '#7C3AED',
-  error: '#FF6B6B',
+  background: '#0E0C0A',
+  headerBackground: '#14110E',
+  surface: '#17140F',
+  card: 'rgba(242, 237, 228, 0.035)',
+  cardFocused: 'rgba(201, 169, 110, 0.08)',
+  border: 'rgba(242, 237, 228, 0.14)',
+  borderFocused: '#C9A96E',
+  borderAccent: '#C9A96E',
+  hairline: 'rgba(242, 237, 228, 0.08)',
+  text: '#F2EDE4',
+  blackText: '#14110E',
+  textSecondary: '#9C9386',
+  textMuted: '#6E665B',
+  accent: '#C9A96E',
+  accentSoft: 'rgba(201, 169, 110, 0.12)',
+  primary: '#C9A96E',
+  primaryDark: '#A8874F',
+  error: '#C9705E',
   boxShadow: '#000',
-  shadowAccent: '#A78BFA',
+  shadowAccent: '#C9A96E',
   // === CELL HIGHLIGHT ===
-  highlightWeak: '#FF9500',
-  highlightStrong: '#8B5CF6',
+  highlightWeak: '#B5674D',
+  highlightStrong: '#C9A96E',
 
   battery: {
-    empty: '#FF3B30',
-    full: '#34C759',
-    light: '#A8E6A1',     // used for the gradient
+    empty: '#B5674D',
+    full: '#8FA87A',
+    light: '#B9C7A8',     // used for the gradient
   },
-  textTertiary: '#D0D0D0',
-  loading: '#FFD700',      // ActivityIndicator color
+  textTertiary: '#CFC7BA',
+  loading: '#C9A96E',      // ActivityIndicator color
 
-  cardBackground: 'rgba(255, 255, 255, 0.05)',
-  cardBorder: 'rgba(255, 255, 255, 0.1)',
-  accentCardBackground: 'rgba(224, 184, 115, 0.1)',
-  accentCardBorder: 'rgba(122, 95, 255, 0.1)',
-  weakHighlightBackground: 'rgba(255, 107, 107, 0.08)',
-  strongHighlightBackground: 'rgba(139, 92, 246, 0.08)',
-  pulseOverlay: 'rgba(224, 184, 115, 0.15)',
-  modalBackdrop: 'rgba(0, 0, 0, 0.75)',
-  textShadow: 'rgba(167, 139, 250, 0.4)',
+  cardBackground: 'rgba(242, 237, 228, 0.035)',
+  cardBorder: 'rgba(242, 237, 228, 0.08)',
+  accentCardBackground: 'rgba(201, 169, 110, 0.08)',
+  accentCardBorder: 'rgba(201, 169, 110, 0.18)',
+  weakHighlightBackground: 'rgba(181, 103, 77, 0.08)',
+  strongHighlightBackground: 'rgba(201, 169, 110, 0.08)',
+  pulseOverlay: 'rgba(201, 169, 110, 0.15)',
+  modalBackdrop: 'rgba(0, 0, 0, 0.8)',
+  textShadow: 'rgba(201, 169, 110, 0.35)',
   transparent: 'transparent',
 };
 
 export const GRADIENTS = {
-  background: ['#1A1C33', '#0D0F21'] as const,
-  button: ['#B794F4', '#9F7AEA', '#7C3AED'] as const,
-  buttonLoading: ['#9F7AEA', '#7C3AED'] as const,
-  goldenButton: ['#C4A484', '#A88460', '#B99470'] as const,
+  background: ['#16130F', '#0E0C0A'] as const,
+  button: ['#D9BE85', '#C9A96E', '#A8874F'] as const,
+  buttonLoading: ['#C9A96E', '#A8874F'] as const,
+  goldenButton: ['#D9BE85', '#C9A96E', '#A8874F'] as const,
+  card: ['#1A1612', '#120F0C'] as const,
+  accentCard: ['rgba(201, 169, 110, 0.16)', 'rgba(201, 169, 110, 0.04)'] as const,
 };
 
 export const SPACING = {
@@ -96,38 +100,38 @@ export const SHADOWS = {
   card: {
     shadowColor: COLORS.boxShadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
     elevation: 3,
   },
   inputFocused: {
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
   },
   button: {
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 16,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 8,
   },
   goldenButton: {
-    shadowColor: '#C4A484',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 18,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 18,
+    elevation: 8,
   },
 
   goldenButtonSoft: {
-    shadowColor: '#B8860B',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.7,
-    shadowRadius: 16,
-    elevation: 14,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    elevation: 6,
   },
 };
 
@@ -159,23 +163,23 @@ export const LAYOUT = {
 
 export const FONTS = {
   title: {
-    fontFamily: FONT_FAMILY.playfair.bold,
-    fontSize: 32,
-    fontWeight: '700' as const,
-    letterSpacing: 0.5,
-    color: COLORS.accent,
+    fontFamily: FONT_FAMILY.playfair.regular,
+    fontSize: 34,
+    letterSpacing: 0.3,
+    color: COLORS.text,
   },
   subtitle: {
     fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 22,
-    color: COLORS.accent,
+    fontSize: 17,
+    lineHeight: 26,
+    color: COLORS.textSecondary,
     textAlign: 'center' as const,
   },
   headerTitle: {
-    fontFamily: FONT_FAMILY.playfair.bold,
+    fontFamily: FONT_FAMILY.playfair.regular,
     fontSize: 20,
-    fontWeight: '700' as const,
-    color: COLORS.accent,
+    letterSpacing: 0.3,
+    color: COLORS.text,
   },
   headerSubtitle: {
     fontFamily: FONT_FAMILY.manrope.regular,
@@ -185,10 +189,11 @@ export const FONTS = {
   },
   button: {
     fontFamily: FONT_FAMILY.manrope.bold,
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '700' as const,
-    letterSpacing: 0.5,
-    color: COLORS.text,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
+    color: COLORS.blackText,
   },
   input: {
     fontFamily: FONT_FAMILY.manrope.regular,
@@ -210,8 +215,10 @@ export const FONTS = {
     color: COLORS.textSecondary,
   },
   cellLabel: {
-    fontFamily: FONT_FAMILY.cinzel.regular,
-    fontSize: 12,
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
     color: COLORS.accent,
   },
   cellValue: {
@@ -226,10 +233,9 @@ export const FONTS = {
     color: COLORS.text,
   },
   cardTitle: {
-    fontFamily: FONT_FAMILY.playfair.bold,
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: COLORS.accent,
+    fontFamily: FONT_FAMILY.playfair.regular,
+    fontSize: 24,
+    color: COLORS.text,
   },
   cardDescription: {
     fontFamily: FONT_FAMILY.manrope.regular,
@@ -250,8 +256,10 @@ export const FONTS = {
     color: COLORS.text,
   },
   workingLabel: {
-    fontFamily: FONT_FAMILY.cinzel.regular,
-    fontSize: 12,
+    fontFamily: FONT_FAMILY.manrope.bold,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase' as const,
     color: COLORS.accent,
   },
   workingValue: {
@@ -275,9 +283,8 @@ export const FONTS = {
 
   link: {
     fontFamily: FONT_FAMILY.manrope.regular,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.accent,
-    textDecorationLine: 'underline' as const,
   },
 } as const;
 

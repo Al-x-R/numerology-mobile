@@ -1,6 +1,6 @@
 // components/DoubleDateInputForm.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Animated, Platform,
@@ -55,13 +55,13 @@ export function DoubleDateInputForm({
   const [localError2, setLocalError2] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const input1Opacity = useRef(new Animated.Value(0)).current;
-  const input1Y = useRef(new Animated.Value(30)).current;
-  const input2Opacity = useRef(new Animated.Value(0)).current;
-  const input2Y = useRef(new Animated.Value(30)).current;
-  const buttonOpacity = useRef(new Animated.Value(0)).current;
-  const buttonY = useRef(new Animated.Value(20)).current;
-  const buttonScale = useRef(new Animated.Value(1)).current;
+  const [input1Opacity] = useState(() => new Animated.Value(0));
+  const [input1Y] = useState(() => new Animated.Value(30));
+  const [input2Opacity] = useState(() => new Animated.Value(0));
+  const [input2Y] = useState(() => new Animated.Value(30));
+  const [buttonOpacity] = useState(() => new Animated.Value(0));
+  const [buttonY] = useState(() => new Animated.Value(20));
+  const [buttonScale] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     Animated.stagger(200, [
@@ -140,10 +140,10 @@ export function DoubleDateInputForm({
     }, 2000);
   };
 
-  const error1Opacity = useRef(new Animated.Value(0)).current;
-  const error1Y = useRef(new Animated.Value(-10)).current;
-  const error2Opacity = useRef(new Animated.Value(0)).current;
-  const error2Y = useRef(new Animated.Value(-10)).current;
+  const [error1Opacity] = useState(() => new Animated.Value(0));
+  const [error1Y] = useState(() => new Animated.Value(-10));
+  const [error2Opacity] = useState(() => new Animated.Value(0));
+  const [error2Y] = useState(() => new Animated.Value(-10));
 
   useEffect(() => {
     if (localError1) {
