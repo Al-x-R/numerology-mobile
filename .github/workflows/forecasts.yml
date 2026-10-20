@@ -39,7 +39,7 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-2.5-flash
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-3.8-flash
         run: node scripts/forecasts/generate.ts public
 
       # Publish whatever was generated, even if some forecasts failed

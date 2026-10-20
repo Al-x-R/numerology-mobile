@@ -9,7 +9,7 @@ import { access, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
 const MAX_RETRIES = 3;
 const KEEP_DAILY_DAYS = 30;
