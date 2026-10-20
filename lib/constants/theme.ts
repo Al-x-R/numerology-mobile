@@ -7,6 +7,11 @@ export const FONT_FAMILY = {
     semibold: 'EBGaramond_600SemiBold',
     italic: 'EBGaramond_500Medium_Italic',
   },
+  // Roman capitals for tracked labels; it has no Cyrillic, so the OS falls back to a system font for it
+  cinzel: {
+    medium: 'Cinzel_500Medium',
+    semibold: 'Cinzel_600SemiBold',
+  },
   sans: {
     regular: 'Manrope_400Regular',
     medium: 'Manrope_500Medium',

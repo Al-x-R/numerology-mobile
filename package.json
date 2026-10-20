@@ -12,6 +12,7 @@
     "forecasts": "node scripts/forecasts/generate.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/cinzel": "^0.4.2",
     "@expo-google-fonts/eb-garamond": "^0.4.3",
     "@expo-google-fonts/manrope": "^0.4.2",
     "@expo/vector-icons": "^15.0.3",

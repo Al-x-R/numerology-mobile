@@ -1,7 +1,7 @@
 // app/profile/_layout.tsx
 import { router, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
-import { COLORS, FONTS } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, FONTS } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
 import React from 'react';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -19,7 +19,7 @@ export default function ProfileLayout() {
         presentation: 'card',
         headerStyle: { backgroundColor: COLORS.background },
         headerShadowVisible: false,
-        headerTitleStyle: FONTS.headerTitle,
+        headerTitleStyle: { ...FONTS.headerTitle, fontFamily: FONT_FAMILY.cinzel.medium },
         headerTintColor: COLORS.text,
         headerTitleAlign: 'center',
         headerLeft: renderBackButton,

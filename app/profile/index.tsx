@@ -20,7 +20,7 @@ import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
 import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
-import { COLORS, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { formatBirthDate } from '@/lib/utils/date';
 import { toRoman } from '@/lib/utils/roman';
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   destinyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
-  destinyText: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2.2 },
+  destinyText: { ...TYPE.labelMd, fontFamily: FONT_FAMILY.cinzel.medium, color: COLORS.accent, letterSpacing: 2.2 },
   name: {
     ...TYPE.displayLg,
     fontSize: 36,
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.hairline,
     marginBottom: SPACING.lg,
   },
-  editButtonText: TYPE.labelLg,
+  editButtonText: { ...TYPE.labelLg, fontFamily: FONT_FAMILY.cinzel.semibold, letterSpacing: 2.4 },
 
   // --- MEMBERSHIP ---
   proCard: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  proLabel: { ...TYPE.labelLg, letterSpacing: 2.6 },
+  proLabel: { ...TYPE.labelLg, fontFamily: FONT_FAMILY.cinzel.semibold, letterSpacing: 2.6 },
   proBadge: {
     paddingVertical: 3,
     paddingHorizontal: SPACING.sm + 2,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
 
   // --- SETTINGS ---
-  sectionLabel: { ...TYPE.labelMd, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  sectionLabel: { ...TYPE.labelMd, fontFamily: FONT_FAMILY.cinzel.semibold, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
   module: {
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  proChipText: { ...TYPE.labelSm, color: COLORS.accent, letterSpacing: 1 },
+  proChipText: { ...TYPE.labelSm, fontFamily: FONT_FAMILY.cinzel.semibold, color: COLORS.accent, letterSpacing: 1 },
 
   resetButton: { alignSelf: 'center', paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md, marginBottom: SPACING.sm },
   resetText: { ...TYPE.bodyMd, color: COLORS.textMuted, letterSpacing: 0.6 },
