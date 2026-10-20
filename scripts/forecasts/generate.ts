@@ -11,7 +11,9 @@ import path from 'node:path';
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
+const BASE_RETRY_DELAY_MS = 15_000;
+const MAX_RETRY_DELAY_MS = 120_000;
 const KEEP_DAILY_DAYS = 30;
 
 const LANGS = ['ru', 'en', 'uk'];
@@ -122,6 +124,27 @@ const buildPrompt = (kind: Kind, period: Period, id: string): string => {
 
 // --- GEMINI ---
 
+// Carries the delay Gemini asks for on 429 (RetryInfo.retryDelay, e.g. "37s")
+class GeminiError extends Error {
+  retryAfterMs?: number;
+
+  constructor(message: string, retryAfterMs?: number) {
+    super(message);
+    this.retryAfterMs = retryAfterMs;
+  }
+}
+
+const parseGeminiError = (status: number, body: string): GeminiError => {
+  try {
+    const error = JSON.parse(body).error;
+    const retryDelay: string | undefined = error?.details?.find((d: any) => d.retryDelay)?.retryDelay;
+    const retryAfterMs = retryDelay ? parseFloat(retryDelay) * 1000 : undefined;
+    return new GeminiError(`Gemini HTTP ${status}: ${error?.message ?? body}`, retryAfterMs);
+  } catch {
+    return new GeminiError(`Gemini HTTP ${status}: ${body.slice(0, 300)}`);
+  }
+};
+
 const callGemini = async (prompt: string): Promise<string> => {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
     method: 'POST',
@@ -133,7 +156,7 @@ const callGemini = async (prompt: string): Promise<string> => {
   });
 
   if (!res.ok) {
-    throw new Error(`Gemini HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    throw parseGeminiError(res.status, await res.text());
   }
 
   const json: any = await res.json();
@@ -186,7 +209,11 @@ const generate = async (kind: Kind, period: Period, id: string): Promise<boolean
       return true;
     } catch (e: any) {
       console.warn(`⚠️ Attempt ${attempt}/${MAX_RETRIES} failed for ${collection}/${id}: ${e.message}`);
-      if (attempt < MAX_RETRIES) await sleep(3000);
+      if (attempt < MAX_RETRIES) {
+        // Gemini is often overloaded (503) or rate limited (429), so back off exponentially
+        const delay = Math.min(e.retryAfterMs ?? BASE_RETRY_DELAY_MS * 2 ** (attempt - 1), MAX_RETRY_DELAY_MS);
+        await sleep(delay);
+      }
     }
   }
 
