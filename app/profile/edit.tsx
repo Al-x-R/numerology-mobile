@@ -1,14 +1,13 @@
 // app/profile/edit.tsx
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Platform, Modal, StyleSheet, KeyboardAvoidingView, ScrollView, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Platform, Modal, StyleSheet, KeyboardAvoidingView, ScrollView, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
 
-import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
-import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { useProfile } from '@/contexts/ProfileContext';
+import { COLORS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { formatBirthDateFromDate } from '@/lib/utils/date';
@@ -29,7 +28,6 @@ export default function EditProfileScreen() {
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const [localImage, setLocalImage] = useState<string | null>(null);
   const { t, language } = useAppTranslation();
 
   // --- Date Picker Logic ---
@@ -57,29 +55,6 @@ export default function EditProfileScreen() {
   };
   // ---------------------------
 
-  // --- PHOTO UPLOADING LOGIC ---
-  const handlePickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(t('common.error'), "Permission to access camera roll is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-    });
-
-    if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setLocalImage(uri);
-    }
-  };
-
-  // ---------------------------
 
   const saveChanges = async () => {
     if (!name.trim()) {
@@ -100,7 +75,6 @@ export default function EditProfileScreen() {
       await updateProfile({
         name: name.trim(),
         date: dateString,
-        ...(localImage ? { photoUri: localImage } : {}),
       });
 
       setTimeout(() => {
@@ -114,26 +88,6 @@ export default function EditProfileScreen() {
       setIsSaving(false);
     }
   };
-
-  const handleRemovePhoto = () => {
-    Alert.alert(
-      t('profile.removePhoto'),
-      t('profile.removePhotoConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.remove'),
-          style: 'destructive',
-          onPress: async () => {
-            setLocalImage(null);
-            await updateProfile({ photoUri: null });
-          }
-        }
-      ]
-    );
-  };
-
-  const currentAvatar = localImage || getAvatarUri(activeProfile);
 
   const getIOSLocale = (lang: string) => {
     switch (lang) {
@@ -157,35 +111,6 @@ export default function EditProfileScreen() {
           contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
           showsVerticalScrollIndicator={false}
         >
-
-          {/* Avatar Section */}
-          <View style={styles.avatarSection}>
-            <View style={styles.avatarContainer}>
-              {currentAvatar ? (
-                <Image source={{ uri: currentAvatar }} style={styles.avatarLarge} />
-              ) : (
-                <View style={styles.avatarPlaceholderLarge}>
-                  <Ionicons name="person-outline" size={44} color={COLORS.accent} />
-                </View>
-              )}
-
-              <TouchableOpacity style={styles.editIconBadge} onPress={handlePickImage}>
-                <Ionicons name="camera-outline" size={16} color={COLORS.accent} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.avatarActions}>
-              <TouchableOpacity onPress={handlePickImage}>
-                <Text style={styles.changePhotoText}>{t('profile.changePhoto')}</Text>
-              </TouchableOpacity>
-
-              {currentAvatar && (
-                <TouchableOpacity onPress={handleRemovePhoto} style={{ marginTop: 10 }}>
-                  <Text style={styles.removePhotoText}>{t('profile.removePhoto')}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
 
           {/* Form */}
           <View style={styles.formContainer}>
@@ -274,40 +199,6 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { paddingHorizontal: SPACING.margin, paddingTop: SPACING.lg },
-  avatarSection: { alignItems: 'center', marginBottom: SPACING.xl },
-  avatarContainer: {
-    position: 'relative',
-    padding: 3,
-    borderRadius: 64,
-    borderWidth: 1.5,
-    borderColor: COLORS.borderSelected,
-    ...SHADOWS.goldenButtonSoft,
-  },
-  avatarLarge: { width: 112, height: 112, borderRadius: 56 },
-  avatarPlaceholderLarge: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    backgroundColor: COLORS.surfaceRaised,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editIconBadge: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: COLORS.surfaceRaised,
-    borderWidth: 1,
-    borderColor: COLORS.borderSelected,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarActions: { marginTop: SPACING.md, alignItems: 'center', gap: SPACING.sm },
-  changePhotoText: TYPE.labelLg,
-  removePhotoText: { ...TYPE.labelMd, color: COLORS.error },
   formContainer: { marginBottom: SPACING.lg },
   field: { marginBottom: SPACING.lg },
   label: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },

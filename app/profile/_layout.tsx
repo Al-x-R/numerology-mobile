@@ -1,11 +1,14 @@
 // app/profile/_layout.tsx
 import { router, Stack } from 'expo-router';
+import { StyleSheet } from 'react-native';
 import { COLORS, FONTS } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
 import React from 'react';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
-const renderBackButton = () => <BackButton onPress={() => router.back()} iconColor={COLORS.accent} />;
+const renderBackButton = () => (
+  <BackButton onPress={() => router.back()} iconColor={COLORS.textTertiary} style={styles.backButton} />
+);
 
 export default function ProfileLayout() {
   const { t } = useAppTranslation();
@@ -31,3 +34,7 @@ export default function ProfileLayout() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  backButton: { backgroundColor: COLORS.surfaceRaised, borderWidth: 1, borderColor: COLORS.hairline },
+});

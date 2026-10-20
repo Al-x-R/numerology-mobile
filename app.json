@@ -14,7 +14,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.destinycode.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow access to photos to upload your profile avatar.",
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
       }
     },
@@ -45,12 +44,6 @@
         }
       ],
       "expo-web-browser",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app needs access to your photos to let you set a profile picture."
-        }
-      ],
       "expo-localization",
       [
         "react-native-google-mobile-ads",

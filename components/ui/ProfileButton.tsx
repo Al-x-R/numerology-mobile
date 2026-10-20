@@ -2,12 +2,11 @@
 import React from 'react';
 import {
   TouchableOpacity,
-  Image,
   View,
   Text,
   StyleSheet,
 } from 'react-native';
-import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import { COLORS, SPACING, TYPE } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
@@ -19,19 +18,14 @@ export const ProfileButton = ({ onPress }: Props) => {
   const { activeProfile } = useProfile();
 
   const displayName = activeProfile?.name || t('profile.guest');
-  const photoURL = getAvatarUri(activeProfile);
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container} activeOpacity={0.7}>
-      {photoURL ? (
-        <Image source={{ uri: photoURL }} style={styles.avatar} />
-      ) : (
-        <View style={styles.avatarFallback}>
-          <Text style={styles.initial}>
-            {displayName.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-      )}
+      <View style={styles.avatarFallback}>
+        <Text style={styles.initial}>
+          {displayName.charAt(0).toUpperCase()}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -43,11 +37,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(242, 202, 80, 0.3)',
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
   },
   avatarFallback: {
     width: 32,

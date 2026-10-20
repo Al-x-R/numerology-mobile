@@ -90,6 +90,7 @@ export const GRADIENTS = {
   goldenButton: ['#DFBA54', '#C9A84C'] as const,
   card: ['#1E1E1E', '#161616'] as const,
   accentCard: ['rgba(212, 175, 55, 0.14)', 'rgba(212, 175, 55, 0.02)'] as const,
+  proCard: ['#211D16', '#151412'] as const,
   goldHairline: ['transparent', 'rgba(212, 175, 55, 0.3)', 'transparent'] as const,
 };
 

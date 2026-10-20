@@ -5,10 +5,10 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   StyleSheet,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,14 +16,18 @@ import Constants from 'expo-constants';
 import { useNavigation, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
+import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
 import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
-import { COLORS, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { formatBirthDate } from '@/lib/utils/date';
+import { toRoman } from '@/lib/utils/roman';
 import { getZodiacName, getZodiacSign } from '@/lib/calculators/zodiac';
+import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
+
+const PRIVACY_URL = 'https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03';
 
 const LANGUAGE_LABELS: Record<string, string> = {
   en: 'English (EN)',
@@ -34,7 +38,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 interface MenuRowProps {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
-  value?: string;
+  value?: React.ReactNode;
   onPress: () => void;
   isLast?: boolean;
 }
@@ -42,12 +46,18 @@ interface MenuRowProps {
 const MenuRow = ({ icon, title, value, onPress, isLast }: MenuRowProps) => (
   <TouchableOpacity style={[styles.row, !isLast && styles.rowDivider]} onPress={onPress} activeOpacity={0.7}>
     <View style={styles.medallion}>
-      <Ionicons name={icon} size={20} color={COLORS.accent} />
+      <Ionicons name={icon} size={18} color={COLORS.accent} />
     </View>
     <Text style={styles.rowTitle} numberOfLines={1}>{title}</Text>
-    {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+    {typeof value === 'string' ? <Text style={styles.rowValue}>{value}</Text> : value}
     <Ionicons name="chevron-forward" size={18} color={COLORS.chevron} />
   </TouchableOpacity>
+);
+
+const ProBadge = () => (
+  <View style={styles.proChip}>
+    <Text style={styles.proChipText}>PRO</Text>
+  </View>
 );
 
 export default function ProfileScreen() {
@@ -58,14 +68,16 @@ export default function ProfileScreen() {
   const { t, language } = useAppTranslation();
   const { settings: reminders } = useNotifications();
 
-  const remindersValue = !isPremium
-    ? 'PRO'
-    : hasActiveReminders(reminders) ? formatReminderTime(reminders) : t('notifications.statusOff');
-
   const displayName = activeProfile?.name || t('profile.guest');
-  const photoURL = getAvatarUri(activeProfile);
   const birthDate = activeProfile?.date || null;
-  const zodiac = birthDate ? getZodiacName(getZodiacSign(new Date(birthDate)), language) : null;
+  const zodiacSign = birthDate ? getZodiacSign(new Date(birthDate)) : null;
+  const destinyNumber = birthDate
+    ? calculatePythagoreanSquare(new Date(birthDate)).additionalParams.destinyNumber
+    : null;
+
+  const remindersValue = !isPremium
+    ? <ProBadge />
+    : hasActiveReminders(reminders) ? formatReminderTime(reminders) : t('notifications.statusOff');
 
   useEffect(() => {
     navigation.setOptions({ headerTitle: t('profile.title').toUpperCase() });
@@ -96,38 +108,27 @@ export default function ProfileScreen() {
       >
         {/* --- IDENTITY --- */}
         <View style={styles.identity}>
-          <View style={styles.avatarRing}>
-            {photoURL ? (
-              <Image source={{ uri: photoURL }} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, styles.avatarFallback]}>
-                <Text style={styles.avatarInitial}>{displayName.charAt(0).toUpperCase()}</Text>
-              </View>
-            )}
-            {isPremium && (
-              <View style={styles.avatarBadge}>
-                <MaterialCommunityIcons name="star-four-points" size={12} color={COLORS.accent} />
-              </View>
-            )}
-          </View>
+          {destinyNumber ? (
+            <View style={styles.destinyChip}>
+              <View style={styles.destinyDot} />
+              <Text style={styles.destinyText}>{t('profile.destinyCode')}: {toRoman(destinyNumber)}</Text>
+            </View>
+          ) : null}
 
           <Text style={styles.name}>{displayName}</Text>
-          {birthDate && (
-            <Text style={styles.meta}>
-              {formatBirthDate(birthDate)}{zodiac ? `  •  ${zodiac}` : ''}
-            </Text>
-          )}
 
-          {isPremium && (
-            <View style={styles.memberChip}>
-              <View style={styles.memberDot} />
-              <Text style={styles.memberText}>{t('profile.memberPro')}</Text>
+          {birthDate && zodiacSign && (
+            <View style={styles.metaRow}>
+              <Text style={styles.meta}>{formatBirthDate(birthDate)}</Text>
+              <Text style={styles.metaDot}>•</Text>
+              <Text style={[styles.meta, styles.metaAccent]}>{getZodiacName(zodiacSign, language)}</Text>
+              <MaterialCommunityIcons name={`zodiac-${zodiacSign}`} size={16} color={COLORS.accent} />
             </View>
           )}
         </View>
 
         <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit')} activeOpacity={0.8}>
-          <Ionicons name="create-outline" size={18} color={COLORS.accent} />
+          <Ionicons name="pencil-outline" size={16} color={COLORS.accent} />
           <Text style={styles.editButtonText}>{t('profile.editProfile')}</Text>
         </TouchableOpacity>
 
@@ -137,11 +138,13 @@ export default function ProfileScreen() {
           onPress={() => router.push('/premium/upgrade')}
           activeOpacity={0.85}
         >
-          <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 1, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={GRADIENTS.proCard} style={StyleSheet.absoluteFill} />
+          <View style={styles.proGlow} />
+
           <View style={styles.proHeader}>
             <View style={styles.proLabelRow}>
               <View style={styles.proIcon}>
-                <MaterialCommunityIcons name="crown-outline" size={18} color={COLORS.accent} />
+                <MaterialCommunityIcons name="crown-outline" size={16} color={COLORS.accent} />
               </View>
               <Text style={styles.proLabel}>{t('profile.proCardLabel')}</Text>
             </View>
@@ -151,13 +154,17 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
+
           <Text style={styles.proTitle}>
             {isPremium ? t('profile.proActiveTitle') : t('profile.proUpsellTitle')}
           </Text>
           <Text style={styles.proDescription}>
             {isPremium ? t('profile.proActiveDescription') : t('profile.proUpsellDescription')}
           </Text>
-          <Ionicons name="arrow-forward" size={20} color={COLORS.accent} style={styles.proArrow} />
+
+          <View style={styles.proArrow}>
+            <Ionicons name="arrow-forward" size={16} color={COLORS.accent} />
+          </View>
         </TouchableOpacity>
 
         {/* --- SETTINGS --- */}
@@ -176,16 +183,14 @@ export default function ProfileScreen() {
             onPress={() => router.push('/profile/notifications')}
           />
           <MenuRow
-            icon="diamond-outline"
-            title={t('profile.subscription')}
-            value={isPremium ? 'PRO' : t('profile.subscriptionFree')}
-            onPress={() => router.push('/premium/upgrade')}
+            icon="shield-checkmark-outline"
+            title={t('profile.privacy')}
+            onPress={() => Linking.openURL(PRIVACY_URL)}
             isLast
           />
         </View>
 
-        <TouchableOpacity style={styles.resetButton} onPress={handleResetData} activeOpacity={0.7}>
-          <Ionicons name="trash-outline" size={16} color={COLORS.error} />
+        <TouchableOpacity style={styles.resetButton} onPress={handleResetData} activeOpacity={0.6}>
           <Text style={styles.resetText}>{t('profile.resetData')}</Text>
         </TouchableOpacity>
 
@@ -199,89 +204,94 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingTop: SPACING.lg, paddingHorizontal: SPACING.margin },
+  scrollContent: { paddingTop: SPACING.sm, paddingHorizontal: SPACING.margin },
 
   // --- IDENTITY ---
   identity: { alignItems: 'center', marginBottom: SPACING.lg },
-  avatarRing: {
-    padding: 3,
-    borderRadius: 64,
-    borderWidth: 1.5,
-    borderColor: COLORS.borderSelected,
-    marginBottom: SPACING.md,
-    ...SHADOWS.goldenButtonSoft,
-  },
-  avatar: { width: 112, height: 112, borderRadius: 56 },
-  avatarFallback: {
-    backgroundColor: COLORS.surfaceRaised,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarInitial: { ...TYPE.displayLg, fontSize: 44, lineHeight: 52, color: COLORS.accent },
-  avatarBadge: {
-    position: 'absolute',
-    right: 4,
-    bottom: 4,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: COLORS.surfaceRaised,
-    borderWidth: 1,
-    borderColor: COLORS.borderSelected,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  name: { ...TYPE.displayLg, textAlign: 'center' },
-  meta: { ...TYPE.bodyMd, marginTop: SPACING.xs, textAlign: 'center' },
-  memberChip: {
+  destinyChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
-    marginTop: SPACING.md,
-    paddingVertical: SPACING.xs + 2,
-    paddingHorizontal: SPACING.md,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.accentSoft,
+    backgroundColor: COLORS.surfaceSelected,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.md,
   },
-  memberDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
-  memberText: { ...TYPE.labelMd, color: COLORS.accent },
+  destinyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
+  destinyText: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2.2 },
+  name: {
+    ...TYPE.displayLg,
+    fontSize: 36,
+    lineHeight: 44,
+    color: COLORS.accentLight,
+    textAlign: 'center',
+    textShadowColor: COLORS.textShadow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: SPACING.xs,
+  },
+  meta: TYPE.bodyMd,
+  metaAccent: { color: COLORS.textTertiary },
+  metaDot: { ...TYPE.bodyMd, color: COLORS.accentAmber, opacity: 0.6 },
 
   editButton: {
-    height: 54,
+    height: 52,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.md,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
+    borderColor: COLORS.hairline,
     marginBottom: SPACING.lg,
   },
-  editButtonText: { ...TYPE.labelLg },
+  editButtonText: TYPE.labelLg,
 
   // --- MEMBERSHIP ---
   proCard: {
     overflow: 'hidden',
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
-    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     marginBottom: SPACING.xl,
   },
   proCardActive: { borderColor: COLORS.borderAccent },
-  proHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
-  proLabelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  proIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: RADIUS.sm,
+  // Soft light in the top right corner
+  proGlow: {
+    position: 'absolute',
+    top: -48,
+    right: -48,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: COLORS.accentSoft,
+    opacity: 0.6,
+  },
+  proHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
+  proLabelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm + 2 },
+  proIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: RADIUS.sm + 2,
+    backgroundColor: COLORS.surfaceSelected,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  proLabel: { ...TYPE.labelLg },
+  proLabel: { ...TYPE.labelLg, letterSpacing: 2.6 },
   proBadge: {
     paddingVertical: 3,
     paddingHorizontal: SPACING.sm + 2,
@@ -289,41 +299,56 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accentSoft,
   },
   proBadgeText: { ...TYPE.bodySm, color: COLORS.accent },
-  proTitle: { ...TYPE.headlineLg, marginBottom: SPACING.sm },
-  proDescription: { ...TYPE.bodyMd, color: COLORS.textTertiary, paddingRight: SPACING.lg },
-  proArrow: { alignSelf: 'flex-end', marginTop: SPACING.sm },
+  proTitle: { ...TYPE.headlineMd, fontSize: 24, lineHeight: 30, marginBottom: SPACING.sm },
+  proDescription: { ...TYPE.bodyMd, paddingRight: SPACING.lg },
+  proArrow: {
+    alignSelf: 'flex-end',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.accentSoft,
+    borderWidth: 1,
+    borderColor: COLORS.borderAccent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // --- SETTINGS ---
-  sectionLabel: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  sectionLabel: { ...TYPE.labelMd, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
   module: {
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.divider,
     paddingHorizontal: SPACING.md,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
   },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, gap: SPACING.md },
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: SPACING.md },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
   medallion: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.divider,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rowTitle: { ...TYPE.titleMd, flex: 1 },
-  rowValue: { ...TYPE.bodyMd },
+  rowTitle: { ...TYPE.bodyLg, flex: 1 },
+  rowValue: TYPE.bodyMd,
+  proChip: {
+    paddingVertical: 2,
+    paddingHorizontal: SPACING.sm,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.accentSoft,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  proChipText: { ...TYPE.labelSm, color: COLORS.accent, letterSpacing: 1 },
 
-  resetButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.sm,
-    height: 54,
-    borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.surface,
-    marginBottom: SPACING.md,
-  },
-  resetText: { ...TYPE.labelLg, color: COLORS.error },
-  version: { ...TYPE.bodySm, color: COLORS.textMuted, textAlign: 'center' },
+  resetButton: { alignSelf: 'center', paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md, marginBottom: SPACING.sm },
+  resetText: { ...TYPE.bodyMd, color: COLORS.textMuted, letterSpacing: 0.6 },
+  version: { ...TYPE.bodySm, color: COLORS.textMuted, textAlign: 'center', opacity: 0.7 },
 });
