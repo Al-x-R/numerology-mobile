@@ -9,7 +9,7 @@ import { access, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
 const MAX_RETRIES = 5;
 const BASE_RETRY_DELAY_MS = 15_000;
@@ -139,7 +139,12 @@ const parseGeminiError = (status: number, body: string): GeminiError => {
     const error = JSON.parse(body).error;
     const retryDelay: string | undefined = error?.details?.find((d: any) => d.retryDelay)?.retryDelay;
     const retryAfterMs = retryDelay ? parseFloat(retryDelay) * 1000 : undefined;
-    return new GeminiError(`Gemini HTTP ${status}: ${error?.message ?? body}`, retryAfterMs);
+    // On 429 QuotaFailure names the exhausted quota, e.g. "GenerateRequestsPerDayPerProjectPerModel-FreeTier"
+    const quotas: string[] = (error?.details ?? [])
+      .flatMap((d: any) => d.violations ?? [])
+      .map((v: any) => `${v.quotaId} (limit ${v.quotaValue})`);
+    const quotaInfo = quotas.length ? ` [quota: ${quotas.join(', ')}; retry in ${retryDelay ?? '?'}]` : '';
+    return new GeminiError(`Gemini HTTP ${status}: ${error?.message ?? body}${quotaInfo}`, retryAfterMs);
   } catch {
     return new GeminiError(`Gemini HTTP ${status}: ${body.slice(0, 300)}`);
   }
