@@ -26,7 +26,7 @@ export default function OnboardingScreen() {
 
   const handleStart = async () => {
     await completeOnboarding();
-    router.replace('/(tabs)/pythagoras');
+    router.replace('/(tabs)/today');
   };
 
   return (

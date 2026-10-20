@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { COLORS } from '@/lib/constants/theme';
 import { ProfileProvider } from '@/contexts/ProfileContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { NotificationsProvider } from '@/contexts/NotificationsContext';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 
 SplashScreen.preventAutoHideAsync();
@@ -39,33 +40,35 @@ export default function RootLayout() {
   return (
     <ProfileProvider>
       <LanguageProvider>
-        <SafeAreaProvider>
-          <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
-          <View style={styles.root}>
-            <AuraBackground />
-            <View style={styles.navigation}>
-              <Stack
-                screenOptions={{
-                  contentStyle: { backgroundColor: 'transparent' },
-                  headerStyle: { backgroundColor: 'transparent' },
-                  headerShadowVisible: false,
-                }}
-              >
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="premium/upgrade"
-                  options={{
-                    presentation: 'fullScreenModal',
-                    headerShown: false,
-                    gestureEnabled: true
+        <NotificationsProvider>
+          <SafeAreaProvider>
+            <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+            <View style={styles.root}>
+              <AuraBackground />
+              <View style={styles.navigation}>
+                <Stack
+                  screenOptions={{
+                    contentStyle: { backgroundColor: 'transparent' },
+                    headerStyle: { backgroundColor: 'transparent' },
+                    headerShadowVisible: false,
                   }}
-                />
-                <Stack.Screen name="profile" options={{ headerShown: false }} />
-              </Stack>
+                >
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="premium/upgrade"
+                    options={{
+                      presentation: 'fullScreenModal',
+                      headerShown: false,
+                      gestureEnabled: true
+                    }}
+                  />
+                  <Stack.Screen name="profile" options={{ headerShown: false }} />
+                </Stack>
+              </View>
             </View>
-          </View>
-        </SafeAreaProvider>
+          </SafeAreaProvider>
+        </NotificationsProvider>
       </LanguageProvider>
     </ProfileProvider>
   );

@@ -43,6 +43,22 @@ export default function ProfileLayout() {
       />
 
       <Stack.Screen
+        name="notifications"
+        options={{
+          title: t('notifications.title').toUpperCase(),
+          presentation: 'card',
+          headerStyle: { backgroundColor: COLORS.background },
+          headerShadowVisible: false,
+          headerTitleStyle: FONTS.headerTitle,
+          headerTintColor: COLORS.text,
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <BackButton onPress={() => router.back()} style={styles.headerButton} iconColor={COLORS.accent} />
+          ),
+        }}
+      />
+
+      <Stack.Screen
         name="language/index"
         options={{
           title: t('profile.changeLanguage').toUpperCase(),

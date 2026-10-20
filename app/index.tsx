@@ -16,7 +16,7 @@ export default function InitialLoadScreen() {
 
   useEffect(() => {
     if (ready && !isLoading) {
-      const targetRoute: Href = isOnboarded ? '/(tabs)/pythagoras' : '/(auth)/onboarding';
+      const targetRoute: Href = isOnboarded ? '/(tabs)/today' : '/(auth)/onboarding';
       router.replace(targetRoute);
     }
   }, [ready, isLoading, isOnboarded, router]);

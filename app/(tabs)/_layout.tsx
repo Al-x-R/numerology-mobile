@@ -40,6 +40,14 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="today"
+        options={{
+          title: t('tabs.today'),
+          tabBarLabel: t('tabs.short.today'),
+          tabBarIcon: ({ color }) => <Ionicons name="sunny-outline" size={LAYOUT.iconSize} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="pythagoras"
         options={{
           title: t('tabs.pythagoras'),

@@ -18,6 +18,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getAvatarUri, useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { useNotifications } from '@/contexts/NotificationsContext';
+import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
 import { COLORS, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { formatBirthDate } from '@/lib/utils/date';
@@ -54,6 +56,11 @@ export default function ProfileScreen() {
   const navigation = useNavigation();
   const { activeProfile, isPremium, resetAppData } = useProfile();
   const { t, language } = useAppTranslation();
+  const { settings: reminders } = useNotifications();
+
+  const remindersValue = !isPremium
+    ? 'PRO'
+    : hasActiveReminders(reminders) ? formatReminderTime(reminders) : t('notifications.statusOff');
 
   const displayName = activeProfile?.name || t('profile.guest');
   const photoURL = getAvatarUri(activeProfile);
@@ -161,6 +168,12 @@ export default function ProfileScreen() {
             title={t('profile.changeLanguage')}
             value={LANGUAGE_LABELS[language]}
             onPress={() => router.push('/profile/language')}
+          />
+          <MenuRow
+            icon="notifications-outline"
+            title={t('notifications.title')}
+            value={remindersValue}
+            onPress={() => router.push('/profile/notifications')}
           />
           <MenuRow
             icon="diamond-outline"
