@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 
 import { DateInputForm } from '@/components/DateInputForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
@@ -13,12 +13,33 @@ import { COLORS, LAYOUT, TYPE } from '@/lib/constants/theme';
 import { TAB_BAR_STYLE } from '@/lib/constants/navigation';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { BackButton } from '@/components/ui/BackButton';
+import { SaveCalculationButton } from '@/components/SaveCalculationButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
+
+// DD.MM.YYYY -> Date, or null if the date is invalid
+const parseFormDate = (dateString: string): Date | null => {
+  const [day, month, year] = dateString.split('.');
+  const date = new Date(`${year}-${month}-${day}`);
+  return isNaN(date.getTime()) ? null : date;
+};
 
 export default function HomeScreen() {
   const [dateString, setDateString] = useState<string>('');
   const [results, setResults] = useState<CalculationResult | null>(null);
+  // Set when a saved matrix is opened from storage
+  const { date: savedDate, open: openToken } = useLocalSearchParams<{ date?: string; open?: string }>();
+  const [handledOpenToken, setHandledOpenToken] = useState<string>();
+
+  // Saved entries open without an interstitial: the user has already calculated them once
+  if (openToken && openToken !== handledOpenToken) {
+    setHandledOpenToken(openToken);
+    const dateObj = savedDate ? parseFormDate(savedDate) : null;
+    if (savedDate && dateObj) {
+      setDateString(savedDate);
+      setResults(calculatePythagoreanSquare(dateObj));
+    }
+  }
 
   const navigation = useNavigation();
   const { t, language } = useAppTranslation();
@@ -26,19 +47,12 @@ export default function HomeScreen() {
   const { showRewarded } = useRewarded();
 
   const handleCalculate = () => {
-    // DATE CONVERSION: DD.MM.YYYY -> YYYY-MM-DD
-    const parts = dateString.split('.');
-    const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`;
-
     showInterstitial(() => {
       try {
-        const dateObj = new Date(isoDateString);
-        if (isNaN(dateObj.getTime())) {
-          return;
-        }
+        const dateObj = parseFormDate(dateString);
+        if (!dateObj) return;
 
-        const calcResults = calculatePythagoreanSquare(dateObj);
-        setResults(calcResults);
+        setResults(calculatePythagoreanSquare(dateObj));
       } catch (e) {
         console.error(e);
       }
@@ -68,7 +82,7 @@ export default function HomeScreen() {
         ),
         headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
         headerRight: () => (
-          <View style={{ alignItems: 'center' }} />
+          <SaveCalculationButton input={{ kind: 'matrix', date: dateString }} style={{ marginRight: 20 }} />
         ),
         tabBarStyle: { display: 'none' },
       });

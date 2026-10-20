@@ -1,8 +1,9 @@
 // app/profile/_layout.tsx
 import { router, Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
-import { COLORS, FONT_FAMILY, FONTS } from '@/lib/constants/theme';
+import { COLORS, FONTS } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
+import { capsFontFamily } from '@/components/ui/CapsLabel';
 import React from 'react';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -19,7 +20,8 @@ export default function ProfileLayout() {
         presentation: 'card',
         headerStyle: { backgroundColor: COLORS.background },
         headerShadowVisible: false,
-        headerTitleStyle: { ...FONTS.headerTitle, fontFamily: FONT_FAMILY.cinzel.medium },
+        // All profile titles are in the same script, so the first one decides the font
+        headerTitleStyle: { ...FONTS.headerTitle, fontFamily: capsFontFamily(t('profile.title'), 'medium') },
         headerTintColor: COLORS.text,
         headerTitleAlign: 'center',
         headerLeft: renderBackButton,
@@ -30,6 +32,7 @@ export default function ProfileLayout() {
       <Stack.Screen name="index" options={{ title: t('profile.title').toUpperCase() }} />
       <Stack.Screen name="edit" options={{ title: t('profile.editProfile').toUpperCase() }} />
       <Stack.Screen name="notifications" options={{ title: t('notifications.title').toUpperCase() }} />
+      <Stack.Screen name="storage" options={{ title: t('storage.title').toUpperCase() }} />
       <Stack.Screen name="language/index" options={{ title: t('profile.changeLanguage').toUpperCase() }} />
     </Stack>
   );

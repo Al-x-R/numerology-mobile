@@ -397,7 +397,7 @@ export const en = {
   },
   alerts: {
     resetDataTitle: 'Reset Data',
-    resetData: 'Your profile and birth date will be removed from this device. This cannot be undone.',
+    resetData: 'Your profile, birth date and saved calculations will be removed from this device. This cannot be undone.',
     cancel: 'Cancel',
     resetButton: 'Reset',
   },
@@ -488,6 +488,29 @@ export const en = {
     horoscopeBody: "Find out what the stars have in store for you today",
     combinedTitle: "Number of the day {number} · {sign}",
     combinedBody: "Your numerology and horoscope for today are ready",
+  },
+
+  storage: {
+    title: "Saved matrices",
+    countForms: ["calculation", "calculations"],
+    empty: "Empty",
+    matrices: "Matrices",
+    compatibility: "Compatibility",
+    emptyMatrices: "Save a matrix with the bookmark button on its result screen",
+    emptyCompatibility: "Save a compatibility check with the bookmark button on its result screen",
+    saveTitle: "Save calculation",
+    labelHint: "Who is it for?",
+    placeholderMatrix: "For example, Mom",
+    placeholderCompatibility: "For example, Me and Alex",
+    limitFreeTitle: "Free version limit",
+    limitFreeText: "The free version keeps 1 matrix and 1 compatibility check. PRO keeps up to {limit} of each.",
+    limitProTitle: "Storage is full",
+    limitProText: "You can keep up to {limit} entries of this type. Delete the ones you no longer need.",
+    openStorage: "Open storage",
+    getPro: "Get PRO",
+    removeTitle: "Delete entry?",
+    removeText: "\u201c{label}\u201d will be removed from storage.",
+    proUpsell: "Keep up to {limit} matrices and {limit} compatibility checks with PRO",
   },
 
   premium: {

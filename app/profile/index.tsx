@@ -19,11 +19,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
+import { useSavedCalculations } from '@/contexts/SavedCalculationsContext';
 import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
-import { COLORS, FONT_FAMILY, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
+import { CapsLabel } from '@/components/ui/CapsLabel';
 import { formatBirthDate } from '@/lib/utils/date';
 import { toRoman } from '@/lib/utils/roman';
+import { pluralize } from '@/lib/utils/plural';
+import { tArray } from '@/lib/constants/locales';
 import { getZodiacName, getZodiacSign } from '@/lib/calculators/zodiac';
 import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare';
 
@@ -56,7 +60,7 @@ const MenuRow = ({ icon, title, value, onPress, isLast }: MenuRowProps) => (
 
 const ProBadge = () => (
   <View style={styles.proChip}>
-    <Text style={styles.proChipText}>PRO</Text>
+    <CapsLabel style={styles.proChipText}>PRO</CapsLabel>
   </View>
 );
 
@@ -67,6 +71,7 @@ export default function ProfileScreen() {
   const { activeProfile, isPremium, resetAppData } = useProfile();
   const { t, language } = useAppTranslation();
   const { settings: reminders } = useNotifications();
+  const { items: savedItems, clear: clearSaved } = useSavedCalculations();
 
   const displayName = activeProfile?.name || t('profile.guest');
   const birthDate = activeProfile?.date || null;
@@ -79,6 +84,10 @@ export default function ProfileScreen() {
     ? <ProBadge />
     : hasActiveReminders(reminders) ? formatReminderTime(reminders) : t('notifications.statusOff');
 
+  const storageValue = savedItems.length
+    ? `${savedItems.length} ${pluralize(savedItems.length, tArray('storage.countForms', language), language)}`
+    : t('storage.empty');
+
   useEffect(() => {
     navigation.setOptions({ headerTitle: t('profile.title').toUpperCase() });
   }, [language, navigation, t]);
@@ -90,7 +99,7 @@ export default function ProfileScreen() {
         text: t('alerts.resetButton'),
         style: 'destructive',
         onPress: async () => {
-          await resetAppData();
+          await Promise.all([resetAppData(), clearSaved()]);
           if (router.canDismiss()) router.dismissAll();
           router.replace('/(auth)/onboarding');
         },
@@ -111,7 +120,9 @@ export default function ProfileScreen() {
           {destinyNumber ? (
             <View style={styles.destinyChip}>
               <View style={styles.destinyDot} />
-              <Text style={styles.destinyText}>{t('profile.destinyCode')}: {toRoman(destinyNumber)}</Text>
+              <CapsLabel style={styles.destinyText} weight="medium">
+                {`${t('profile.destinyCode')}: ${toRoman(destinyNumber)}`}
+              </CapsLabel>
             </View>
           ) : null}
 
@@ -129,7 +140,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit')} activeOpacity={0.8}>
           <Ionicons name="pencil-outline" size={16} color={COLORS.accent} />
-          <Text style={styles.editButtonText}>{t('profile.editProfile')}</Text>
+          <CapsLabel style={styles.editButtonText}>{t('profile.editProfile')}</CapsLabel>
         </TouchableOpacity>
 
         {/* --- MEMBERSHIP --- */}
@@ -146,7 +157,7 @@ export default function ProfileScreen() {
               <View style={styles.proIcon}>
                 <MaterialCommunityIcons name="crown-outline" size={16} color={COLORS.accent} />
               </View>
-              <Text style={styles.proLabel}>{t('profile.proCardLabel')}</Text>
+              <CapsLabel style={styles.proLabel}>{t('profile.proCardLabel')}</CapsLabel>
             </View>
             {isPremium && (
               <View style={styles.proBadge}>
@@ -168,7 +179,7 @@ export default function ProfileScreen() {
         </TouchableOpacity>
 
         {/* --- SETTINGS --- */}
-        <Text style={styles.sectionLabel}>{t('profile.sectionSettings')}</Text>
+        <CapsLabel style={styles.sectionLabel}>{t('profile.sectionSettings')}</CapsLabel>
         <View style={styles.module}>
           <MenuRow
             icon="globe-outline"
@@ -181,6 +192,12 @@ export default function ProfileScreen() {
             title={t('notifications.title')}
             value={remindersValue}
             onPress={() => router.push('/profile/notifications')}
+          />
+          <MenuRow
+            icon="archive-outline"
+            title={t('storage.title')}
+            value={storageValue}
+            onPress={() => router.push('/profile/storage')}
           />
           <MenuRow
             icon="shield-checkmark-outline"
@@ -221,7 +238,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   destinyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
-  destinyText: { ...TYPE.labelMd, fontFamily: FONT_FAMILY.cinzel.medium, color: COLORS.accent, letterSpacing: 2.2 },
+  destinyText: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2.2 },
   name: {
     ...TYPE.displayLg,
     fontSize: 36,
@@ -256,7 +273,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.hairline,
     marginBottom: SPACING.lg,
   },
-  editButtonText: { ...TYPE.labelLg, fontFamily: FONT_FAMILY.cinzel.semibold, letterSpacing: 2.4 },
+  editButtonText: { ...TYPE.labelLg, letterSpacing: 2.4 },
 
   // --- MEMBERSHIP ---
   proCard: {
@@ -291,7 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  proLabel: { ...TYPE.labelLg, fontFamily: FONT_FAMILY.cinzel.semibold, letterSpacing: 2.6 },
+  proLabel: { ...TYPE.labelLg, letterSpacing: 2.6 },
   proBadge: {
     paddingVertical: 3,
     paddingHorizontal: SPACING.sm + 2,
@@ -315,7 +332,7 @@ const styles = StyleSheet.create({
   },
 
   // --- SETTINGS ---
-  sectionLabel: { ...TYPE.labelMd, fontFamily: FONT_FAMILY.cinzel.semibold, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  sectionLabel: { ...TYPE.labelMd, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
   module: {
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
@@ -346,7 +363,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  proChipText: { ...TYPE.labelSm, fontFamily: FONT_FAMILY.cinzel.semibold, color: COLORS.accent, letterSpacing: 1 },
+  proChipText: { ...TYPE.labelSm, color: COLORS.accent, letterSpacing: 1 },
 
   resetButton: { alignSelf: 'center', paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md, marginBottom: SPACING.sm },
   resetText: { ...TYPE.bodyMd, color: COLORS.textMuted, letterSpacing: 0.6 },

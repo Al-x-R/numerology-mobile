@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 
 import { DoubleDateInputForm } from '@/components/DoubleDateInputForm';
@@ -14,6 +14,7 @@ import { ProfileButton } from '@/components/ui/ProfileButton';
 import { HeaderEmblem } from '@/components/ui/HeaderEmblem';
 import { useProfile } from '@/contexts/ProfileContext';
 import { BackButton } from '@/components/ui/BackButton';
+import { SaveCalculationButton } from '@/components/SaveCalculationButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
 
@@ -25,12 +26,31 @@ export default function CompatibilityScreen() {
   const [dateString2, setDateString2] = useState<string>('');
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
   const [isAdUnlocked, setIsAdUnlocked] = useState(false);
+  // Set when a saved compatibility check is opened from storage
+  const { date1: savedDate1, date2: savedDate2, open: openToken } =
+    useLocalSearchParams<{ date1?: string; date2?: string; open?: string }>();
+  const [handledOpenToken, setHandledOpenToken] = useState<string>();
 
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
   const { t, language } = useAppTranslation();
   const { showRewarded } = useRewarded();
   const { showInterstitial } = useInterstitial();
+
+  // Saved entries open without an interstitial: the user has already calculated them once
+  if (openToken && openToken !== handledOpenToken) {
+    setHandledOpenToken(openToken);
+    if (savedDate1 && savedDate2) {
+      try {
+        setDateString1(savedDate1);
+        setDateString2(savedDate2);
+        setIsAdUnlocked(false);
+        setCompatibilityResult(calculateCompatibility(savedDate1, savedDate2, isPremium));
+      } catch (e) {
+        console.error('Saved compatibility error:', e);
+      }
+    }
+  }
 
   const hasResults = compatibilityResult !== null;
 
@@ -50,7 +70,12 @@ export default function CompatibilityScreen() {
           </View>
         ),
         headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
-        headerRight: () => <View />,
+        headerRight: () => (
+          <SaveCalculationButton
+            input={{ kind: 'compatibility', date1: dateString1, date2: dateString2 }}
+            style={{ marginRight: 20 }}
+          />
+        ),
         tabBarStyle: { display: 'none' },
       });
     } else {
@@ -61,7 +86,7 @@ export default function CompatibilityScreen() {
         tabBarStyle: TAB_BAR_STYLE,
       });
     }
-  }, [navigation, hasResults, handleBack, language]);
+  }, [navigation, hasResults, handleBack, language, dateString1, dateString2]);
 
   const calculateResult = (d1: string, d2: string, unlocked: boolean) => {
     try {
