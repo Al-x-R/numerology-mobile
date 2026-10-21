@@ -1,10 +1,10 @@
 // components/InterpretationCard.tsx
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Interpretation } from '@/lib/types/calculation';
-import { COLORS, SPACING, RADIUS, LAYOUT, SHADOWS, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, SPACING, RADIUS, LAYOUT, TYPE } from '@/lib/constants/theme';
 import { getCurrentLocale, t } from '@/lib/constants/locales';
 
 interface InterpretationCardProps {
@@ -33,8 +33,8 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.title} numberOfLines={3}>{title}</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.7} accessibilityRole="button">
           <Ionicons name="close" size={20} color={COLORS.text} />
         </TouchableOpacity>
       </View>
@@ -53,19 +53,18 @@ export function InterpretationCard({ interpretation, onClose }: InterpretationCa
         </View>
       )}
 
-      <Text style={styles.description}>{description}</Text>
+      {/* Long interpretations scroll inside the sheet instead of running off screen */}
+      <ScrollView style={styles.descriptionScroll} showsVerticalScrollIndicator={false}>
+        <Text style={styles.description}>{description}</Text>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // The surrounding sheet provides background, radius and padding
   card: {
-    backgroundColor: COLORS.surfaceRaised,
-    borderRadius: RADIUS.xl,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: SPACING.lg,
-    ...SHADOWS.card,
+    flexShrink: 1,
   },
   header: {
     flexDirection: 'row',
@@ -76,12 +75,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...TYPE.headlineLg,
+    fontFamily: FONT_FAMILY.serif.semibold,
     flex: 1,
   },
   closeButton: {
-    width: LAYOUT.iconButton,
-    height: LAYOUT.iconButton,
-    borderRadius: LAYOUT.iconButton / 2,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.glass,
     justifyContent: 'center',
     alignItems: 'center',
@@ -98,22 +98,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.sm,
   },
-  potentialLabel: TYPE.labelMd,
-  potentialValue: { ...TYPE.labelMd, color: COLORS.accent },
+  potentialLabel: { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight },
+  potentialValue: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.accent,
+    fontVariant: ['tabular-nums'],
+  },
   potentialValueEmpty: { color: COLORS.error },
   segments: {
     flexDirection: 'row',
-    gap: 6,
+    gap: SPACING.xs,
   },
   segment: {
     flex: 1,
-    height: 6,
-    borderRadius: 3,
+    height: SPACING.sm,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
   },
   segmentFilled: {
     backgroundColor: COLORS.accentLight,
   },
+  descriptionScroll: { flexShrink: 1 },
   description: {
     ...TYPE.bodyLg,
     color: COLORS.textTertiary,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
+import { Alert, StyleProp, StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 
@@ -9,13 +9,13 @@ import { calculatePythagoreanSquare } from '@/lib/calculators/pythagoreanSquare'
 import { CalculationResult } from '@/lib/types/calculation';
 import { ProfileButton } from '@/components/ui/ProfileButton';
 import { HeaderEmblem } from '@/components/ui/HeaderEmblem';
-import { COLORS, LAYOUT, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, SPACING, TYPE } from '@/lib/constants/theme';
 import { TAB_BAR_STYLE } from '@/lib/constants/navigation';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { BackButton } from '@/components/ui/BackButton';
 import { SaveCalculationButton } from '@/components/SaveCalculationButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
-import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
+import { useInterstitial } from '@/hooks/useAdMob';
 import { parseLocalDate } from '@/lib/utils/date';
 
 // DD.MM.YYYY -> Date, or null if the date is invalid
@@ -45,7 +45,6 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const { t, language } = useAppTranslation();
   const { showInterstitial } = useInterstitial();
-  const { showRewarded } = useRewarded();
 
   const handleCalculate = () => {
     showInterstitial(() => {
@@ -56,6 +55,7 @@ export default function HomeScreen() {
         setResults(calculatePythagoreanSquare(dateObj));
       } catch (e) {
         console.error(e);
+        Alert.alert(t('common.error'), t('errors.calculationFailed'));
       }
     });
   };
@@ -74,16 +74,16 @@ export default function HomeScreen() {
       navigation.setOptions({
         headerTitle: () => (
           <View style={styles.resultHeader}>
-            <Text style={styles.resultTitle}>{t('analysisTitle')}</Text>
+            <Text style={styles.resultTitle} numberOfLines={1}>{t('analysisTitle')}</Text>
             <View style={styles.resultDateRow}>
               <View style={styles.resultDot} />
               <Text style={styles.resultDate}>{dateString}</Text>
             </View>
           </View>
         ),
-        headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
+        headerLeft: () => <BackButton onPress={handleBack} style={styles.headerLeft} />,
         headerRight: () => (
-          <SaveCalculationButton input={{ kind: 'matrix', date: dateString }} style={{ marginRight: 20 }} />
+          <SaveCalculationButton input={{ kind: 'matrix', date: dateString }} style={styles.headerRight} />
         ),
         tabBarStyle: { display: 'none' },
       });
@@ -112,7 +112,7 @@ export default function HomeScreen() {
             onSubmit={handleCalculate}
           />
         ) : (
-          <ResultsDisplay results={results} date={dateString} onBack={handleBack} />
+          <ResultsDisplay results={results} />
         )}
       </View>
     </SafeAreaView>
@@ -121,10 +121,19 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   resultHeader: { alignItems: 'center' },
-  resultTitle: { ...TYPE.headlineMd },
-  resultDateRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  resultDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: COLORS.accent },
-  resultDate: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2 },
+  resultTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold },
+  resultDateRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
+  resultDot: { width: SPACING.xs, height: SPACING.xs, borderRadius: SPACING.xs / 2, backgroundColor: COLORS.textSecondary },
+  resultDate: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.textTertiary,
+    letterSpacing: 2,
+    fontVariant: ['tabular-nums'],
+  },
+  headerLeft: { marginLeft: LAYOUT.contentPadding },
+  headerRight: { marginRight: LAYOUT.contentPadding },
   container: {
     flex: 1,
     backgroundColor: COLORS.transparent,

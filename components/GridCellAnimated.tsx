@@ -12,7 +12,7 @@ import Animated, {
 import { getInterpretation } from '@/lib/data/pythagoreanInterpretations';
 import { getHighlightType } from '@/lib/utils/highlight';
 import { getTooltipText } from '@/lib/utils/tooltip';
-import { COLORS, FONTS, FONT_FAMILY, SPACING, RADIUS, FONT_SIZES, SHADOWS, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONTS, FONT_FAMILY, SPACING, RADIUS, FONT_SIZES, TYPE } from '@/lib/constants/theme';
 import { t } from '@/lib/constants/locales';
 
 
@@ -99,7 +99,7 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
           { width: cellSize, minHeight: cellSize * 0.95 },
           highlight === 'strong' && styles.cellStrong,
         ]}
-        activeOpacity={0.8}
+        activeOpacity={0.7}
       >
         <View style={styles.labelRow}>
           <Animated.Text style={[styles.cellLabel, labelStyle]} numberOfLines={1}>
@@ -132,6 +132,9 @@ export function GridCellAnimated({ id, value, cellSize, onPress, index, maxLengt
   );
 }
 
+// Labels and chips at the 12pt caption minimum
+const caption = { fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight };
+
 const styles = StyleSheet.create({
   cell: {
     backgroundColor: COLORS.surface,
@@ -142,10 +145,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'relative',
   },
+  // Gold marks a strong trait: a meaning, not decoration
   cellStrong: {
     backgroundColor: COLORS.surfaceSelected,
     borderColor: COLORS.borderAccent,
-    ...SHADOWS.goldenButtonSoft,
   },
   labelRow: {
     flexDirection: 'row',
@@ -154,12 +157,13 @@ const styles = StyleSheet.create({
   },
   cellLabel: {
     ...FONTS.cellLabel,
+    ...caption,
     flex: 1,
   },
   dot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+    width: SPACING.xs,
+    height: SPACING.xs,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.textMuted,
   },
   dotStrong: {
@@ -167,16 +171,15 @@ const styles = StyleSheet.create({
   },
   cellValue: {
     ...FONTS.cellValue,
+    fontFamily: FONT_FAMILY.serif.semibold,
+    fontVariant: ['tabular-nums'],
     marginVertical: SPACING.xs,
   },
-  caption: {
-    ...TYPE.bodySm,
-    fontSize: 11,
-  },
-  // TOOLTIPS: chips on the top border
+  caption: TYPE.bodySm,
+  // TOOLTIPS: chips centred on the top border (half of the 24pt chip above it)
   tooltipWrapper: {
     position: 'absolute',
-    top: -9,
+    top: -SPACING.gutterSm,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -184,7 +187,7 @@ const styles = StyleSheet.create({
   },
   tooltip: {
     paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
+    paddingVertical: SPACING.xs,
     borderRadius: RADIUS.full,
   },
   tooltipWeak: {
@@ -195,6 +198,7 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     ...TYPE.labelSm,
+    ...caption,
     fontFamily: FONT_FAMILY.sans.bold,
   },
   tooltipTextWeak: {

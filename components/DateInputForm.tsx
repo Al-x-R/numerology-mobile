@@ -1,7 +1,8 @@
 // components/DateInputForm.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Animated, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
@@ -35,24 +36,9 @@ export function DateInputForm({
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [inputOpacity] = useState(() => new Animated.Value(0));
-  const [inputY] = useState(() => new Animated.Value(30));
-  const [buttonOpacity] = useState(() => new Animated.Value(0));
-  const [buttonY] = useState(() => new Animated.Value(20));
-  const [buttonScale] = useState(() => new Animated.Value(1));
-
-  useEffect(() => {
-    Animated.stagger(200, [
-      Animated.parallel([
-        Animated.spring(inputY, { toValue: 0, friction: 8, tension: 100, useNativeDriver: true }),
-        Animated.timing(inputOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.spring(buttonY, { toValue: 0, friction: 8, tension: 100, useNativeDriver: true }),
-        Animated.timing(buttonOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]),
-    ]).start();
-  }, []);
+  // Reanimated respects the system Reduce Motion setting; entering animations live on the views below
+  const buttonScale = useSharedValue(1);
+  const buttonPressStyle = useAnimatedStyle(() => ({ transform: [{ scale: buttonScale.value }] }));
 
   const handleTextChange = (text: string) => {
     const formattedText = formatRussianDate(text);
@@ -62,12 +48,12 @@ export function DateInputForm({
 
   const handlePressIn = () => {
     if (isLoading) return;
-    Animated.spring(buttonScale, { toValue: 0.95, useNativeDriver: true }).start();
+    buttonScale.set(withSpring(0.97));
   };
 
   const handlePressOut = () => {
     if (isLoading) return;
-    Animated.spring(buttonScale, { toValue: 1, useNativeDriver: true }).start();
+    buttonScale.set(withSpring(1));
   };
 
   const handleSubmit = () => {
@@ -94,21 +80,6 @@ export function DateInputForm({
     }, 2000);
   };
 
-  const [errorOpacity] = useState(() => new Animated.Value(0));
-  const [errorY] = useState(() => new Animated.Value(-10));
-
-  useEffect(() => {
-    if (localError) {
-      Animated.parallel([
-        Animated.timing(errorOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(errorY, { toValue: 0, friction: 8, useNativeDriver: true }),
-      ]).start();
-    } else {
-      errorOpacity.setValue(0);
-      errorY.setValue(-10);
-    }
-  }, [errorOpacity, errorY, localError]);
-
   const isValid = isValidRussianDate(date);
   const profileDate = activeProfile?.date ? activeProfile.date.split('-').reverse().join('.') : '';
 
@@ -128,19 +99,19 @@ export function DateInputForm({
       {/* --- HERO --- */}
       <View style={styles.emblem}>
         <View style={styles.emblemInner}>
-          <MaterialCommunityIcons name="hexagram-outline" size={30} color={COLORS.accent} />
+          <MaterialCommunityIcons name="hexagram-outline" size={28} color={COLORS.textTertiary} />
         </View>
       </View>
       <Text style={styles.eyebrow}>{t('matrixForm.eyebrow')}</Text>
-      <Text style={styles.title}>{t('subtitle')}</Text>
-      <Text style={styles.description}>{t('matrixForm.description')}</Text>
+      <Text style={styles.title} numberOfLines={2}>{t('subtitle')}</Text>
+      <Text style={styles.description} numberOfLines={3}>{t('matrixForm.description')}</Text>
 
       {!!profileDate && (
         <View style={styles.chips}>
           <TouchableOpacity
             style={[styles.chip, date === profileDate && styles.chipActive]}
             onPress={() => handleTextChange(profileDate)}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
             <View style={styles.chipDot} />
             <Text style={styles.chipText}>{t('matrixForm.you')}: {profileDate}</Text>
@@ -149,11 +120,11 @@ export function DateInputForm({
       )}
 
       {/* --- FORM CARD --- */}
-      <Animated.View style={[styles.formCard, { opacity: inputOpacity, transform: [{ translateY: inputY }] }]}>
+      <Animated.View entering={FadeInDown.duration(400)} style={styles.formCard}>
         <View style={styles.formHeader}>
           <Text style={styles.fieldLabel}>{t('profile.birthDate')}</Text>
           <View style={styles.formHeaderRight}>
-            <Ionicons name="calendar-outline" size={13} color={COLORS.accent} />
+            <Ionicons name="calendar-outline" size={14} color={COLORS.textSecondary} />
             <Text style={styles.formHeaderText}>{t('matrixForm.calendar')}</Text>
           </View>
         </View>
@@ -172,13 +143,13 @@ export function DateInputForm({
             onBlur={() => setIsFocused(false)}
           />
           <View style={styles.inputIcon}>
-            <Ionicons name="calendar-clear-outline" size={20} color={COLORS.accent} />
+            <Ionicons name="calendar-clear-outline" size={20} color={COLORS.textSecondary} />
           </View>
         </View>
 
         <View style={styles.helperRow}>
           {localError ? (
-            <Animated.Text style={[styles.errorText, { opacity: errorOpacity, transform: [{ translateY: errorY }] }]}>
+            <Animated.Text entering={FadeInUp.duration(300)} style={styles.errorText}>
               {localError}
             </Animated.Text>
           ) : (
@@ -186,13 +157,13 @@ export function DateInputForm({
           )}
           {isValid && !localError && (
             <View style={styles.validBadge}>
-              <MaterialCommunityIcons name="check-decagram-outline" size={14} color={COLORS.accent} />
+              <MaterialCommunityIcons name="check-decagram-outline" size={14} color={COLORS.textTertiary} />
               <Text style={styles.validText}>{t('matrixForm.valid')}</Text>
             </View>
           )}
         </View>
 
-        <Animated.View style={[styles.buttonContainer, { opacity: buttonOpacity, transform: [{ translateY: buttonY }, { scale: buttonScale }] }]}>
+        <Animated.View entering={FadeInDown.delay(200).duration(300)} style={[styles.buttonContainer, buttonPressStyle]}>
           <TouchableOpacity
             activeOpacity={1}
             onPressIn={handlePressIn}
@@ -229,11 +200,11 @@ export function DateInputForm({
         {learnItems.map((item) => (
           <View key={item.title} style={styles.learnRow}>
             <View style={styles.learnIcon}>
-              <Ionicons name={item.icon} size={18} color={COLORS.accent} />
+              <Ionicons name={item.icon} size={18} color={COLORS.textTertiary} />
             </View>
             <View style={styles.learnText}>
-              <Text style={styles.learnRowTitle}>{item.title}</Text>
-              <Text style={styles.learnRowText}>{item.text}</Text>
+              <Text style={styles.learnRowTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={styles.learnRowText} numberOfLines={2}>{item.text}</Text>
             </View>
             <Text style={styles.learnTag}>{item.tag}</Text>
           </View>
@@ -241,51 +212,55 @@ export function DateInputForm({
       </View>
 
       <View style={styles.footer}>
-        <Ionicons name="lock-closed-outline" size={14} color={COLORS.accent} />
-        <Text style={styles.footerText}>{t('matrixForm.footer')}</Text>
+        <Ionicons name="lock-closed-outline" size={14} color={COLORS.textSecondary} />
+        <Text style={styles.footerText} numberOfLines={2}>{t('matrixForm.footer')}</Text>
       </View>
     </ScrollView>
   );
 }
+
+// Captions on this screen use the 12pt minimum
+const caption = { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight };
 
 const styles = StyleSheet.create({
   scroll: { width: '100%' },
   container: {
     alignItems: 'center',
     paddingTop: SPACING.md,
-    paddingBottom: SPACING.xl,
+    paddingBottom: SPACING.lg,
   },
 
   // --- HERO ---
+  // Neutral: on this screen gold belongs to the Calculate button and the focused field
   emblem: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
   },
   emblemInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: LAYOUT.emblem,
+    height: LAYOUT.emblem,
+    borderRadius: RADIUS.full,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
+    borderColor: COLORS.hairline,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  eyebrow: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2.4, marginBottom: SPACING.md },
-  title: { ...TYPE.displayLg, textAlign: 'center' },
+  eyebrow: { ...caption, letterSpacing: 2.4, marginBottom: SPACING.md },
+  title: { ...TYPE.displayLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center' },
   description: { ...TYPE.bodyMd, textAlign: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, alignSelf: 'stretch', marginBottom: SPACING.lg },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
-    paddingVertical: SPACING.sm,
+    minHeight: LAYOUT.minTouch,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
@@ -293,22 +268,21 @@ const styles = StyleSheet.create({
     borderColor: COLORS.transparent,
   },
   chipActive: { borderColor: COLORS.borderAccent },
-  chipDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COLORS.accent },
-  chipText: { ...TYPE.bodySm, color: COLORS.text },
+  chipDot: { width: SPACING.sm, height: SPACING.sm, borderRadius: RADIUS.full, backgroundColor: COLORS.textSecondary },
+  chipText: { ...TYPE.bodyMd, color: COLORS.text, fontVariant: ['tabular-nums'] },
 
   // --- FORM CARD ---
   formCard: {
     alignSelf: 'stretch',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
-    padding: SPACING.md + 4,
+    padding: SPACING.margin,
     marginBottom: SPACING.lg,
-    ...SHADOWS.card,
   },
   formHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.gutterSm },
-  fieldLabel: { ...TYPE.labelMd, color: COLORS.textTertiary },
-  formHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  formHeaderText: { ...TYPE.bodySm, color: COLORS.accent },
+  fieldLabel: { ...caption, color: COLORS.textTertiary },
+  formHeaderRight: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
+  formHeaderText: TYPE.bodySm,
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -317,25 +291,33 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
     borderColor: COLORS.transparent,
-    paddingLeft: SPACING.md + 4,
+    paddingLeft: SPACING.margin,
     paddingRight: SPACING.sm,
   },
   inputFocused: { borderColor: COLORS.accent },
   inputError: { borderColor: COLORS.error },
-  input: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.sans.medium, letterSpacing: 4, flex: 1, height: '100%' },
+  input: {
+    ...TYPE.headlineMd,
+    fontFamily: FONT_FAMILY.sans.semibold,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 4,
+    flex: 1,
+    height: '100%',
+  },
   inputIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  helperRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.sm, minHeight: 18 },
+  // minHeight keeps the layout from jumping when the hint swaps for an error
+  helperRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: SPACING.sm, minHeight: SPACING.md },
   helperText: { ...TYPE.bodySm, flex: 1 },
   errorText: { ...TYPE.bodySm, color: COLORS.error, flex: 1 },
-  validBadge: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  validText: { ...TYPE.bodySm, color: COLORS.accent },
+  validBadge: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
+  validText: { ...TYPE.bodySm, color: COLORS.textTertiary },
   buttonContainer: { marginTop: SPACING.lg, borderRadius: RADIUS.lg, ...SHADOWS.button },
   button: { borderRadius: RADIUS.lg, overflow: 'hidden' },
   buttonGradient: { height: LAYOUT.buttonHeight, justifyContent: 'center', alignItems: 'center' },
@@ -347,13 +329,18 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
-    padding: SPACING.md + 4,
+    padding: SPACING.margin,
     gap: SPACING.gutterSm,
   },
   learnHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.xs },
-  learnTitle: { ...TYPE.labelMd, color: COLORS.textTertiary, flex: 1 },
-  countPill: { paddingVertical: 3, paddingHorizontal: SPACING.sm + 2, borderRadius: RADIUS.full, backgroundColor: COLORS.accentSoft },
-  countText: { ...TYPE.bodySm, color: COLORS.accent },
+  learnTitle: { ...caption, color: COLORS.textTertiary, flex: 1 },
+  countPill: {
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.gutterSm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
+  },
+  countText: { ...TYPE.bodySm, color: COLORS.textTertiary },
   learnRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -363,18 +350,18 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
   },
   learnIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.accentSoft,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
   learnText: { flex: 1 },
   learnRowTitle: { ...TYPE.titleMd },
-  learnRowText: { ...TYPE.bodySm, marginTop: 2 },
-  learnTag: { ...TYPE.labelSm, fontFamily: FONT_FAMILY.sans.bold, color: COLORS.accent },
+  learnRowText: { ...TYPE.bodyMd, marginTop: SPACING.xs },
+  learnTag: caption,
 
   footer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.lg },
-  footerText: { ...TYPE.bodySm },
+  footerText: { ...TYPE.bodySm, flexShrink: 1 },
 });

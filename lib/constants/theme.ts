@@ -281,7 +281,7 @@ export const FONT_SIZES = {
   screenTitle: 24,
   screenSubtitle: 16,
   cellValueLarge: 32,
-  cellValueMedium: 27,
+  cellValueMedium: 28,
   modalTitle: 22,
   loadingText: 16,
 } as const;

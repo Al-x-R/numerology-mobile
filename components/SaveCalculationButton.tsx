@@ -15,18 +15,22 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 
 import { useProfile } from '@/contexts/ProfileContext';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { CalculationInput, SAVED_LIMITS, useSavedCalculations } from '@/contexts/SavedCalculationsContext';
-import { COLORS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 
 interface SaveCalculationButtonProps {
   input: CalculationInput;
   style?: StyleProp<ViewStyle>;
 }
+
+// The 40pt button keeps its look while the touch area reaches 44pt
+const BUTTON_SLOP = (LAYOUT.minTouch - LAYOUT.iconButton) / 2;
 
 export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonProps) => {
   const { isPremium } = useProfile();
@@ -77,21 +81,23 @@ export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonPro
 
   const handleSave = async () => {
     await save(input, label.trim() || fallbackLabel);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setIsModalVisible(false);
   };
 
   return (
     <>
-      <TouchableOpacity style={[styles.button, style]} onPress={handlePress} activeOpacity={0.7}>
-        <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={18} color={COLORS.accent} />
+      {/* Gold only once saved: the filled bookmark is the active state */}
+      <TouchableOpacity style={[styles.button, style]} onPress={handlePress} hitSlop={BUTTON_SLOP} activeOpacity={0.7}>
+        <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={18} color={saved ? COLORS.accent : COLORS.text} />
       </TouchableOpacity>
 
       <Modal transparent animationType="fade" visible={isModalVisible} onRequestClose={() => setIsModalVisible(false)}>
         <KeyboardAvoidingView style={styles.overlay} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => setIsModalVisible(false)} />
           <View style={styles.sheet}>
-            <Text style={styles.title}>{t('storage.saveTitle')}</Text>
-            <Text style={styles.hint}>{t('storage.labelHint')}</Text>
+            <Text style={styles.title} numberOfLines={2}>{t('storage.saveTitle')}</Text>
+            <Text style={styles.hint} numberOfLines={2}>{t('storage.labelHint')}</Text>
 
             <TextInput
               style={styles.input}
@@ -106,7 +112,7 @@ export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonPro
             />
 
             <GoldButton title={t('common.save')} onPress={handleSave} />
-            <TouchableOpacity style={styles.cancel} onPress={() => setIsModalVisible(false)}>
+            <TouchableOpacity style={styles.cancel} onPress={() => setIsModalVisible(false)} activeOpacity={0.7}>
               <Text style={styles.cancelText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
           </View>
@@ -118,9 +124,9 @@ export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonPro
 
 const styles = StyleSheet.create({
   button: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.glass,
     justifyContent: 'center',
     alignItems: 'center',
@@ -131,9 +137,9 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.borderAccent,
+    borderColor: COLORS.hairline,
   },
-  title: { ...TYPE.headlineMd, textAlign: 'center' },
+  title: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center' },
   hint: { ...TYPE.bodyMd, textAlign: 'center', marginTop: SPACING.xs, marginBottom: SPACING.lg },
   input: {
     ...TYPE.bodyLg,
@@ -145,6 +151,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     marginBottom: SPACING.lg,
   },
-  cancel: { alignSelf: 'center', marginTop: SPACING.md, padding: SPACING.xs },
+  cancel: {
+    alignSelf: 'center',
+    minHeight: LAYOUT.minTouch,
+    justifyContent: 'center',
+    marginTop: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+  },
   cancelText: { ...TYPE.labelLg, color: COLORS.ghost },
 });

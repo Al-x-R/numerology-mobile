@@ -1,6 +1,6 @@
 // components/WorkingNumbersDisplayAnimated.tsx
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, StyleProp, TextStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,8 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getContextualInterpretations } from '@/lib/data/additionalNumberInterpretations';
 import { Interpretation } from '@/lib/types/calculation';
-import { FONTS, SPACING, COLORS, RADIUS, GRADIENTS, TYPE } from '@/lib/constants/theme';
-import { LinearGradient } from 'expo-linear-gradient';
+import { FONTS, FONT_FAMILY, SPACING, COLORS, RADIUS, LAYOUT, TYPE } from '@/lib/constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentLocale } from '@/lib/constants/locales';
 import { useAppTranslation } from '@/contexts/LanguageContext';
@@ -21,7 +20,7 @@ import { getWorkingMeanings } from '@/lib/data/workingMeanings';
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
   onPress: (data: Interpretation) => void;
-  textAccentStyle: any;
+  textAccentStyle: StyleProp<TextStyle>;
 }
 
 function getFullWorkingInterpretation(
@@ -104,8 +103,8 @@ const WorkingNumberCard: React.FC<{
   }));
 
   return (
-    <Animated.View style={animatedStyle}>
-      <TouchableOpacity style={styles.numberCard} onPress={() => onPress(interpretationData)}>
+    <Animated.View style={[animatedStyle, styles.numberCell]}>
+      <TouchableOpacity style={styles.numberCard} onPress={() => onPress(interpretationData)} activeOpacity={0.7}>
         <Text style={styles.numberLabel} numberOfLines={2}>
           {t('workingNumberLabel').replace('{number}', (index + 1).toString())}
         </Text>
@@ -119,7 +118,7 @@ const WorkingNumberCard: React.FC<{
 const FateCard: React.FC<{
   value: number;
   onPress: (data: Interpretation) => void;
-  textAccentStyle: any;
+  textAccentStyle: StyleProp<TextStyle>;
 }> = ({ value, onPress, textAccentStyle }) => {
   const { t } = useAppTranslation();
   const interpretationData = getFullWorkingInterpretation('destiny', value, t);
@@ -150,27 +149,28 @@ const FateCard: React.FC<{
       <TouchableOpacity
         style={styles.fateCardFinal}
         onPress={() => onPress(interpretationData)}
+        activeOpacity={0.7}
       >
-        <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 1, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
         <View style={styles.fateMedallion}>
-          <MaterialCommunityIcons name="infinity" size={26} color={COLORS.accent} />
+          <MaterialCommunityIcons name="infinity" size={26} color={COLORS.textTertiary} />
         </View>
         <View style={styles.fateTextBlock}>
-          <Text style={styles.fateEyebrow}>{t('fateEyebrow')}</Text>
-          <Text style={styles.fateTitle}>
+          <Text style={styles.fateEyebrow} numberOfLines={1}>{t('fateEyebrow')}</Text>
+          <Text style={styles.fateTitle} numberOfLines={2}>
             {t('destinyNumberLabel')}: <Text style={textAccentStyle}>{value}</Text>
           </Text>
         </View>
-        <Ionicons name="chevron-forward" size={20} color={COLORS.accent} />
+        <Ionicons name="chevron-forward" size={20} color={COLORS.chevron} />
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  numbersSection: { marginTop: SPACING.xl },
+  numbersSection: { marginTop: SPACING.lg },
   sectionTitle: {
     ...FONTS.sectionTitle,
+    fontFamily: FONT_FAMILY.serif.semibold,
     marginBottom: SPACING.md,
   },
   numbersGrid: {
@@ -179,8 +179,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: SPACING.gutterSm,
   },
+  // Two per row whatever the window width
+  numberCell: { flexBasis: '45%', flexGrow: 1 },
   numberCard: {
-    width: (Dimensions.get('window').width - SPACING.margin * 2 - SPACING.gutterSm) / 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -191,32 +192,36 @@ const styles = StyleSheet.create({
   },
   numberLabel: {
     ...FONTS.workingLabel,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
     flex: 1,
   },
+  // Neutral: the grid is the screen's hero, gold stays on strong cells and the destiny number
   numberValue: {
     ...FONTS.workingValue,
+    color: COLORS.text,
+    fontVariant: ['tabular-nums'],
   },
   fateCardFinal: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.md,
-    overflow: 'hidden',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.md + 2,
+    padding: SPACING.md,
   },
   fateMedallion: {
-    width: 52,
-    height: 52,
+    width: LAYOUT.emblem,
+    height: LAYOUT.emblem,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
   },
   fateTextBlock: { flex: 1 },
-  fateEyebrow: { ...TYPE.labelSm, marginBottom: 4 },
+  fateEyebrow: { ...TYPE.labelSm, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight, marginBottom: SPACING.xs },
   fateTitle: { ...TYPE.titleLg },
 });
