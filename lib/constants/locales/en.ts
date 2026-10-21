@@ -364,9 +364,6 @@ export const en = {
   language: {
     eyebrow: 'Interface language',
     description: 'Choose the main language for psychomatrix readings, interpretations and forecasts',
-    infoLabel: 'Sync',
-    infoTitle: 'Multilingual matrix',
-    infoText: 'All numerology readings switch along with the interface',
     current: 'Current',
     save: 'Save selection',
     hint: 'Applies instantly to all matrices and forecasts',

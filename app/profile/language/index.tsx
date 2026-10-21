@@ -9,10 +9,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTranslation, useLanguage } from '@/contexts/LanguageContext';
-import { COLORS, SPACING, RADIUS, SHADOWS, TYPE } from '@/lib/constants/theme';
+import { COLORS, LAYOUT, SPACING, RADIUS, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { GoldButton } from '@/components/ui/GoldButton';
 
@@ -29,6 +30,12 @@ export default function LanguageScreen() {
   const { language, setLanguage } = useLanguage();
   const { t } = useAppTranslation();
   const [selected, setSelected] = useState<LanguageCode>(language);
+
+  const select = (code: LanguageCode) => {
+    if (code === selected) return;
+    Haptics.selectionAsync();
+    setSelected(code);
+  };
 
   const handleSave = async () => {
     if (selected !== language) {
@@ -48,20 +55,10 @@ export default function LanguageScreen() {
         {/* --- INTRO --- */}
         <View style={styles.intro}>
           <View style={styles.introIcon}>
-            <MaterialIcons name="translate" size={20} color={COLORS.accent} />
+            <MaterialIcons name="translate" size={20} color={COLORS.textTertiary} />
           </View>
           <Text style={styles.eyebrow}>{t('language.eyebrow')}</Text>
-          <Text style={styles.description}>{t('language.description')}</Text>
-        </View>
-
-        {/* --- INFO --- */}
-        <View style={styles.infoCard}>
-          <View style={styles.infoText}>
-            <Text style={styles.infoLabel}>{t('language.infoLabel')}</Text>
-            <Text style={styles.infoTitle}>{t('language.infoTitle')}</Text>
-            <Text style={styles.infoBody}>{t('language.infoText')}</Text>
-          </View>
-          <Ionicons name="sparkles-outline" size={20} color={COLORS.textMuted} />
+          <Text style={styles.description} numberOfLines={3}>{t('language.description')}</Text>
         </View>
 
         {/* --- LANGUAGES --- */}
@@ -74,19 +71,19 @@ export default function LanguageScreen() {
               <TouchableOpacity
                 key={item.code}
                 style={[styles.card, isSelected && styles.cardActive]}
-                onPress={() => setSelected(item.code)}
-                activeOpacity={0.85}
+                onPress={() => select(item.code)}
+                activeOpacity={0.7}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: isSelected }}
               >
                 <View style={styles.monogram}>
-                  <Text style={[styles.monogramText, isSelected && styles.accentText]}>
+                  <Text style={styles.monogramText}>
                     {item.code.toUpperCase()}
                   </Text>
                 </View>
 
                 <View style={styles.textContainer}>
-                  <Text style={[styles.languageName, isSelected && styles.accentText]} numberOfLines={1}>
+                  <Text style={styles.languageName} numberOfLines={1}>
                     {item.native}
                   </Text>
                   <Text style={styles.languageSubtitle} numberOfLines={1}>
@@ -108,7 +105,7 @@ export default function LanguageScreen() {
           icon={<Ionicons name="checkmark" size={18} color={COLORS.blackText} />}
           style={styles.saveButton}
         />
-        <Text style={styles.hint}>{t('language.hint')}</Text>
+        <Text style={styles.hint} numberOfLines={2}>{t('language.hint')}</Text>
       </ScrollView>
     </View>
   );
@@ -130,55 +127,38 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   introIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
-    ...SHADOWS.card,
   },
+  // Caption at 12pt, neutral: gold marks only the selection and the save button
   eyebrow: {
     ...TYPE.labelMd,
-    color: COLORS.accent,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
     letterSpacing: 2,
     marginBottom: SPACING.sm,
   },
   description: {
     ...TYPE.bodyMd,
     textAlign: 'center',
-    maxWidth: 300,
   },
-
-  // --- INFO ---
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.lg,
-    ...SHADOWS.card,
-  },
-  infoText: { flex: 1 },
-  infoLabel: { ...TYPE.labelSm, color: COLORS.accent, marginBottom: 2 },
-  infoTitle: { ...TYPE.titleMd },
-  infoBody: { ...TYPE.bodySm, marginTop: 2 },
 
   // --- LANGUAGES ---
   list: {
-    gap: SPACING.gutterSm + 2,
+    gap: SPACING.gutterSm,
     marginBottom: SPACING.lg,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 74,
-    gap: SPACING.gutterSm + 2,
+    gap: SPACING.gutterSm,
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.gutterSm + 2,
+    paddingVertical: SPACING.md,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
@@ -187,11 +167,10 @@ const styles = StyleSheet.create({
   cardActive: {
     backgroundColor: COLORS.surfaceSelected,
     borderColor: COLORS.borderAccent,
-    ...SHADOWS.goldenButtonSoft,
   },
   monogram: {
-    width: 44,
-    height: 44,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surface,
     justifyContent: 'center',
@@ -208,29 +187,26 @@ const styles = StyleSheet.create({
     ...TYPE.titleLg,
   },
   languageSubtitle: {
-    ...TYPE.bodySm,
-    marginTop: 2,
+    ...TYPE.bodyMd,
+    marginTop: SPACING.xs,
   },
-  accentText: {
-    color: COLORS.accent,
-  },
+  // Unselected ring uses text4 so the control stays visible on the card (>= 3:1)
   radio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: COLORS.surface,
+    width: SPACING.lg,
+    height: SPACING.lg,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: COLORS.textMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioSelected: {
-    borderWidth: 1,
-    borderColor: COLORS.borderAccent,
-    ...SHADOWS.goldenButtonSoft,
+    borderColor: COLORS.accent,
   },
   radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: SPACING.gutterSm,
+    height: SPACING.gutterSm,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.accent,
   },
 
@@ -238,7 +214,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   hint: {
-    ...TYPE.bodySm,
+    ...TYPE.bodyMd,
     textAlign: 'center',
   },
 });
