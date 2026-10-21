@@ -6,8 +6,12 @@
 // Usage: GEMINI_API_KEY=... node scripts/forecasts/generate.ts [outDir]
 //   FORCE="daily_zodiac/2026-10-21,daily_forecasts/2026-10-21"  regenerate these files even if they exist
 //   ONLY="daily_zodiac/2026-10-21:ru"  dry run: generate one collection/id in one language and print it, write nothing
+//
+// Each finished language is kept in <outDir>/_partial/ until its file is complete, so when the quota runs out
+// mid-file the next run only generates the missing languages. It lives in the published branch because
+// every workflow run starts on a clean machine.
 
-import { access, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Body, EclipticGeoMoon, Illumination, MakeTime, MoonPhase } from 'astronomy-engine';
 
@@ -22,6 +26,7 @@ const exhaustedModels = new Set<string>();
 // and validation below still checks the shape
 const schemalessModels = new Set<string>();
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
+const PARTIAL_DIR = path.join(OUT_DIR, '_partial');
 const FORCE = new Set((process.env.FORCE || '').split(',').map(s => s.trim()).filter(Boolean));
 const ONLY = process.env.ONLY;
 // Attempts per model before moving on: every failed request, even a 503, still costs daily quota
@@ -393,16 +398,27 @@ const generate = async (kind: Kind, period: Period, id: string): Promise<boolean
   console.log(`🚀 Generating ${name}...`);
   const keys = kind === 'numerology' ? NUMBER_KEYS : ZODIAC_KEYS;
   const moon = period === 'day' ? moonOn(id) : undefined;
+  const partialFile = (lang: Lang) => path.join(PARTIAL_DIR, collection, `${id}.${lang}.json`);
 
   // One request per language: a single multilingual answer squeezes every text to a line
   const byLang: Partial<Record<Lang, Record<string, any>>> = {};
   for (const lang of LANGS) {
+    const saved = await readFile(partialFile(lang), 'utf8').then(JSON.parse, () => null);
+    if (saved) {
+      console.log(`   ${name} [${lang}] reused from an earlier run`);
+      byLang[lang] = saved;
+      continue;
+    }
+
     const result = await generateLanguage(kind, period, id, lang, moon);
     if (!result) {
       console.error(`🔥 FATAL: Could not generate ${name} [${lang}] with any model.`);
       return false;
     }
     byLang[lang] = result;
+    // Kept right away, so a quota stop on the next language does not waste this one
+    await mkdir(path.dirname(partialFile(lang)), { recursive: true });
+    await writeFile(partialFile(lang), JSON.stringify(result));
   }
 
   const doc: Record<string, any> = Object.fromEntries(
@@ -415,22 +431,35 @@ const generate = async (kind: Kind, period: Period, id: string): Promise<boolean
 
   await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, JSON.stringify(doc));
+  await Promise.all(LANGS.map(lang => rm(partialFile(lang), { force: true })));
   console.log(`🎉 Saved ${name}`);
   return true;
 };
 
-// The client no longer needs old daily forecasts
+// The client no longer needs old daily forecasts, nor half-made ones for days that have passed
 const pruneDaily = async () => {
   const cutoff = dayId(-KEEP_DAILY_DAYS);
+  const lastTarget = dayId(-1);
 
   for (const kind of Object.keys(COLLECTIONS) as Kind[]) {
-    const dir = path.join(OUT_DIR, COLLECTIONS[kind].day);
+    const collection = COLLECTIONS[kind].day;
+    const dir = path.join(OUT_DIR, collection);
     const files = await readdir(dir).catch(() => [] as string[]);
 
     for (const name of files) {
       if (name.endsWith('.json') && name.replace('.json', '') < cutoff) {
         await rm(path.join(dir, name));
-        console.log(`🧹 Removed ${COLLECTIONS[kind].day}/${name}`);
+        console.log(`🧹 Removed ${collection}/${name}`);
+      }
+    }
+
+    // Partial names look like 2026-10-21.ru.json
+    const partialDir = path.join(PARTIAL_DIR, collection);
+    const partials = await readdir(partialDir).catch(() => [] as string[]);
+    for (const name of partials) {
+      if (name.slice(0, 10) < lastTarget) {
+        await rm(path.join(partialDir, name));
+        console.log(`🧹 Removed _partial/${collection}/${name}`);
       }
     }
   }
