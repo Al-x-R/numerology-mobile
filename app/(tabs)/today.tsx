@@ -12,6 +12,7 @@ import { useForecasts } from '@/hooks/useForecasts';
 import { useZodiacForecast } from '@/hooks/useZodiacForecast';
 import { calculatePersonalDay } from '@/lib/calculators/numerologyForecast';
 import { getZodiacName, getZodiacSign } from '@/lib/calculators/zodiac';
+import { parseLocalDate } from '@/lib/utils/date';
 import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
 import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
@@ -51,7 +52,7 @@ export default function TodayScreen() {
   const now = new Date();
 
   const dayNumber = birthDate ? calculatePersonalDay(birthDate, now) : 0;
-  const sign = birthDate ? getZodiacSign(new Date(birthDate)) : null;
+  const sign = birthDate ? getZodiacSign(parseLocalDate(birthDate)) : null;
 
   // Free users see daily forecasts in their tabs after a rewarded ad, so here they get only a teaser
   const locked = !isPremium;

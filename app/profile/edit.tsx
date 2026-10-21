@@ -5,26 +5,32 @@ import { View, Text, TextInput, TouchableOpacity, Platform, Modal, StyleSheet, K
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+// Expo Router ships its own React Navigation, so the header height comes from its copy
+import { useHeaderHeight } from 'expo-router/react-navigation';
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { COLORS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 import { AuraBackground } from '@/components/ui/AuraBackground';
-import { formatBirthDateFromDate } from '@/lib/utils/date';
+import { formatBirthDateFromDate, parseLocalDate } from '@/lib/utils/date';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+
+// Where the picker opens when no birth date is set yet
+const DEFAULT_PICKER_DATE = new Date(2000, 0, 1);
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const { updateProfile, activeProfile } = useProfile();
 
   const [name, setName] = useState(activeProfile?.name || '');
   const [birthDate, setBirthDate] = useState<Date | null>(
-    activeProfile?.date ? new Date(activeProfile.date) : null
+    activeProfile?.date ? parseLocalDate(activeProfile.date) : null
   );
 
-  const [tempDate, setTempDate] = useState<Date>(new Date('2000-01-01'));
+  const [tempDate, setTempDate] = useState<Date>(DEFAULT_PICKER_DATE);
   const [showPicker, setShowPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -32,7 +38,7 @@ export default function EditProfileScreen() {
 
   // --- Date Picker Logic ---
   const openDatePicker = () => {
-    setTempDate(birthDate || new Date('2000-01-01'));
+    setTempDate(birthDate || DEFAULT_PICKER_DATE);
     setShowPicker(true);
   };
 
@@ -98,17 +104,17 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <AuraBackground />
 
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
       >
         <ScrollView
           style={styles.container}
-          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 20 }]}
+          contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + SPACING.margin }]}
           showsVerticalScrollIndicator={false}
         >
 
@@ -118,7 +124,7 @@ export default function EditProfileScreen() {
             <View style={styles.field}>
               <Text style={styles.label}>{t('profile.name')}</Text>
               <View style={styles.inputWrapper}>
-                <Ionicons name="person-outline" size={18} color={COLORS.accent} style={styles.inputIcon} />
+                <Ionicons name="person-outline" size={18} color={COLORS.textSecondary} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={name}
@@ -134,9 +140,9 @@ export default function EditProfileScreen() {
             {/* Date of birth field */}
             <View style={styles.field}>
               <Text style={styles.label}>{t('profile.birthDate')}</Text>
-              <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="calendar-outline" size={18} color={COLORS.accent} style={styles.inputIcon} />
+              <TouchableOpacity style={styles.dateButton} onPress={openDatePicker} activeOpacity={0.7}>
+                <View style={styles.dateValue}>
+                  <Ionicons name="calendar-outline" size={18} color={COLORS.textSecondary} style={styles.inputIcon} />
                   <Text style={birthDate ? styles.dateText : styles.placeholderText}>
                     {birthDate ? formatBirthDateFromDate(birthDate) : t('profile.selectDate')}
                   </Text>
@@ -156,13 +162,13 @@ export default function EditProfileScreen() {
       {showPicker && Platform.OS === 'ios' ? (
         <Modal transparent animationType="fade" visible={showPicker}>
           <View style={styles.modalOverlay}>
-            <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={cancelIOSDate} />
-            <View style={styles.pickerContainer}>
+            <TouchableOpacity style={styles.container} activeOpacity={1} onPress={cancelIOSDate} />
+            <View style={[styles.pickerContainer, { paddingBottom: insets.bottom + SPACING.md }]}>
               <View style={styles.pickerHeader}>
-                <TouchableOpacity onPress={cancelIOSDate}>
+                <TouchableOpacity style={styles.pickerButton} onPress={cancelIOSDate} activeOpacity={0.7}>
                   <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={confirmIOSDate}>
+                <TouchableOpacity style={styles.pickerButton} onPress={confirmIOSDate} activeOpacity={0.7}>
                   <Text style={styles.doneText}>{t('common.done')}</Text>
                 </TouchableOpacity>
               </View>
@@ -174,8 +180,8 @@ export default function EditProfileScreen() {
                 onValueChange={onDateChange}
                 maximumDate={new Date()}
                 themeVariant="dark"
-                textColor="white"
-                style={{ backgroundColor: COLORS.surfaceRaised, height: 200, width: '100%' }}
+                textColor={COLORS.text}
+                style={styles.picker}
                 locale={getIOSLocale(language)}
               />
             </View>
@@ -183,7 +189,7 @@ export default function EditProfileScreen() {
         </Modal>
       ) : showPicker && (
         <DateTimePicker
-          value={birthDate || new Date('2000-01-01')}
+          value={birthDate || DEFAULT_PICKER_DATE}
           mode="date"
           display="default"
           onValueChange={onDateChange}
@@ -201,7 +207,14 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: SPACING.margin, paddingTop: SPACING.lg },
   formContainer: { marginBottom: SPACING.lg },
   field: { marginBottom: SPACING.lg },
-  label: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  // Visible field labels at 12pt, the caption minimum
+  label: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    marginBottom: SPACING.sm,
+    marginLeft: SPACING.xs,
+  },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -225,6 +238,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     paddingHorizontal: SPACING.md,
   },
+  dateValue: { flexDirection: 'row', alignItems: 'center' },
   dateText: TYPE.bodyLg,
   placeholderText: { ...TYPE.bodyLg, color: COLORS.placeholder },
   modalOverlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'flex-end' },
@@ -232,19 +246,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceRaised,
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
-    paddingBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: COLORS.borderAccent,
+    borderColor: COLORS.hairline,
     alignItems: 'center',
   },
   pickerHeader: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: SPACING.lg,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
+  // Text-only buttons get a 44pt touch area
+  pickerButton: { minHeight: LAYOUT.minTouch, justifyContent: 'center', paddingHorizontal: SPACING.sm },
+  picker: { backgroundColor: COLORS.surfaceRaised, height: 200, width: '100%' },
   cancelText: { ...TYPE.labelLg, color: COLORS.ghost },
   doneText: TYPE.labelLg,
 });

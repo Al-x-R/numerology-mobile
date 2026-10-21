@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Locale, t } from '@/lib/constants/locales';
 import { calculatePersonalDay } from '@/lib/calculators/numerologyForecast';
 import { getZodiacName, getZodiacSign } from '@/lib/calculators/zodiac';
+import { parseLocalDate } from '@/lib/utils/date';
 
 const SETTINGS_KEY = '@forecast_reminders';
 const CHANNEL_ID = 'daily-forecasts';
@@ -110,7 +111,7 @@ const syncNow = async ({ settings, birthDate, isPremium, language }: SyncParams)
 
   await ensureChannel(language);
 
-  const signName = getZodiacName(getZodiacSign(new Date(birthDate)), language);
+  const signName = getZodiacName(getZodiacSign(parseLocalDate(birthDate)), language);
   const now = new Date();
 
   for (let i = 0; i < DAYS_AHEAD; i++) {

@@ -16,11 +16,12 @@ import { BackButton } from '@/components/ui/BackButton';
 import { SaveCalculationButton } from '@/components/SaveCalculationButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useInterstitial, useRewarded } from '@/hooks/useAdMob';
+import { parseLocalDate } from '@/lib/utils/date';
 
 // DD.MM.YYYY -> Date, or null if the date is invalid
 const parseFormDate = (dateString: string): Date | null => {
   const [day, month, year] = dateString.split('.');
-  const date = new Date(`${year}-${month}-${day}`);
+  const date = parseLocalDate(`${year}-${month}-${day}`);
   return isNaN(date.getTime()) ? null : date;
 };
 

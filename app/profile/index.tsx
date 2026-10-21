@@ -25,7 +25,7 @@ import { COLORS, FONT_FAMILY, GRADIENTS, LAYOUT, RADIUS, SPACING, TYPE } from '@
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { CapsLabel } from '@/components/ui/CapsLabel';
 import { ProChip } from '@/components/ui/ProChip';
-import { formatBirthDate } from '@/lib/utils/date';
+import { formatBirthDate, parseLocalDate } from '@/lib/utils/date';
 import { toRoman } from '@/lib/utils/roman';
 import { pluralize } from '@/lib/utils/plural';
 import { tArray } from '@/lib/constants/locales';
@@ -70,9 +70,9 @@ export default function ProfileScreen() {
 
   const displayName = activeProfile?.name || t('profile.guest');
   const birthDate = activeProfile?.date || null;
-  const zodiacSign = birthDate ? getZodiacSign(new Date(birthDate)) : null;
+  const zodiacSign = birthDate ? getZodiacSign(parseLocalDate(birthDate)) : null;
   const destinyNumber = birthDate
-    ? calculatePythagoreanSquare(new Date(birthDate)).additionalParams.destinyNumber
+    ? calculatePythagoreanSquare(parseLocalDate(birthDate)).additionalParams.destinyNumber
     : null;
 
   const remindersValue = !isPremium

@@ -18,6 +18,7 @@ import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { LockedForecast } from '@/components/ui/LockedForecast';
 import { BirthDateRequiredState } from '@/components/ui/BirthDateRequiredState';
 import { useRewarded } from '@/hooks/useAdMob';
+import { parseLocalDate } from '@/lib/utils/date';
 
 type TabType = 'day' | 'month' | 'year';
 
@@ -44,7 +45,7 @@ export default function HoroscopeScreen() {
 
   const { showRewarded } = useRewarded();
 
-  const signKey = birthDate ? getZodiacSign(new Date(birthDate)) : null;
+  const signKey = birthDate ? getZodiacSign(parseLocalDate(birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
   const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
