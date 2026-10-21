@@ -150,7 +150,7 @@ export function DoubleDateInputForm({
 
       {/* Partner 2 */}
       <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.card}>
-        <CardGlow color={COLORS.categoryLove} />
+        <CardGlow />
         <View style={styles.cardHeader}>
           <View style={styles.medallion}>
             <Ionicons name="heart" size={18} color={COLORS.textTertiary} />

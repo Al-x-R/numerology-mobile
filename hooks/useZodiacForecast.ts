@@ -1,6 +1,6 @@
 // hooks/useZodiacForecast.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchForecastDoc } from '@/lib/api/forecasts';
+import { fetchForecastDoc, revalidateForecastDoc } from '@/lib/api/forecasts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -51,6 +51,7 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
         if (cachedJson) {
           console.log(`📦 Cache hit: ${cacheKey}`);
           fetchedData = JSON.parse(cachedJson);
+          revalidateForecastDoc(collectionName, docId, cacheKey, cachedJson, setFullDoc);
         }
       }
 

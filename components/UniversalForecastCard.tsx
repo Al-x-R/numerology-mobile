@@ -48,12 +48,12 @@ interface Props {
 
 type AspectKey = 'love' | 'finance' | 'health' | 'warning';
 
-// Aspects are categories, so each gets its own hue (rules 2.5) plus a distinct icon
-const ASPECT_STYLE: Record<AspectKey, { icon: keyof typeof Ionicons.glyphMap; color: string }> = {
-  love: { icon: 'heart', color: COLORS.categoryLove },
-  finance: { icon: 'briefcase', color: COLORS.categoryWork },
-  health: { icon: 'flash', color: COLORS.categoryHealth },
-  warning: { icon: 'shield-half', color: COLORS.warning },
+// One gold family for every aspect (brand-first, rules 2.4); the icon tells them apart
+const ASPECT_ICONS: Record<AspectKey, keyof typeof Ionicons.glyphMap> = {
+  love: 'heart',
+  finance: 'briefcase',
+  health: 'flash',
+  warning: 'shield-half',
 };
 
 const ZODIAC_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap> = {
@@ -326,7 +326,7 @@ const AspectCard = ({ aspectKey, label, text, meter }: {
   const [expanded, setExpanded] = useState(false);
   // Set from an unclamped hidden copy of the text, so the chevron shows only when something is cut off
   const [truncated, setTruncated] = useState(false);
-  const { icon, color } = ASPECT_STYLE[aspectKey];
+  const icon = ASPECT_ICONS[aspectKey];
 
   return (
     <TouchableOpacity
@@ -336,16 +336,16 @@ const AspectCard = ({ aspectKey, label, text, meter }: {
       activeOpacity={0.7}
       accessibilityState={truncated ? { expanded } : undefined}
     >
-      <CardGlow color={color} />
-      <View style={[styles.aspectMedallion, { backgroundColor: withAlpha(color, 0.16) }]}>
-        <Ionicons name={icon} size={20} color={color} />
+      <CardGlow intensity={0.06} />
+      <View style={styles.aspectMedallion}>
+        <Ionicons name={icon} size={20} color={COLORS.accentLight} />
       </View>
       <View style={styles.aspectContent}>
         <View style={styles.aspectHeader}>
-          <Text style={[styles.aspectLabel, { color }]} numberOfLines={2}>{label}</Text>
+          <Text style={styles.aspectLabel} numberOfLines={2}>{label}</Text>
           {meter && (
-            <View style={[styles.aspectChip, { backgroundColor: withAlpha(color, 0.08) }]}>
-              <Text style={[styles.aspectChipText, { color }]} numberOfLines={1}>{meter.label} {meter.score}%</Text>
+            <View style={styles.aspectChip}>
+              <Text style={styles.aspectChipText} numberOfLines={1}>{meter.label} {meter.score}%</Text>
             </View>
           )}
         </View>
@@ -357,7 +357,7 @@ const AspectCard = ({ aspectKey, label, text, meter }: {
         >
           {text}
         </Text>
-        {meter && <Meter score={meter.score} color={color} />}
+        {meter && <Meter score={meter.score} color={COLORS.accent} />}
       </View>
       {truncated && (
         <View style={styles.aspectChevron}>
@@ -523,14 +523,15 @@ const styles = StyleSheet.create({
     width: LAYOUT.minTouch,
     height: LAYOUT.minTouch,
     borderRadius: RADIUS.full,
+    backgroundColor: COLORS.accentSoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
   aspectContent: { flex: 1, gap: SPACING.sm },
   aspectHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  aspectLabel: { ...TYPE.labelMd, ...caption, flex: 1 },
-  aspectChip: { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.sm, borderRadius: RADIUS.full },
-  aspectChipText: { ...TYPE.labelMd, ...caption, fontVariant: ['tabular-nums'] },
+  aspectLabel: { ...TYPE.labelMd, ...caption, color: COLORS.textTertiary, flex: 1 },
+  aspectChip: { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.sm, borderRadius: RADIUS.full, backgroundColor: COLORS.accentSoft },
+  aspectChipText: { ...TYPE.labelMd, ...caption, color: COLORS.accentLight, fontVariant: ['tabular-nums'] },
   aspectText: { ...TYPE.bodyMd, color: COLORS.textTertiary },
   // Invisible full-length copy used only to count lines
   measure: { position: 'absolute', left: 0, right: 0, opacity: 0 },

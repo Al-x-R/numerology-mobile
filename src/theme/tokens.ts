@@ -32,11 +32,6 @@ export const palette = {
   dangerSoft: '#3A2222', // danger chip fill
   onDangerSoft: '#E8A3A3', // text and icons on the danger chip, 7.1
 
-  // Forecast aspect categories (rules 2.5: several hues only for categories), each also has its own icon
-  love: '#D28894', // 6.0–7.0
-  work: '#7EA0C1', // 6.0–7.0
-  health: '#64AC77', // 6.0–7.0
-
   // Secondary actions and decoration
   ghost: '#928572', // muted warm text for cancel actions, 4.6–5.3
   iconMuted: '#6E6A63', // inactive tab icons, 3.1–3.6

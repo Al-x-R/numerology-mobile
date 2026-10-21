@@ -56,11 +56,6 @@ export const COLORS = {
 
   error: palette.danger,
   warning: palette.warn,
-
-  // Forecast aspect categories
-  categoryLove: palette.love,
-  categoryWork: palette.work,
-  categoryHealth: palette.health,
   warningChip: palette.dangerSoft,
   warningChipText: palette.onDangerSoft,
   ghost: palette.ghost,

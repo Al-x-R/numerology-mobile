@@ -1,6 +1,6 @@
 // hooks/useForecasts.ts
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchForecastDoc } from '@/lib/api/forecasts';
+import { fetchForecastDoc, revalidateForecastDoc } from '@/lib/api/forecasts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -68,6 +68,7 @@ export const useForecasts = (
         if (cachedJson) {
           console.log(`📦 Cache hit (forecast): ${cacheKey}`);
           fetchedData = JSON.parse(cachedJson);
+          revalidateForecastDoc<ForecastDataMap>(collectionName, docId, cacheKey, cachedJson, setFullDoc);
         }
       }
 
