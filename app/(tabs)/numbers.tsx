@@ -164,6 +164,7 @@ export default function NumbersScreen() {
           data={currentForecast.data}
           loading={currentForecast.loading}
           error={currentForecast.error}
+          moon={currentForecast.moon}
           type={activeTab}
           onRetry={currentForecast.refetch}
           number={currentNumber}

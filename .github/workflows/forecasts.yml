@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 0 * * *' # daily at 00:00 UTC
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Comma-separated files to regenerate, e.g. daily_zodiac/2026-10-21,daily_forecasts/2026-10-21'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -24,6 +29,10 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install generator dependencies
+        working-directory: scripts/forecasts
+        run: npm ci
+
       # Generated forecasts live in the gh-pages branch served by GitHub Pages
       - name: Checkout gh-pages into ./public
         run: |
@@ -39,7 +48,8 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-3.8-flash
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-3.6-flash
+          FORCE: ${{ inputs.force }}
         run: node scripts/forecasts/generate.ts public
 
       # Publish whatever was generated, even if some forecasts failed

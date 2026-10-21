@@ -103,5 +103,8 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
     fetchMasterData(true);
   }, [fetchMasterData]);
 
-  return { data, loading, error, refetch };
+  // e.g. "Луна в Водолее · растущая Луна, 76%"; null for older files and monthly/yearly ones
+  const moon: string | null = fullDoc?._meta?.moon?.label?.[language] ?? null;
+
+  return { data, loading, error, refetch, moon };
 };

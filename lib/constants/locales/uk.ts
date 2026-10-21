@@ -36,6 +36,7 @@ export const uk = {
     health: 'Здоров’я та Енергія',
     warning: 'Застереження',
     affirmation: 'МАНТРА',
+    energy: 'Енергія',
     day: 'Енергія Дня',
     month: 'Тема Місяця',
     year: 'Стратегія Року',

@@ -36,6 +36,7 @@ export const ru = {
     health: 'Здоровье и Энергия',
     warning: 'Предостережение',
     affirmation: 'МАНТРА',
+    energy: 'Энергия',
     day: 'Энергия Дня',
     month: 'Тема Месяца',
     year: 'Стратегия Года',

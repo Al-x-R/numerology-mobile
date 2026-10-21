@@ -36,6 +36,7 @@ export const en = {
     health: 'Health & Energy',
     warning: 'Warning',
     affirmation: 'MANTRA',
+    energy: 'Energy',
     day: 'Daily Vibration',
     month: 'Monthly Theme',
     year: 'Yearly Strategy',

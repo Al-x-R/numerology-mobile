@@ -26,11 +26,16 @@ export const palette = {
 
   // Statuses, each passes as text on surfaces and carries onStatus on its fill
   ok: '#399859', // 4.6–5.3
-  warn: '#B57945', // 4.5–5.3, orange so it never reads as the gold accent
+  warn: '#C59265', // 6.0–7.0, orange so it never reads as the gold accent
   danger: '#C26F6F', // 4.5–5.3
-  onStatus: '#100F0E', // on ok / warn / danger fills, 5.3 (white: 3.6)
+  onStatus: '#100F0E', // on ok / warn / danger fills, >= 5.3 (white: <= 3.6)
   dangerSoft: '#3A2222', // danger chip fill
   onDangerSoft: '#E8A3A3', // text and icons on the danger chip, 7.1
+
+  // Forecast aspect categories (rules 2.5: several hues only for categories), each also has its own icon
+  love: '#D28894', // 6.0–7.0
+  work: '#7EA0C1', // 6.0–7.0
+  health: '#64AC77', // 6.0–7.0
 
   // Secondary actions and decoration
   ghost: '#928572', // muted warm text for cancel actions, 4.6–5.3

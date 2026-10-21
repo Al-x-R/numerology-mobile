@@ -9,13 +9,18 @@ interface ForecastDataMap {
   [key: string]: { [lang: string]: ForecastSection };
 }
 
+// Shared facts written by the generator next to the 1-9 keys (daily files only)
+interface ForecastDocMeta {
+  _meta?: { moon?: { label?: { [lang: string]: string } } };
+}
+
 export const useForecasts = (
   type: 'day' | 'month' | 'year',
   personalNumber: number
 ) => {
   const [data, setData] = useState<ForecastSection | null>(null);
 
-  const [fullDoc, setFullDoc] = useState<ForecastDataMap | null>(null);
+  const [fullDoc, setFullDoc] = useState<(ForecastDataMap & ForecastDocMeta) | null>(null);
 
   const [loading, setLoading] = useState(true);
   // Set when the fetch fails, so screens can tell a load error apart from a missing forecast
@@ -118,5 +123,8 @@ export const useForecasts = (
     fetchMasterData(true);
   }, [fetchMasterData]);
 
-  return { data, loading, error, refetch };
+  // e.g. "Луна в Водолее · растущая Луна, 76%"; null for older files and monthly/yearly ones
+  const moon = fullDoc?._meta?.moon?.label?.[language] ?? null;
+
+  return { data, loading, error, refetch, moon };
 };

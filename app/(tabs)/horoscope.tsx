@@ -131,6 +131,7 @@ export default function HoroscopeScreen() {
           data={currentData.data}
           loading={currentData.loading}
           error={currentData.error}
+          moon={currentData.moon}
           type={activeTab}
           onRetry={currentData.refetch}
           zodiacSign={signKey || undefined}
