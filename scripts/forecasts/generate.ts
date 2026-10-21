@@ -12,11 +12,17 @@ import path from 'node:path';
 import { Body, EclipticGeoMoon, Illumination, MakeTime, MoonPhase } from 'astronomy-engine';
 
 const API_KEY = process.env.GEMINI_API_KEY;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+// Free-tier quota is counted per model, and models get overloaded independently, so a request
+// falls through this chain: GEMINI_MODEL first, then the fallbacks
+const FALLBACK_MODELS = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+const MODELS = [...new Set([process.env.GEMINI_MODEL, ...FALLBACK_MODELS].filter((m): m is string => !!m))];
+// Models whose daily quota ran out during this run
+const exhaustedModels = new Set<string>();
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
 const FORCE = new Set((process.env.FORCE || '').split(',').map(s => s.trim()).filter(Boolean));
 const ONLY = process.env.ONLY;
-const MAX_RETRIES = 5;
+// Attempts per model before moving on: every failed request, even a 503, still costs daily quota
+const ATTEMPTS_PER_MODEL = 2;
 const BASE_RETRY_DELAY_MS = 15_000;
 const MAX_RETRY_DELAY_MS = 120_000;
 const KEEP_DAILY_DAYS = 30;
@@ -152,6 +158,7 @@ const STYLE_RULES = `
   - Concrete and situational: name moments of the day, small actions, typical situations ("in a meeting after lunch", "a message you keep postponing").
   - Every item must feel written for that sign/number only: use its traits and today's facts. No two items may share an opening, a structure or a key idea.
   - Second person, present/future tense, 0-1 exclamation marks per item.
+  - Address the reader politely as in the rest of the app: Russian "вы" (lowercase), Ukrainian "ви", never "ты"/"ти".
   - BANNED clichés (and their equivalents in any language): "listen to your intuition", "be flexible", "stay open to new opportunities", "the stars favour you", "the universe", "harmony and balance", "drink more water", "take care of yourself", "avoid conflicts".
   - Astrology/numerology terms only in plain words, never jargon like "trine", "retrograde in the 2nd house".`;
 
@@ -233,13 +240,16 @@ const responseSchema = (keys: string[]) => ({
 // Carries the delay Gemini asks for on 429 (RetryInfo.retryDelay, e.g. "37s")
 class GeminiError extends Error {
   retryAfterMs?: number;
-  // A per-day quota is gone: every further request fails for hours, so the run should stop
+  // A per-day quota is gone: every further request to this model fails for hours
   dailyQuotaExhausted: boolean;
+  // 503: the model is overloaded right now, another model may answer
+  overloaded: boolean;
 
-  constructor(message: string, retryAfterMs?: number, dailyQuotaExhausted = false) {
+  constructor(message: string, retryAfterMs?: number, dailyQuotaExhausted = false, overloaded = false) {
     super(message);
     this.retryAfterMs = retryAfterMs;
     this.dailyQuotaExhausted = dailyQuotaExhausted;
+    this.overloaded = overloaded;
   }
 }
 
@@ -253,14 +263,14 @@ const parseGeminiError = (status: number, body: string): GeminiError => {
     const quotas = violations.map((v: any) => `${v.quotaId} (limit ${v.quotaValue})`);
     const quotaInfo = quotas.length ? ` [quota: ${quotas.join(', ')}; retry in ${retryDelay ?? '?'}]` : '';
     const dailyQuotaExhausted = status === 429 && violations.some((v: any) => String(v.quotaId).includes('PerDay'));
-    return new GeminiError(`Gemini HTTP ${status}: ${error?.message ?? body}${quotaInfo}`, retryAfterMs, dailyQuotaExhausted);
+    return new GeminiError(`Gemini HTTP ${status}: ${error?.message ?? body}${quotaInfo}`, retryAfterMs, dailyQuotaExhausted, status === 503);
   } catch {
-    return new GeminiError(`Gemini HTTP ${status}: ${body.slice(0, 300)}`);
+    return new GeminiError(`Gemini HTTP ${status}: ${body.slice(0, 300)}`, undefined, false, status === 503);
   }
 };
 
-const callGemini = async (prompt: string, keys: string[]): Promise<string> => {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+const callGemini = async (model: string, prompt: string, keys: string[]): Promise<string> => {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': API_KEY! },
     body: JSON.stringify({
@@ -315,27 +325,40 @@ const fileExists = async (file: string) => access(file).then(() => true, () => f
 
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-// One language of one file; throws GeminiError with dailyQuotaExhausted to stop the whole run
+// One language of one file. Walks the model chain; throws GeminiError with dailyQuotaExhausted
+// once every model is out of quota, so main can stop the run
 const generateLanguage = async (kind: Kind, period: Period, id: string, lang: Lang, moon?: MoonInfo) => {
   const collection = COLLECTIONS[kind][period];
   const keys = kind === 'numerology' ? NUMBER_KEYS : ZODIAC_KEYS;
+  const prompt = buildPrompt(kind, period, id, lang, moon);
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const data = JSON.parse(await callGemini(buildPrompt(kind, period, id, lang, moon), keys));
-      const invalid = keys.filter(key => !isValidItem(data?.[key]));
-      if (invalid.length) throw new Error(`Validation failed for: ${invalid.join(', ')}`);
-      return Object.fromEntries(keys.map(key => [key, toStoredItem(data[key])]));
-    } catch (e: any) {
-      console.warn(`⚠️ Attempt ${attempt}/${MAX_RETRIES} failed for ${collection}/${id} [${lang}]: ${e.message}`);
-      // Retrying cannot help until the quota resets; let main stop the run
-      if (e instanceof GeminiError && e.dailyQuotaExhausted) throw e;
-      if (attempt < MAX_RETRIES) {
-        // Gemini is often overloaded (503) or rate limited (429), so back off exponentially
-        const delay = Math.min(e.retryAfterMs ?? BASE_RETRY_DELAY_MS * 2 ** (attempt - 1), MAX_RETRY_DELAY_MS);
-        await sleep(delay);
+  for (const model of MODELS) {
+    if (exhaustedModels.has(model)) continue;
+
+    for (let attempt = 1; attempt <= ATTEMPTS_PER_MODEL; attempt++) {
+      try {
+        const data = JSON.parse(await callGemini(model, prompt, keys));
+        const invalid = keys.filter(key => !isValidItem(data?.[key]));
+        if (invalid.length) throw new Error(`Validation failed for: ${invalid.join(', ')}`);
+        console.log(`   ${collection}/${id} [${lang}] by ${model}`);
+        return Object.fromEntries(keys.map(key => [key, toStoredItem(data[key])]));
+      } catch (e: any) {
+        console.warn(`⚠️ ${model} attempt ${attempt}/${ATTEMPTS_PER_MODEL} failed for ${collection}/${id} [${lang}]: ${e.message}`);
+        if (e instanceof GeminiError && e.dailyQuotaExhausted) {
+          exhaustedModels.add(model);
+          break;
+        }
+        if (attempt < ATTEMPTS_PER_MODEL) {
+          // Gemini is often overloaded (503) or rate limited (429), so back off exponentially
+          const delay = Math.min(e.retryAfterMs ?? BASE_RETRY_DELAY_MS * 2 ** (attempt - 1), MAX_RETRY_DELAY_MS);
+          await sleep(delay);
+        }
       }
     }
+  }
+
+  if (MODELS.every(model => exhaustedModels.has(model))) {
+    throw new GeminiError('Daily quota exhausted on every model', undefined, true);
   }
   return null;
 };
@@ -360,7 +383,7 @@ const generate = async (kind: Kind, period: Period, id: string): Promise<boolean
   for (const lang of LANGS) {
     const result = await generateLanguage(kind, period, id, lang, moon);
     if (!result) {
-      console.error(`🔥 FATAL: Could not generate ${name} [${lang}] after ${MAX_RETRIES} attempts.`);
+      console.error(`🔥 FATAL: Could not generate ${name} [${lang}] with any model.`);
       return false;
     }
     byLang[lang] = result;
@@ -436,7 +459,7 @@ const main = async () => {
     } catch (e: any) {
       if (!(e instanceof GeminiError && e.dailyQuotaExhausted)) throw e;
       const left = jobs.length - index;
-      console.error(`⛔ Daily Gemini quota exhausted, stopping. ${left} forecast(s) left for the next run.`);
+      console.error(`⛔ Daily Gemini quota exhausted on every model, stopping. ${left} forecast(s) left for the next run.`);
       failed += left;
       break;
     }

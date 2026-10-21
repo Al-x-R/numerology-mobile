@@ -48,7 +48,7 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional, defaults to gemini-3.6-flash
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }} # optional preferred model, tried before the fallback chain in generate.ts
           FORCE: ${{ inputs.force }}
         run: node scripts/forecasts/generate.ts public
 
