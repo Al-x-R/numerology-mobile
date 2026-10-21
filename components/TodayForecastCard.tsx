@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { ForecastSection } from '@/components/UniversalForecastCard';
+import { CardGlow } from '@/components/ui/CardGlow';
 import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 
 interface TodayForecastCardProps {
@@ -54,6 +55,8 @@ export const TodayForecastCard = ({ emblem, eyebrow, heading, data, loading, err
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+      {/* The hero card glows a little more than the secondary one */}
+      <CardGlow intensity={hero ? 0.08 : 0.04} />
       <View style={styles.header}>
         <View style={[styles.emblem, hero && styles.emblemHero]}>{emblem}</View>
         <View style={styles.headerText}>
@@ -74,6 +77,7 @@ export const TodayForecastCard = ({ emblem, eyebrow, heading, data, loading, err
 
 const styles = StyleSheet.create({
   card: {
+    overflow: 'hidden',
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     backgroundColor: COLORS.surface,

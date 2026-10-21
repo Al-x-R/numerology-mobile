@@ -1,13 +1,13 @@
 // components/UniversalForecastCard.tsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { Locale } from '@/lib/constants/locales';
 import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
 import { withAlpha } from '@/src/theme/tokens';
 import { GoldButton } from '@/components/ui/GoldButton';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 export interface ForecastMeter {
   score: number;
@@ -234,12 +234,8 @@ export const UniversalForecastCard: React.FC<Props> = ({
     <>
     {/* --- HERO: the screen's main element --- */}
     <View style={styles.card}>
-      <LinearGradient
-        colors={[withAlpha(COLORS.accent, 0.14), withAlpha(COLORS.accent, 0)]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0.8 }}
-        style={StyleSheet.absoluteFill}
-      />
+      {/* Light only around the badge: a full-card gold wash turns olive on the warm dark surface */}
+      <CardGlow />
       <View style={styles.header}>
         {badgeContent && (
           <View style={styles.numberBadge}>
@@ -298,13 +294,9 @@ export const UniversalForecastCard: React.FC<Props> = ({
 
     {/* --- MANTRA --- */}
     {!!data.affirmation && (
+      // A quiet closing note: weaker glow, no border, smaller type than the hero
       <View style={styles.mantra}>
-        <LinearGradient
-          colors={[withAlpha(COLORS.accent, 0.1), withAlpha(COLORS.accent, 0)]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+        <CardGlow intensity={0.05} />
         <View style={styles.mantraHeader}>
           <MaterialCommunityIcons name="meditation" size={18} color={COLORS.accent} />
           <Text style={styles.mantraLabel}>{t('forecast.affirmation')}</Text>
@@ -322,6 +314,8 @@ const Meter = ({ score, color }: { score: number; color: string }) => (
   </View>
 );
 
+const COLLAPSED_LINES = 3;
+
 // Collapsed cards show the opening lines; tapping reveals the full text
 const AspectCard = ({ aspectKey, label, text, meter }: {
   aspectKey: AspectKey;
@@ -330,21 +324,19 @@ const AspectCard = ({ aspectKey, label, text, meter }: {
   meter?: ForecastMeter;
 }) => {
   const [expanded, setExpanded] = useState(false);
+  // Set from an unclamped hidden copy of the text, so the chevron shows only when something is cut off
+  const [truncated, setTruncated] = useState(false);
   const { icon, color } = ASPECT_STYLE[aspectKey];
 
   return (
     <TouchableOpacity
       style={styles.aspectRow}
       onPress={() => setExpanded((v) => !v)}
+      disabled={!truncated}
       activeOpacity={0.7}
-      accessibilityState={{ expanded }}
+      accessibilityState={truncated ? { expanded } : undefined}
     >
-      <LinearGradient
-        colors={[withAlpha(color, 0.12), withAlpha(color, 0)]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.9, y: 0.6 }}
-        style={StyleSheet.absoluteFill}
-      />
+      <CardGlow color={color} />
       <View style={[styles.aspectMedallion, { backgroundColor: withAlpha(color, 0.16) }]}>
         <Ionicons name={icon} size={20} color={color} />
       </View>
@@ -357,9 +349,21 @@ const AspectCard = ({ aspectKey, label, text, meter }: {
             </View>
           )}
         </View>
-        <Text style={styles.aspectText} numberOfLines={expanded ? undefined : 3}>{text}</Text>
+        <Text style={styles.aspectText} numberOfLines={expanded ? undefined : COLLAPSED_LINES}>{text}</Text>
+        <Text
+          style={[styles.aspectText, styles.measure]}
+          onTextLayout={(e) => setTruncated(e.nativeEvent.lines.length > COLLAPSED_LINES)}
+          aria-hidden
+        >
+          {text}
+        </Text>
         {meter && <Meter score={meter.score} color={color} />}
       </View>
+      {truncated && (
+        <View style={styles.aspectChevron}>
+          <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.textSecondary} />
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -528,14 +532,22 @@ const styles = StyleSheet.create({
   aspectChip: { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.sm, borderRadius: RADIUS.full },
   aspectChipText: { ...TYPE.labelMd, ...caption, fontVariant: ['tabular-nums'] },
   aspectText: { ...TYPE.bodyMd, color: COLORS.textTertiary },
+  // Invisible full-length copy used only to count lines
+  measure: { position: 'absolute', left: 0, right: 0, opacity: 0 },
+  aspectChevron: {
+    width: SPACING.lg,
+    height: SPACING.lg,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   // Mantra
   mantra: {
     overflow: 'hidden',
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
     backgroundColor: COLORS.surface,
     alignItems: 'center',
     gap: SPACING.sm,
@@ -543,5 +555,5 @@ const styles = StyleSheet.create({
   },
   mantraHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   mantraLabel: { ...TYPE.labelMd, ...caption, color: COLORS.accentLight, letterSpacing: 2 },
-  mantraText: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.italic, color: COLORS.text, textAlign: 'center' },
+  mantraText: { ...TYPE.titleLg, fontFamily: FONT_FAMILY.serif.italic, color: COLORS.textTertiary, textAlign: 'center' },
 });

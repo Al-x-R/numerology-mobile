@@ -21,6 +21,7 @@ import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/consta
 import { Ionicons } from '@expo/vector-icons';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
 import { ProChip } from '@/components/ui/ProChip';
+import { CardGlow } from '@/components/ui/CardGlow';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 // --- INTERFACES ---
@@ -79,6 +80,7 @@ function GeneralAnalysisCard({
 
   return (
     <Animated.View style={[styles.analysisCard, animatedStyle]}>
+      <CardGlow intensity={0.05} />
       <Text style={styles.datesText}>
         {date1}  ⇄  {date2}
       </Text>
@@ -183,6 +185,7 @@ function AnimatedTotalCard({ label, value, index }: AnimatedTotalCardProps) {
   return (
     <Animated.View style={[styles.totalContainer, animatedStyle]}>
       <View style={styles.totalCard}>
+        <CardGlow intensity={0.1} />
         <Text style={styles.totalLabel} numberOfLines={2}>{label}</Text>
         <Text style={styles.totalValue}>{value}%</Text>
       </View>
@@ -392,6 +395,7 @@ const styles = StyleSheet.create({
 
   // --- Union card (neutral; the total below is the hero) ---
   analysisCard: {
+    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
@@ -466,6 +470,7 @@ const styles = StyleSheet.create({
   // --- Total: the hero ---
   totalContainer: { marginBottom: SPACING.lg },
   totalCard: {
+    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surfaceSelected,
     borderRadius: RADIUS.lg,

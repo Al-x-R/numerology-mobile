@@ -93,9 +93,10 @@ export const COLORS = {
 
 export const GRADIENTS = {
   background: [palette.bg, palette.bg] as const,
-  button: [palette.accentText, palette.accentDeep] as const,
+  // Deeper gold than the accent text colour, so the CTA glows without glaring (onAccent 9.1 → 6.8)
+  button: [palette.accent, palette.accentPressed] as const,
   buttonLoading: [palette.accentDeep, palette.accentPressed] as const,
-  goldenButton: [palette.accentText, palette.accentDeep] as const,
+  goldenButton: [palette.accent, palette.accentPressed] as const,
   card: [palette.field, palette.card] as const,
   accentCard: [withAlpha(palette.accent, 0.14), withAlpha(palette.accent, 0.02)] as const,
   proCard: [palette.proTop, palette.proBottom] as const,
@@ -151,13 +152,13 @@ export const SHADOWS = {
     shadowRadius: 12,
     elevation: 4,
   },
-  // Primary CTA aura: 0 8px 24px rgba(212, 175, 55, 0.22)
+  // Primary CTA aura, kept soft so the button does not glare on the dark canvas
   button: {
     shadowColor: COLORS.accent,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.22,
-    shadowRadius: 24,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 6,
   },
   goldenButton: {
     shadowColor: COLORS.accent,

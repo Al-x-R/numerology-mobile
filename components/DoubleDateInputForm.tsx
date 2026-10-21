@@ -1,14 +1,15 @@
 // components/DoubleDateInputForm.tsx
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
-import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, FONTS, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { useProfile } from '@/contexts/ProfileContext';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { GoldButton } from '@/components/ui/GoldButton';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 interface DoubleDateInputFormProps {
   onSubmit: () => void;
@@ -43,9 +44,7 @@ export function DoubleDateInputForm({
   const [localError2, setLocalError2] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Reanimated respects the system Reduce Motion setting; entering animations live on the views below
-  const buttonScale = useSharedValue(1);
-  const buttonPressStyle = useAnimatedStyle(() => ({ transform: [{ scale: buttonScale.value }] }));
+  // Reanimated entering animations respect the system Reduce Motion setting
 
   const handleTextChange1 = (text: string) => {
     const formattedText = formatRussianDate(text);
@@ -57,16 +56,6 @@ export function DoubleDateInputForm({
     const formattedText = formatRussianDate(text);
     setLocalError2('');
     setDate2(formattedText);
-  };
-
-  const handlePressIn = () => {
-    if (isLoading) return;
-    buttonScale.set(withSpring(0.97));
-  };
-
-  const handlePressOut = () => {
-    if (isLoading) return;
-    buttonScale.set(withSpring(1));
   };
 
   const handleSubmit = () => {
@@ -118,6 +107,7 @@ export function DoubleDateInputForm({
 
       {/* Partner 1 */}
       <Animated.View entering={FadeInDown.duration(400)} style={styles.card}>
+        <CardGlow />
         <View style={styles.cardHeader}>
           <View style={styles.medallion}>
             <Ionicons name="person-outline" size={18} color={COLORS.textTertiary} />
@@ -160,6 +150,7 @@ export function DoubleDateInputForm({
 
       {/* Partner 2 */}
       <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.card}>
+        <CardGlow color={COLORS.categoryLove} />
         <View style={styles.cardHeader}>
           <View style={styles.medallion}>
             <Ionicons name="heart" size={18} color={COLORS.textTertiary} />
@@ -202,29 +193,14 @@ export function DoubleDateInputForm({
         ))}
       </View>
 
-      <Animated.View entering={FadeInDown.delay(400).duration(300)} style={[styles.buttonContainer, buttonPressStyle]}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
+      <Animated.View entering={FadeInDown.delay(400).duration(300)} style={styles.buttonContainer}>
+        <GoldButton
+          title={t('compatibility.buttonText')}
           onPress={handleSubmit}
-          style={styles.button}
-          disabled={isLoading}
-        >
-          <LinearGradient colors={GRADIENTS.goldenButton} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.buttonGradient}>
-            {isLoading ? (
-              <View style={styles.loadingContent}>
-                <ActivityIndicator size="small" color={COLORS.blackText} />
-                <Text style={styles.loadingText}>{t('compatibility.loadingText')}</Text>
-              </View>
-            ) : (
-              <View style={styles.loadingContent}>
-                <Ionicons name="sparkles-outline" size={18} color={COLORS.blackText} />
-                <Text style={styles.buttonText}>{t('compatibility.buttonText')}</Text>
-              </View>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+          loading={isLoading}
+          loadingTitle={t('compatibility.loadingText')}
+          icon={<Ionicons name="sparkles-outline" size={18} color={COLORS.blackText} />}
+        />
       </Animated.View>
 
       <View style={styles.footer}>
@@ -256,6 +232,7 @@ const styles = StyleSheet.create({
   title: { ...TYPE.displayLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center' },
   subtitle: { ...TYPE.bodyMd, textAlign: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
   card: {
+    overflow: 'hidden',
     width: '100%',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
@@ -324,24 +301,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     marginTop: SPACING.lg,
-    borderRadius: RADIUS.lg,
-    ...SHADOWS.button,
   },
-  button: {
-    width: '100%',
-    borderRadius: RADIUS.lg,
-    overflow: 'hidden',
-  },
-  buttonGradient: {
-    height: LAYOUT.buttonHeight,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: FONTS.button,
-  loadingContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
-  },
-  loadingText: { ...FONTS.button },
 });

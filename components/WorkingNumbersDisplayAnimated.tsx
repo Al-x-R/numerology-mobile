@@ -16,6 +16,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getCurrentLocale } from '@/lib/constants/locales';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { getWorkingMeanings } from '@/lib/data/workingMeanings';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 interface WorkingNumbersDisplayProps {
   workingNumbers: number[];
@@ -151,6 +152,7 @@ const FateCard: React.FC<{
         onPress={() => onPress(interpretationData)}
         activeOpacity={0.7}
       >
+        <CardGlow intensity={0.06} />
         <View style={styles.fateMedallion}>
           <MaterialCommunityIcons name="infinity" size={26} color={COLORS.textTertiary} />
         </View>
@@ -203,6 +205,7 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   fateCardFinal: {
+    overflow: 'hidden',
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',

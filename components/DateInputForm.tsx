@@ -1,14 +1,15 @@
 // components/DateInputForm.tsx
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { useProfile } from '@/contexts/ProfileContext';
 import { isValidRussianDate } from '@/lib/utils/validateDate';
 import { useAppTranslation } from '@/contexts/LanguageContext';
+import { GoldButton } from '@/components/ui/GoldButton';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 interface DateInputFormProps {
   onSubmit: () => void;
@@ -36,24 +37,12 @@ export function DateInputForm({
   const [localError, setLocalError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Reanimated respects the system Reduce Motion setting; entering animations live on the views below
-  const buttonScale = useSharedValue(1);
-  const buttonPressStyle = useAnimatedStyle(() => ({ transform: [{ scale: buttonScale.value }] }));
+  // Reanimated entering animations respect the system Reduce Motion setting
 
   const handleTextChange = (text: string) => {
     const formattedText = formatRussianDate(text);
     setLocalError('');
     setDate(formattedText);
-  };
-
-  const handlePressIn = () => {
-    if (isLoading) return;
-    buttonScale.set(withSpring(0.97));
-  };
-
-  const handlePressOut = () => {
-    if (isLoading) return;
-    buttonScale.set(withSpring(1));
   };
 
   const handleSubmit = () => {
@@ -121,6 +110,7 @@ export function DateInputForm({
 
       {/* --- FORM CARD --- */}
       <Animated.View entering={FadeInDown.duration(400)} style={styles.formCard}>
+        <CardGlow />
         <View style={styles.formHeader}>
           <Text style={styles.fieldLabel}>{t('profile.birthDate')}</Text>
           <View style={styles.formHeaderRight}>
@@ -163,29 +153,14 @@ export function DateInputForm({
           )}
         </View>
 
-        <Animated.View entering={FadeInDown.delay(200).duration(300)} style={[styles.buttonContainer, buttonPressStyle]}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
+        <Animated.View entering={FadeInDown.delay(200).duration(300)} style={styles.buttonContainer}>
+          <GoldButton
+            title={t('matrixForm.button')}
             onPress={handleSubmit}
-            style={styles.button}
-            disabled={isLoading}
-          >
-            <LinearGradient colors={GRADIENTS.goldenButton} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.buttonGradient}>
-              {isLoading ? (
-                <View style={styles.buttonContent}>
-                  <ActivityIndicator size="small" color={COLORS.blackText} />
-                  <Text style={styles.buttonText}>{t('loadingText')}</Text>
-                </View>
-              ) : (
-                <View style={styles.buttonContent}>
-                  <Text style={styles.buttonText}>{t('matrixForm.button')}</Text>
-                  <Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />
-                </View>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+            loading={isLoading}
+            loadingTitle={t('loadingText')}
+            iconRight={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
+          />
         </Animated.View>
       </Animated.View>
 
@@ -273,6 +248,7 @@ const styles = StyleSheet.create({
 
   // --- FORM CARD ---
   formCard: {
+    overflow: 'hidden',
     alignSelf: 'stretch',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
@@ -318,11 +294,7 @@ const styles = StyleSheet.create({
   errorText: { ...TYPE.bodySm, color: COLORS.error, flex: 1 },
   validBadge: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
   validText: { ...TYPE.bodySm, color: COLORS.textTertiary },
-  buttonContainer: { marginTop: SPACING.lg, borderRadius: RADIUS.lg, ...SHADOWS.button },
-  button: { borderRadius: RADIUS.lg, overflow: 'hidden' },
-  buttonGradient: { height: LAYOUT.buttonHeight, justifyContent: 'center', alignItems: 'center' },
-  buttonContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  buttonText: FONTS.button,
+  buttonContainer: { marginTop: SPACING.lg },
 
   // --- WHAT YOU LEARN ---
   learnCard: {

@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 export const BirthDateRequiredState = () => {
   const { t } = useAppTranslation();
@@ -14,6 +15,7 @@ export const BirthDateRequiredState = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
+        <CardGlow intensity={0.06} />
         <View style={styles.medallion}>
           <Ionicons name="calendar-outline" size={28} color={COLORS.textTertiary} />
         </View>
@@ -38,6 +40,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.margin,
   },
   card: {
+    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,

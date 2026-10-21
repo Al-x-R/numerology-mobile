@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
+import { CardGlow } from '@/components/ui/CardGlow';
 
 interface LockedForecastProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -17,6 +18,7 @@ interface LockedForecastProps {
 
 export const LockedForecast = ({ icon, title, subtitle, unlockText, premiumText, onUnlock }: LockedForecastProps) => (
   <View style={styles.card}>
+    <CardGlow intensity={0.06} />
     <View style={styles.medallion}>
       <Ionicons name={icon} size={28} color={COLORS.textTertiary} />
     </View>
@@ -39,6 +41,7 @@ export const LockedForecast = ({ icon, title, subtitle, unlockText, premiumText,
 const styles = StyleSheet.create({
   // Fills the scroll area; gold here is the unlock button only
   card: {
+    overflow: 'hidden',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
