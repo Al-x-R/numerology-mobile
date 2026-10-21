@@ -21,7 +21,7 @@ import { useAppTranslation } from '@/contexts/LanguageContext';
 import { useNotifications } from '@/contexts/NotificationsContext';
 import { useSavedCalculations } from '@/contexts/SavedCalculationsContext';
 import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/forecastReminders';
-import { COLORS, GRADIENTS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, GRADIENTS, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { CapsLabel } from '@/components/ui/CapsLabel';
 import { formatBirthDate } from '@/lib/utils/date';
@@ -50,10 +50,10 @@ interface MenuRowProps {
 const MenuRow = ({ icon, title, value, onPress, isLast }: MenuRowProps) => (
   <TouchableOpacity style={[styles.row, !isLast && styles.rowDivider]} onPress={onPress} activeOpacity={0.7}>
     <View style={styles.medallion}>
-      <Ionicons name={icon} size={18} color={COLORS.accent} />
+      <Ionicons name={icon} size={18} color={COLORS.textTertiary} />
     </View>
     <Text style={styles.rowTitle} numberOfLines={1}>{title}</Text>
-    {typeof value === 'string' ? <Text style={styles.rowValue}>{value}</Text> : value}
+    {typeof value === 'string' ? <Text style={styles.rowValue} numberOfLines={1}>{value}</Text> : value}
     <Ionicons name="chevron-forward" size={18} color={COLORS.chevron} />
   </TouchableOpacity>
 );
@@ -112,7 +112,7 @@ export default function ProfileScreen() {
       <AuraBackground />
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + SPACING.xl }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + SPACING.lg }]}
         showsVerticalScrollIndicator={false}
       >
         {/* --- IDENTITY --- */}
@@ -120,25 +120,25 @@ export default function ProfileScreen() {
           {destinyNumber ? (
             <View style={styles.destinyChip}>
               <View style={styles.destinyDot} />
-              <CapsLabel style={styles.destinyText} weight="medium">
+              <CapsLabel style={styles.destinyText}>
                 {`${t('profile.destinyCode')}: ${toRoman(destinyNumber)}`}
               </CapsLabel>
             </View>
           ) : null}
 
-          <Text style={styles.name}>{displayName}</Text>
+          <Text style={styles.name} numberOfLines={2}>{displayName}</Text>
 
           {birthDate && zodiacSign && (
             <View style={styles.metaRow}>
               <Text style={styles.meta}>{formatBirthDate(birthDate)}</Text>
               <Text style={styles.metaDot}>•</Text>
               <Text style={[styles.meta, styles.metaAccent]}>{getZodiacName(zodiacSign, language)}</Text>
-              <MaterialCommunityIcons name={`zodiac-${zodiacSign}`} size={16} color={COLORS.accent} />
+              <MaterialCommunityIcons name={`zodiac-${zodiacSign}`} size={16} color={COLORS.textSecondary} />
             </View>
           )}
         </View>
 
-        <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit')} activeOpacity={0.8}>
+        <TouchableOpacity style={styles.editButton} onPress={() => router.push('/profile/edit')} activeOpacity={0.7}>
           <Ionicons name="pencil-outline" size={16} color={COLORS.accent} />
           <CapsLabel style={styles.editButtonText}>{t('profile.editProfile')}</CapsLabel>
         </TouchableOpacity>
@@ -147,10 +147,9 @@ export default function ProfileScreen() {
         <TouchableOpacity
           style={[styles.proCard, isPremium && styles.proCardActive]}
           onPress={() => router.push('/premium/upgrade')}
-          activeOpacity={0.85}
+          activeOpacity={0.7}
         >
           <LinearGradient colors={GRADIENTS.proCard} style={StyleSheet.absoluteFill} />
-          <View style={styles.proGlow} />
 
           <View style={styles.proHeader}>
             <View style={styles.proLabelRow}>
@@ -166,10 +165,10 @@ export default function ProfileScreen() {
             )}
           </View>
 
-          <Text style={styles.proTitle}>
+          <Text style={styles.proTitle} numberOfLines={2}>
             {isPremium ? t('profile.proActiveTitle') : t('profile.proUpsellTitle')}
           </Text>
-          <Text style={styles.proDescription}>
+          <Text style={styles.proDescription} numberOfLines={3}>
             {isPremium ? t('profile.proActiveDescription') : t('profile.proUpsellDescription')}
           </Text>
 
@@ -207,7 +206,7 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.resetButton} onPress={handleResetData} activeOpacity={0.6}>
+        <TouchableOpacity style={styles.resetButton} onPress={handleResetData} activeOpacity={0.7}>
           <Text style={styles.resetText}>{t('profile.resetData')}</Text>
         </TouchableOpacity>
 
@@ -224,42 +223,40 @@ const styles = StyleSheet.create({
   scrollContent: { paddingTop: SPACING.sm, paddingHorizontal: SPACING.margin },
 
   // --- IDENTITY ---
+  // Neutral by design: the PRO card below is the screen's single gold element
   identity: { alignItems: 'center', marginBottom: SPACING.lg },
   destinyChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.gutterSm,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.surfaceSelected,
+    backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     marginBottom: SPACING.md,
   },
-  destinyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
-  destinyText: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2.2 },
-  name: {
-    ...TYPE.displayLg,
-    fontSize: 36,
-    lineHeight: 44,
-    color: COLORS.accentLight,
-    textAlign: 'center',
-    textShadowColor: COLORS.textShadow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+  destinyDot: { width: SPACING.sm, height: SPACING.sm, borderRadius: RADIUS.full, backgroundColor: COLORS.textSecondary },
+  destinyText: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.textTertiary,
+    letterSpacing: 2.2,
   },
+  name: { ...TYPE.displayLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center' },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: SPACING.sm,
     marginTop: SPACING.xs,
   },
   meta: TYPE.bodyMd,
   metaAccent: { color: COLORS.textTertiary },
-  metaDot: { ...TYPE.bodyMd, color: COLORS.accentAmber, opacity: 0.6 },
+  metaDot: TYPE.bodyMd,
 
   editButton: {
     height: 52,
@@ -282,26 +279,15 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
   proCardActive: { borderColor: COLORS.borderAccent },
-  // Soft light in the top right corner
-  proGlow: {
-    position: 'absolute',
-    top: -48,
-    right: -48,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: COLORS.accentSoft,
-    opacity: 0.6,
-  },
   proHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
-  proLabelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm + 2 },
+  proLabelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   proIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: RADIUS.sm + 2,
+    width: LAYOUT.iconBadge,
+    height: LAYOUT.iconBadge,
+    borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceSelected,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -310,19 +296,19 @@ const styles = StyleSheet.create({
   },
   proLabel: { ...TYPE.labelLg, letterSpacing: 2.6 },
   proBadge: {
-    paddingVertical: 3,
-    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.gutterSm,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.accentSoft,
   },
   proBadgeText: { ...TYPE.bodySm, color: COLORS.accent },
-  proTitle: { ...TYPE.headlineMd, fontSize: 24, lineHeight: 30, marginBottom: SPACING.sm },
+  proTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, marginBottom: SPACING.sm },
   proDescription: { ...TYPE.bodyMd, paddingRight: SPACING.lg },
   proArrow: {
     alignSelf: 'flex-end',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
     marginTop: SPACING.sm,
     backgroundColor: COLORS.accentSoft,
     borderWidth: 1,
@@ -332,20 +318,28 @@ const styles = StyleSheet.create({
   },
 
   // --- SETTINGS ---
-  sectionLabel: { ...TYPE.labelMd, color: COLORS.textMuted, letterSpacing: 2.2, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  sectionLabel: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.textMuted,
+    letterSpacing: 2.2,
+    marginBottom: SPACING.sm,
+    marginLeft: SPACING.xs,
+  },
   module: {
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.divider,
     paddingHorizontal: SPACING.md,
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
-  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: SPACING.md },
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.gutterSm, gap: SPACING.md },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
   medallion: {
-    width: 38,
-    height: 38,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
@@ -354,18 +348,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rowTitle: { ...TYPE.bodyLg, flex: 1 },
-  rowValue: TYPE.bodyMd,
+  // A long value (e.g. "Українська (UK)") truncates instead of pushing the title out
+  rowValue: { ...TYPE.bodyMd, flexShrink: 1, maxWidth: '50%' },
   proChip: {
-    paddingVertical: 2,
+    paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.sm,
-    borderRadius: RADIUS.sm,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.accentSoft,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  proChipText: { ...TYPE.labelSm, color: COLORS.accent, letterSpacing: 1 },
+  proChipText: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.accent,
+    letterSpacing: 1,
+  },
 
-  resetButton: { alignSelf: 'center', paddingVertical: SPACING.sm, paddingHorizontal: SPACING.md, marginBottom: SPACING.sm },
-  resetText: { ...TYPE.bodyMd, color: COLORS.textMuted, letterSpacing: 0.6 },
-  version: { ...TYPE.bodySm, color: COLORS.textMuted, textAlign: 'center', opacity: 0.7 },
+  // Destructive action: danger color, confirmed by an alert
+  resetButton: {
+    alignSelf: 'center',
+    minHeight: LAYOUT.minTouch,
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.sm,
+  },
+  resetText: { ...TYPE.bodyMd, color: COLORS.error, letterSpacing: 0.6 },
+  version: { ...TYPE.bodySm, color: COLORS.textMuted, textAlign: 'center' },
 });

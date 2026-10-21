@@ -20,8 +20,7 @@ export default function ProfileLayout() {
         presentation: 'card',
         headerStyle: { backgroundColor: COLORS.background },
         headerShadowVisible: false,
-        // All profile titles are in the same script, so the first one decides the font
-        headerTitleStyle: { ...FONTS.headerTitle, fontFamily: capsFontFamily(t('profile.title'), 'medium') },
+        headerTitleStyle: { ...FONTS.headerTitle, fontFamily: capsFontFamily() },
         headerTintColor: COLORS.text,
         headerTitleAlign: 'center',
         headerLeft: renderBackButton,

@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { EBGaramond_500Medium, EBGaramond_500Medium_Italic, EBGaramond_600SemiBold } from '@expo-google-fonts/eb-garamond';
 import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
-import { Cinzel_500Medium, Cinzel_600SemiBold } from '@expo-google-fonts/cinzel';
 import { useEffect } from 'react';
 
 import { COLORS } from '@/lib/constants/theme';
@@ -27,8 +26,6 @@ export default function RootLayout() {
     Manrope_500Medium,
     Manrope_600SemiBold,
     Manrope_700Bold,
-    Cinzel_500Medium,
-    Cinzel_600SemiBold,
   });
 
   useEffect(() => {
