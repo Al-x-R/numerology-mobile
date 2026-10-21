@@ -18,6 +18,8 @@ export const useForecasts = (
   const [fullDoc, setFullDoc] = useState<ForecastDataMap | null>(null);
 
   const [loading, setLoading] = useState(true);
+  // Set when the fetch fails, so screens can tell a load error apart from a missing forecast
+  const [error, setError] = useState(false);
   const { language } = useLanguage();
 
   const loadedDocIdRef = useRef<string | null>(null);
@@ -50,6 +52,7 @@ export const useForecasts = (
     }
 
     setLoading(true);
+    setError(false);
     const cacheKey = `@forecast_full_${collectionName}_${docId}`;
 
     try {
@@ -83,6 +86,7 @@ export const useForecasts = (
 
     } catch (e) {
       console.error('Error fetching forecast master data:', e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -114,5 +118,5 @@ export const useForecasts = (
     fetchMasterData(true);
   }, [fetchMasterData]);
 
-  return { data, loading, refetch };
+  return { data, loading, error, refetch };
 };

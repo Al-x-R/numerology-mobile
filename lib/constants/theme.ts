@@ -1,5 +1,7 @@
 import { DimensionValue } from 'react-native';
 
+import { palette, withAlpha } from '@/src/theme/tokens';
+
 // Aura Noir design system, see DESIGN.md
 export const FONT_FAMILY = {
   serif: {
@@ -22,81 +24,81 @@ export const FONT_FAMILY = {
 
 export const COLORS = {
   // Canvas and surfaces
-  background: '#0F0F0F',
-  headerBackground: 'rgba(15, 15, 15, 0.85)',
-  surface: '#161616',
-  surfaceRaised: '#1E1E1E',
-  surfaceSelected: '#1C1914',
-  card: '#161616',
-  cardFocused: '#1C1914',
+  background: palette.bg,
+  headerBackground: withAlpha(palette.bg, 0.85),
+  surface: palette.card,
+  surfaceRaised: palette.field,
+  surfaceSelected: palette.accentSurface,
+  card: palette.card,
+  cardFocused: palette.accentSurface,
 
   // Gold hierarchy
-  accent: '#D4AF37',
-  accentAmber: '#C9A84C',
-  accentLight: '#DFBA54',
-  accentSoft: 'rgba(201, 168, 76, 0.12)',
-  primary: '#D4AF37',
-  primaryDark: '#C9A84C',
+  accent: palette.accent,
+  accentAmber: palette.accentDeep,
+  accentLight: palette.accentText,
+  accentSoft: withAlpha(palette.accentDeep, 0.12),
+  primary: palette.accent,
+  primaryDark: palette.accentDeep,
 
   // Strokes
-  border: 'rgba(201, 168, 76, 0.18)',
-  borderSubtle: 'rgba(201, 168, 76, 0.12)',
-  borderFocused: '#D4AF37',
-  borderSelected: 'rgba(212, 175, 55, 0.85)',
-  borderAccent: 'rgba(212, 175, 55, 0.5)',
-  hairline: 'rgba(255, 255, 255, 0.08)',
-  divider: 'rgba(255, 255, 255, 0.04)',
+  border: withAlpha(palette.accentDeep, 0.18),
+  borderSubtle: withAlpha(palette.accentDeep, 0.12),
+  borderFocused: palette.accent,
+  borderSelected: withAlpha(palette.accent, 0.85),
+  borderAccent: withAlpha(palette.accent, 0.5),
+  hairline: withAlpha(palette.white, 0.08),
+  divider: withAlpha(palette.white, 0.04),
 
   // Typography and icons
-  text: '#F8F7F4',
-  textSecondary: '#9E9B94',
-  textMuted: '#66635D',
-  textTertiary: '#D0CCC4',
-  placeholder: '#706D66',
-  iconInactive: '#6E6A63',
-  chevron: '#57544E',
-  blackText: '#0F0F0F',
+  text: palette.text,
+  textSecondary: palette.text3,
+  textMuted: palette.text4,
+  textTertiary: palette.text2,
+  placeholder: palette.text4,
+  iconInactive: palette.iconMuted,
+  chevron: palette.chevron,
+  blackText: palette.onAccent,
 
-  error: '#B85858',
-  warningChip: '#3A2222',
-  warningChipText: '#E8A3A3',
-  ghost: '#8A7D6B',
-  boxShadow: '#000',
-  shadowAccent: '#D4AF37',
+  error: palette.danger,
+  warningChip: palette.dangerSoft,
+  warningChipText: palette.onDangerSoft,
+  ghost: palette.ghost,
+  boxShadow: palette.black,
+  shadowAccent: palette.accent,
 
   // Pythagoras matrix cell highlight
-  highlightWeak: '#B85858',
-  highlightStrong: '#D4AF37',
+  highlightWeak: palette.danger,
+  highlightStrong: palette.accent,
 
   battery: {
-    empty: '#B85858',
-    full: '#D4AF37',
-    light: '#DFBA54',     // used for the gradient
+    empty: palette.danger,
+    full: palette.accent,
+    light: palette.accentText, // used for the gradient
   },
-  loading: '#D4AF37',      // ActivityIndicator color
+  loading: palette.accent, // ActivityIndicator color
 
-  cardBackground: '#161616',
-  cardBorder: 'rgba(255, 255, 255, 0.08)',
-  accentCardBackground: '#1C1914',
-  accentCardBorder: 'rgba(212, 175, 55, 0.5)',
-  weakHighlightBackground: 'rgba(184, 88, 88, 0.08)',
-  strongHighlightBackground: '#1C1914',
-  pulseOverlay: 'rgba(212, 175, 55, 0.15)',
-  modalBackdrop: 'rgba(0, 0, 0, 0.8)',
-  glass: 'rgba(255, 255, 255, 0.06)',
-  textShadow: 'rgba(212, 175, 55, 0.35)',
+  cardBackground: palette.card,
+  cardBorder: withAlpha(palette.white, 0.08),
+  accentCardBackground: palette.accentSurface,
+  accentCardBorder: withAlpha(palette.accent, 0.5),
+  weakHighlightBackground: withAlpha(palette.danger, 0.08),
+  strongHighlightBackground: palette.accentSurface,
+  pulseOverlay: withAlpha(palette.accent, 0.15),
+  modalBackdrop: withAlpha(palette.black, 0.8),
+  glass: withAlpha(palette.white, 0.06),
+  textShadow: withAlpha(palette.accent, 0.35),
   transparent: 'transparent',
 };
 
 export const GRADIENTS = {
-  background: ['#0F0F0F', '#0F0F0F'] as const,
-  button: ['#DFBA54', '#C9A84C'] as const,
-  buttonLoading: ['#C9A84C', '#B8963F'] as const,
-  goldenButton: ['#DFBA54', '#C9A84C'] as const,
-  card: ['#1E1E1E', '#161616'] as const,
-  accentCard: ['rgba(212, 175, 55, 0.14)', 'rgba(212, 175, 55, 0.02)'] as const,
-  proCard: ['#211D16', '#151412'] as const,
-  goldHairline: ['transparent', 'rgba(212, 175, 55, 0.3)', 'transparent'] as const,
+  background: [palette.bg, palette.bg] as const,
+  button: [palette.accentText, palette.accentDeep] as const,
+  buttonLoading: [palette.accentDeep, palette.accentPressed] as const,
+  goldenButton: [palette.accentText, palette.accentDeep] as const,
+  card: [palette.field, palette.card] as const,
+  accentCard: [withAlpha(palette.accent, 0.14), withAlpha(palette.accent, 0.02)] as const,
+  proCard: [palette.proTop, palette.proBottom] as const,
+  goldHairline: ['transparent', withAlpha(palette.accent, 0.3), 'transparent'] as const,
 };
 
 export const SPACING = {
@@ -185,6 +187,9 @@ export const LAYOUT = {
   tabBarPaddingTop: 6,
   buttonHeight: 54,
   iconButton: 40,
+  emblemSm: 44,
+  emblem: 52,
+  emblemHero: 64,
   iconSize: 24,
   closeIconSize: 24,
   logoMarginBottom: 30,
@@ -212,6 +217,9 @@ export const TYPE = {
   bodySm: { fontFamily: FONT_FAMILY.sans.regular, fontSize: 12, lineHeight: 16, letterSpacing: 0.24, color: COLORS.textSecondary },
   labelLg: { fontFamily: FONT_FAMILY.sans.bold, fontSize: 13, lineHeight: 18, letterSpacing: 1.56, textTransform: 'uppercase' as const, color: COLORS.accent },
   labelMd: { fontFamily: FONT_FAMILY.sans.semibold, fontSize: 11, lineHeight: 14, letterSpacing: 1.1, textTransform: 'uppercase' as const, color: COLORS.textSecondary },
+  // Hero number of a screen (rules: 40–56, heaviest weight); semibold is the heaviest loaded serif.
+  // Add fontVariant: ['tabular-nums'] at the call site, a readonly tuple here does not type-check as TextStyle
+  heroNumber: { fontFamily: FONT_FAMILY.serif.semibold, fontSize: 40, lineHeight: 48, color: COLORS.accent },
   labelSm: { fontFamily: FONT_FAMILY.sans.medium, fontSize: 10, lineHeight: 12, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: COLORS.textSecondary },
 } as const;
 
@@ -239,7 +247,7 @@ export const FONTS = {
 } as const;
 
 export const FORM_STYLES = {
-  // Input fields: #161616 fill, hairline gold border, centered tracked text
+  // Input fields: surface fill, hairline gold border, centered tracked text
   input: {
     ...TYPE.titleLg,
     height: 56,

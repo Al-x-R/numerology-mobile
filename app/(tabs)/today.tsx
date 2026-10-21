@@ -35,10 +35,10 @@ interface SectionTileProps {
 }
 
 const SectionTile = ({ icon, title, text, onPress }: SectionTileProps) => (
-  <TouchableOpacity style={styles.tile} onPress={onPress} activeOpacity={0.85}>
+  <TouchableOpacity style={styles.tile} onPress={onPress} activeOpacity={0.7}>
     <View style={styles.tileIcon}>{icon}</View>
-    <Text style={styles.tileTitle}>{title}</Text>
-    <Text style={styles.tileText}>{text}</Text>
+    <Text style={styles.tileTitle} numberOfLines={2}>{title}</Text>
+    <Text style={styles.tileText} numberOfLines={3}>{text}</Text>
   </TouchableOpacity>
 );
 
@@ -79,7 +79,15 @@ export default function TodayScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.date}>{dateLabel}</Text>
-        <Text style={styles.greeting}>{greeting}</Text>
+        <Text style={styles.greeting} numberOfLines={2}>{greeting}</Text>
+        <View style={styles.meta}>
+          <MaterialCommunityIcons name={`zodiac-${sign}`} size={14} color={COLORS.textSecondary} />
+          <Text style={styles.metaText} numberOfLines={1}>
+            {getZodiacName(sign, language)}
+            {'  ·  '}
+            {t('today.dayNumberEyebrow')} <Text style={styles.metaValue}>{dayNumber}</Text>
+          </Text>
+        </View>
 
         <TodayForecastCard
           emblem={<Text style={styles.dayNumber}>{dayNumber}</Text>}
@@ -87,16 +95,19 @@ export default function TodayScreen() {
           heading={t('today.dayNumberHeading').replace('{number}', String(dayNumber))}
           data={dayForecast.data}
           loading={dayForecast.loading}
+          error={dayForecast.error}
           locked={locked}
+          hero
           onPress={() => router.navigate('/(tabs)/numbers')}
         />
 
         <TodayForecastCard
-          emblem={<MaterialCommunityIcons name={`zodiac-${sign}`} size={26} color={COLORS.accent} />}
+          emblem={<MaterialCommunityIcons name={`zodiac-${sign}`} size={26} color={COLORS.textTertiary} />}
           eyebrow={t('today.horoscopeEyebrow')}
           heading={getZodiacName(sign, language)}
           data={zodiacForecast.data}
           loading={zodiacForecast.loading}
+          error={zodiacForecast.error}
           locked={locked}
           onPress={() => router.navigate('/(tabs)/horoscope')}
         />
@@ -104,36 +115,39 @@ export default function TodayScreen() {
         <TouchableOpacity
           style={[styles.reminders, remindersOn && styles.remindersOn]}
           onPress={() => router.push('/profile/notifications')}
-          activeOpacity={0.85}
+          activeOpacity={0.7}
         >
-          <View style={[styles.tileIcon, styles.remindersIcon]}>
-            <Ionicons name={remindersOn ? 'notifications' : 'notifications-outline'} size={20} color={COLORS.accent} />
+          <View style={[styles.remindersIcon, remindersOn && styles.remindersIconOn]}>
+            <Ionicons name={remindersOn ? 'notifications' : 'notifications-outline'} size={20} color={remindersOn ? COLORS.accent : COLORS.textTertiary} />
           </View>
           <View style={styles.remindersText}>
-            <Text style={styles.tileTitle}>
+            <Text style={styles.tileTitle} numberOfLines={1}>
               {remindersOn
                 ? t('today.remindersOn').replace('{time}', formatReminderTime(reminders))
                 : t('today.remindersTitle')}
             </Text>
-            {!remindersOn && <Text style={styles.tileText}>{t('today.remindersText')}</Text>}
+            {!remindersOn && <Text style={styles.remindersHint} numberOfLines={2}>{t('today.remindersText')}</Text>}
           </View>
+          {/* The whole row is the touch target; a chevron leaves the text room to fit, free users see what unlocks it */}
           {isPremium ? (
-            <Text style={styles.remindersAction}>{t('today.remindersSetup')}</Text>
+            <Ionicons name="chevron-forward" size={18} color={COLORS.chevron} />
           ) : (
-            <Ionicons name="lock-closed" size={18} color={COLORS.accent} />
+            <View style={styles.remindersAction}>
+              <Text style={styles.remindersActionText}>PRO</Text>
+            </View>
           )}
         </TouchableOpacity>
 
         <Text style={styles.sectionLabel}>{t('today.sectionsLabel')}</Text>
         <View style={styles.tiles}>
           <SectionTile
-            icon={<Ionicons name="grid-outline" size={20} color={COLORS.accent} />}
+            icon={<Ionicons name="grid-outline" size={20} color={COLORS.textTertiary} />}
             title={t('today.pythagorasTitle')}
             text={t('today.pythagorasText')}
             onPress={() => router.navigate('/(tabs)/pythagoras')}
           />
           <SectionTile
-            icon={<MaterialCommunityIcons name="infinity" size={20} color={COLORS.accent} />}
+            icon={<MaterialCommunityIcons name="infinity" size={20} color={COLORS.textTertiary} />}
             title={t('today.compatibilityTitle')}
             text={t('today.compatibilityText')}
             onPress={() => router.navigate('/(tabs)/compatibility')}
@@ -149,30 +163,65 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: LAYOUT.contentPadding,
     paddingTop: SPACING.md,
-    paddingBottom: LAYOUT.tabBarHeight + SPACING.xl,
+    paddingBottom: LAYOUT.tabBarHeight + SPACING.lg,
   },
 
-  date: { ...TYPE.labelMd, color: COLORS.accent },
-  greeting: { ...TYPE.displayLg, marginTop: SPACING.xs, marginBottom: SPACING.lg },
-  dayNumber: { fontFamily: FONT_FAMILY.serif.medium, fontSize: 28, lineHeight: 34, color: COLORS.accent },
+  // Captions at 12pt, the minimum for labels
+  date: { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight },
+  greeting: { ...TYPE.displayLg, fontFamily: FONT_FAMILY.serif.semibold, marginTop: SPACING.xs },
+  // Sign and day number at a glance, neutral so the gold stays on the hero card
+  meta: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs, marginTop: SPACING.xs, marginBottom: SPACING.lg },
+  metaText: { ...TYPE.bodyMd, flexShrink: 1 },
+  metaValue: { fontFamily: FONT_FAMILY.sans.semibold, color: COLORS.text, fontVariant: ['tabular-nums'] },
+  // The day number is the screen's hero, so it is the only gold glyph besides active states
+  dayNumber: { ...TYPE.heroNumber, fontVariant: ['tabular-nums'] },
 
   reminders: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.md,
+    gap: SPACING.gutterSm,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.borderSubtle,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
   },
   remindersOn: { borderColor: COLORS.borderAccent },
-  remindersIcon: { marginBottom: 0 },
+  // Round emblem in the same language as the forecast cards above
+  remindersIcon: {
+    width: LAYOUT.emblemSm,
+    height: LAYOUT.emblemSm,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
+    borderWidth: 1,
+    borderColor: COLORS.hairline,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  remindersIconOn: { borderColor: COLORS.border },
   remindersText: { flex: 1 },
-  remindersAction: TYPE.labelLg,
+  remindersHint: { ...TYPE.bodyMd, marginTop: SPACING.xs },
+  remindersAction: {
+    minWidth: LAYOUT.iconButton,
+    minHeight: LAYOUT.iconButton,
+    paddingHorizontal: SPACING.gutterSm,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  remindersActionText: { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight, color: COLORS.accent },
 
-  sectionLabel: { ...TYPE.labelMd, marginBottom: SPACING.sm, marginLeft: SPACING.xs },
+  sectionLabel: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    // Cards above end with a 16pt margin, this tops it up to the 24pt section gap
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.sm,
+    marginLeft: SPACING.xs,
+  },
   tiles: { flexDirection: 'row', gap: SPACING.md },
   tile: {
     flex: 1,
@@ -183,8 +232,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.borderSubtle,
   },
   tileIcon: {
-    width: 40,
-    height: 40,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
@@ -192,5 +241,5 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   tileTitle: TYPE.titleMd,
-  tileText: { ...TYPE.bodySm, marginTop: 2 },
+  tileText: { ...TYPE.bodyMd, marginTop: SPACING.xs },
 });

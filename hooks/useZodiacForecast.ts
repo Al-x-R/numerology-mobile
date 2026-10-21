@@ -13,6 +13,8 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
   const [fullDoc, setFullDoc] = useState<any>(null);
 
   const [loading, setLoading] = useState(true);
+  // Set when the fetch fails, so screens can tell a load error apart from a missing forecast
+  const [error, setError] = useState(false);
   const { language } = useLanguage();
 
   const loadedDocIdRef = useRef<string | null>(null);
@@ -37,6 +39,7 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
     }
 
     setLoading(true);
+    setError(false);
     const collectionName = `${type === 'day' ? 'daily' : type === 'month' ? 'monthly' : 'yearly'}_zodiac`;
     const cacheKey = `@zodiac_full_${collectionName}_${docId}`;
 
@@ -69,6 +72,7 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
 
     } catch (e) {
       console.error("Master fetch error:", e);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -99,5 +103,5 @@ export const useZodiacForecast = (type: PeriodType, sign: string | null) => {
     fetchMasterData(true);
   }, [fetchMasterData]);
 
-  return { data, loading, refetch };
+  return { data, loading, error, refetch };
 };
