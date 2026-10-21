@@ -18,6 +18,9 @@ const FALLBACK_MODELS = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.8-fla
 const MODELS = [...new Set([process.env.GEMINI_MODEL, ...FALLBACK_MODELS].filter((m): m is string => !!m))];
 // Models whose daily quota ran out during this run
 const exhaustedModels = new Set<string>();
+// Older models reject the 12-sign schema ("too many states"); they get plain JSON mode instead,
+// and validation below still checks the shape
+const schemalessModels = new Set<string>();
 const OUT_DIR = path.resolve(process.argv[2] || 'public');
 const FORCE = new Set((process.env.FORCE || '').split(',').map(s => s.trim()).filter(Boolean));
 const ONLY = process.env.ONLY;
@@ -244,12 +247,15 @@ class GeminiError extends Error {
   dailyQuotaExhausted: boolean;
   // 503: the model is overloaded right now, another model may answer
   overloaded: boolean;
+  // 400: the model cannot serve this response schema
+  schemaTooComplex: boolean;
 
   constructor(message: string, retryAfterMs?: number, dailyQuotaExhausted = false, overloaded = false) {
     super(message);
     this.retryAfterMs = retryAfterMs;
     this.dailyQuotaExhausted = dailyQuotaExhausted;
     this.overloaded = overloaded;
+    this.schemaTooComplex = /too many states/i.test(message);
   }
 }
 
@@ -275,7 +281,11 @@ const callGemini = async (model: string, prompt: string, keys: string[]): Promis
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': API_KEY! },
     body: JSON.stringify({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { responseMimeType: 'application/json', responseSchema: responseSchema(keys), temperature: 1 },
+      generationConfig: {
+        responseMimeType: 'application/json',
+        ...(schemalessModels.has(model) ? {} : { responseSchema: responseSchema(keys) }),
+        temperature: 1,
+      },
     }),
   });
 
@@ -347,6 +357,12 @@ const generateLanguage = async (kind: Kind, period: Period, id: string, lang: La
         if (e instanceof GeminiError && e.dailyQuotaExhausted) {
           exhaustedModels.add(model);
           break;
+        }
+        // Retry right away without the schema; this attempt does not count
+        if (e instanceof GeminiError && e.schemaTooComplex && !schemalessModels.has(model)) {
+          schemalessModels.add(model);
+          attempt--;
+          continue;
         }
         if (attempt < ATTEMPTS_PER_MODEL) {
           // Gemini is often overloaded (503) or rate limited (429), so back off exponentially
