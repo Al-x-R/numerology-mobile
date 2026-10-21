@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 
 interface LockedForecastProps {
@@ -18,10 +18,10 @@ interface LockedForecastProps {
 export const LockedForecast = ({ icon, title, subtitle, unlockText, premiumText, onUnlock }: LockedForecastProps) => (
   <View style={styles.card}>
     <View style={styles.medallion}>
-      <Ionicons name={icon} size={28} color={COLORS.accent} />
+      <Ionicons name={icon} size={28} color={COLORS.textTertiary} />
     </View>
-    <Text style={styles.title}>{title}</Text>
-    <Text style={styles.subtitle}>{subtitle}</Text>
+    <Text style={styles.title} numberOfLines={2}>{title}</Text>
+    <Text style={styles.subtitle} numberOfLines={3}>{subtitle}</Text>
 
     <GoldButton
       title={unlockText}
@@ -30,40 +30,40 @@ export const LockedForecast = ({ icon, title, subtitle, unlockText, premiumText,
       style={styles.button}
     />
 
-    <TouchableOpacity style={styles.link} onPress={() => router.push('/premium/upgrade')}>
+    <TouchableOpacity style={styles.link} onPress={() => router.push('/premium/upgrade')} activeOpacity={0.7}>
       <Text style={styles.linkText}>{premiumText}</Text>
     </TouchableOpacity>
   </View>
 );
 
 const styles = StyleSheet.create({
+  // Fills the scroll area; gold here is the unlock button only
   card: {
     flex: 1,
-    minHeight: 360,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
+    borderColor: COLORS.hairline,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
   },
   medallion: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
-    ...SHADOWS.goldenButtonSoft,
   },
-  title: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
-  subtitle: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.xl },
+  title: { ...TYPE.headlineLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center', marginBottom: SPACING.sm },
+  subtitle: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.lg },
   button: { alignSelf: 'stretch' },
-  link: { marginTop: SPACING.lg, padding: SPACING.sm },
+  // Text link with a 44pt touch area
+  link: { marginTop: SPACING.md, minHeight: LAYOUT.minTouch, justifyContent: 'center', paddingHorizontal: SPACING.md },
   linkText: TYPE.labelLg,
 });

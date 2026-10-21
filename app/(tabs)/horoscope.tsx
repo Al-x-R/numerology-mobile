@@ -1,5 +1,5 @@
 // app/(tabs)/horoscope.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
@@ -22,12 +22,6 @@ import { parseLocalDate } from '@/lib/utils/date';
 
 type TabType = 'day' | 'month' | 'year';
 
-interface ForecastResultWithRefetch {
-  data: any;
-  loading: boolean;
-  refetch: () => void;
-}
-
 export default function HoroscopeScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('day');
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -48,9 +42,15 @@ export default function HoroscopeScreen() {
   const signKey = birthDate ? getZodiacSign(parseLocalDate(birthDate)) : null;
   const signName = signKey ? getZodiacName(signKey, language) : '';
 
-  const dayData = useZodiacForecast('day', signKey) as ForecastResultWithRefetch;
-  const monthData = useZodiacForecast('month', signKey) as ForecastResultWithRefetch;
-  const yearData = useZodiacForecast('year', signKey) as ForecastResultWithRefetch;
+  const dayData = useZodiacForecast('day', signKey);
+  const monthData = useZodiacForecast('month', signKey);
+  const yearData = useZodiacForecast('year', signKey);
+
+  const forecasts = { day: dayData, month: monthData, year: yearData };
+  const currentData = forecasts[activeTab];
+
+  // The pull-to-refresh spinner stays until the refetch actually finishes (state adjusted during render)
+  if (isRefreshing && !currentData.loading) setIsRefreshing(false);
 
   const getLocals = () => {
     const d = new Date();
@@ -60,22 +60,10 @@ export default function HoroscopeScreen() {
     return { dayStr, monthStr, yearStr };
   };
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = () => {
     setIsRefreshing(true);
-
-    let currentData = dayData;
-    if (activeTab === 'month') currentData = monthData;
-    else if (activeTab === 'year') currentData = yearData;
-
-    if (currentData && typeof currentData.refetch === 'function') {
-      currentData.refetch();
-    }
-
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 1500);
-
-  }, [activeTab, dayData, monthData, yearData]);
+    currentData.refetch();
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -100,10 +88,6 @@ export default function HoroscopeScreen() {
   };
 
   const renderContent = () => {
-    let currentData = dayData;
-    if (activeTab === 'month') currentData = monthData;
-    else if (activeTab === 'year') currentData = yearData;
-
     const { dayStr, monthStr, yearStr } = getLocals();
     let isUnlocked = false;
 
@@ -146,12 +130,12 @@ export default function HoroscopeScreen() {
         <UniversalForecastCard
           data={currentData.data}
           loading={currentData.loading}
+          error={currentData.error}
           type={activeTab}
           onRetry={currentData.refetch}
           zodiacSign={signKey || undefined}
           signName={signName}
         />
-        {/*<View style={{ height: 20 }} />*/}
       </View>
     );
   };
@@ -185,12 +169,12 @@ export default function HoroscopeScreen() {
         {renderTabs()}
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollContent}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              tintColor={COLORS.accent}
+              tintColor={COLORS.textTertiary}
             />
           }
         >
@@ -204,4 +188,5 @@ export default function HoroscopeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   mainContainer: { flex: 1, paddingHorizontal: LAYOUT.contentPadding, paddingTop: SPACING.md },
+  scrollContent: { flexGrow: 1 },
 });

@@ -22,12 +22,6 @@ import { useRewarded } from '@/hooks/useAdMob';
 
 type TabType = 'day' | 'month' | 'year';
 
-interface ForecastResultWithRefetch {
-  data: any;
-  loading: boolean;
-  refetch: () => void;
-}
-
 export default function NumbersScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('day');
 
@@ -72,9 +66,15 @@ export default function NumbersScreen() {
 
   useFocusEffect(useCallback(() => { performCalculation(); }, [performCalculation]));
 
-  const dayForecast = useForecasts('day', pDay) as ForecastResultWithRefetch;
-  const monthForecast = useForecasts('month', pMonth) as ForecastResultWithRefetch;
-  const yearForecast = useForecasts('year', pYear) as ForecastResultWithRefetch;
+  const dayForecast = useForecasts('day', pDay);
+  const monthForecast = useForecasts('month', pMonth);
+  const yearForecast = useForecasts('year', pYear);
+
+  const forecasts = { day: dayForecast, month: monthForecast, year: yearForecast };
+  const currentForecast = forecasts[activeTab];
+
+  // The pull-to-refresh spinner stays until the refetch actually finishes (state adjusted during render)
+  if (isRefreshing && !currentForecast.loading) setIsRefreshing(false);
 
   useEffect(() => {
     navigation.setOptions({
@@ -85,17 +85,10 @@ export default function NumbersScreen() {
     });
   }, [navigation, language, t]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = () => {
     setIsRefreshing(true);
-    let currentForecast = dayForecast;
-    if (activeTab === 'month') currentForecast = monthForecast;
-    if (activeTab === 'year') currentForecast = yearForecast;
-
-    if (currentForecast && currentForecast.refetch) {
-      currentForecast.refetch();
-    }
-    setTimeout(() => { setIsRefreshing(false); }, 1500);
-  }, [activeTab, dayForecast, monthForecast, yearForecast]);
+    currentForecast.refetch();
+  };
 
   const handleUnlockCurrentTab = () => {
     showRewarded(() => {
@@ -125,16 +118,8 @@ export default function NumbersScreen() {
 
   // --- CONTENT ---
   const renderContent = () => {
-    let currentAI = dayForecast;
-    let currentNumber = pDay;
-
-    if (activeTab === 'month') {
-      currentAI = monthForecast;
-      currentNumber = pMonth;
-    } else if (activeTab === 'year') {
-      currentAI = yearForecast;
-      currentNumber = pYear;
-    }
+    const numbers = { day: pDay, month: pMonth, year: pYear };
+    const currentNumber = numbers[activeTab];
 
     const { dayStr, monthStr, yearStr } = getLocals();
     let isUnlocked = false;
@@ -176,10 +161,11 @@ export default function NumbersScreen() {
     return (
       <View>
         <UniversalForecastCard
-          data={currentAI.data}
-          loading={currentAI.loading}
+          data={currentForecast.data}
+          loading={currentForecast.loading}
+          error={currentForecast.error}
           type={activeTab}
-          onRetry={currentAI.refetch}
+          onRetry={currentForecast.refetch}
           number={currentNumber}
         />
       </View>
@@ -204,12 +190,12 @@ export default function NumbersScreen() {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={styles.scrollContent}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              tintColor={COLORS.accent}
+              tintColor={COLORS.textTertiary}
             />
           }
         >
@@ -231,4 +217,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.contentPadding,
     paddingTop: SPACING.md
   },
+  scrollContent: { flexGrow: 1 },
 });

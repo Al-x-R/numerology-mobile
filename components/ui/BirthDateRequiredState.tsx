@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { useAppTranslation } from '@/contexts/LanguageContext';
-import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 
 export const BirthDateRequiredState = () => {
@@ -15,11 +15,11 @@ export const BirthDateRequiredState = () => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.medallion}>
-          <Ionicons name="calendar-outline" size={28} color={COLORS.accent} />
+          <Ionicons name="calendar-outline" size={28} color={COLORS.textTertiary} />
         </View>
 
-        <Text style={styles.title}>{t('birthDateRequired.title')}</Text>
-        <Text style={styles.description}>{t('birthDateRequired.description')}</Text>
+        <Text style={styles.title} numberOfLines={2}>{t('birthDateRequired.title')}</Text>
+        <Text style={styles.description} numberOfLines={3}>{t('birthDateRequired.description')}</Text>
 
         <GoldButton
           title={t('birthDateRequired.button')}
@@ -42,22 +42,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
+    borderColor: COLORS.hairline,
     padding: SPACING.lg,
   },
+  // Neutral: the button is the one gold element
   medallion: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
-    ...SHADOWS.goldenButtonSoft,
   },
-  title: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
+  title: { ...TYPE.headlineLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center', marginBottom: SPACING.sm },
   description: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.lg },
   button: { alignSelf: 'stretch' },
 });

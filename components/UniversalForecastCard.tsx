@@ -1,11 +1,10 @@
 // components/UniversalForecastCard.tsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 import { Locale } from '@/lib/constants/locales';
-import { COLORS, FONT_FAMILY, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 
 export interface ForecastSection {
@@ -21,6 +20,8 @@ export interface ForecastSection {
 interface Props {
   data: ForecastSection | null;
   loading: boolean;
+  // A failed load; shown apart from "not ready yet" so it never looks like an empty forecast
+  error?: boolean;
   type: 'day' | 'month' | 'year';
   number?: number;
   zodiacSign?: string;
@@ -54,6 +55,7 @@ const getIntlLocale = (locale: Locale): string => {
 export const UniversalForecastCard: React.FC<Props> = ({
   data,
   loading,
+  error,
   type,
   number,
   zodiacSign,
@@ -65,8 +67,29 @@ export const UniversalForecastCard: React.FC<Props> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color={COLORS.accent} />
+        <ActivityIndicator size="small" color={COLORS.textTertiary} />
         <Text style={styles.loadingText}>{t('forecast.loading')}</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.emptyContainer}>
+        <View style={styles.emptyRing}>
+          <View style={styles.emptyMedallion}>
+            <Ionicons name="cloud-offline-outline" size={26} color={COLORS.error} />
+          </View>
+        </View>
+        <Text style={styles.emptyText} numberOfLines={3}>{t('common.networkError')}</Text>
+        {onRetry && (
+          <GoldButton
+            title={t('forecast.retry')}
+            onPress={onRetry}
+            icon={<Ionicons name="refresh" size={18} color={COLORS.blackText} />}
+            style={styles.emptyButton}
+          />
+        )}
       </View>
     );
   }
@@ -83,37 +106,35 @@ export const UniversalForecastCard: React.FC<Props> = ({
 
     return (
       <View style={styles.emptyContainer}>
-        <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 0.7 }} style={StyleSheet.absoluteFill} />
         <View style={styles.emptyRing}>
           <View style={styles.emptyMedallion}>
-            <Ionicons name="hourglass" size={26} color={COLORS.accent} />
+            <Ionicons name="hourglass" size={26} color={COLORS.textTertiary} />
           </View>
         </View>
         <Text style={styles.emptyEyebrow}>
           {zodiacSign ? t('forecast.emptyEyebrowAstro') : t('forecast.emptyEyebrow')}
         </Text>
-        <Text style={styles.emptyTitle}>{emptyTitles[type]}</Text>
-        <Text style={styles.emptyText}>{t('forecast.emptyText')}</Text>
+        <Text style={styles.emptyTitle} numberOfLines={2}>{emptyTitles[type]}</Text>
+        <Text style={styles.emptyText} numberOfLines={3}>{t('forecast.emptyText')}</Text>
 
         <View style={styles.emptyChip}>
-          <Ionicons name="calendar-outline" size={14} color={COLORS.accent} />
+          <Ionicons name="calendar-outline" size={14} color={COLORS.textSecondary} />
           <Text style={styles.emptyChipDate}>{t('forecast.today')}, {today}</Text>
           {!!identity && (
             <>
               <View style={styles.emptyChipDot} />
               <Text style={[styles.emptyChipText, styles.emptyChipAccent]}>{identity}</Text>
-              {zodiacIcon && <MaterialCommunityIcons name={zodiacIcon} size={14} color={COLORS.accent} />}
+              {zodiacIcon && <MaterialCommunityIcons name={zodiacIcon} size={14} color={COLORS.textSecondary} />}
             </>
           )}
         </View>
 
+        {/* Secondary: the forecast is simply not ready, refreshing is rarely needed */}
         {onRetry && (
-          <GoldButton
-            title={t('forecast.retry')}
-            onPress={onRetry}
-            icon={<Ionicons name="sparkles-outline" size={18} color={COLORS.blackText} />}
-            style={styles.emptyButton}
-          />
+          <TouchableOpacity style={styles.secondaryButton} onPress={onRetry} activeOpacity={0.7}>
+            <Ionicons name="sparkles-outline" size={18} color={COLORS.accentLight} />
+            <Text style={styles.secondaryButtonText}>{t('forecast.retry')}</Text>
+          </TouchableOpacity>
         )}
       </View>
     );
@@ -171,7 +192,7 @@ export const UniversalForecastCard: React.FC<Props> = ({
     { key: 'love', icon: 'heart-outline' as const, label: t('forecast.love'), text: data.love },
     { key: 'finance', icon: 'briefcase-outline' as const, label: t('forecast.finance'), text: data.finance },
     { key: 'health', icon: 'flash-outline' as const, label: t('forecast.health'), text: data.health },
-    { key: 'warning', icon: 'shield-half-outline' as const, label: t('forecast.warning'), text: data.warning, warning: true },
+    { key: 'warning', icon: 'shield-half-outline' as const, label: t('forecast.warning'), text: data.warning },
   ].filter((aspect) => !!aspect.text);
 
   const aspectsTitles = {
@@ -183,7 +204,6 @@ export const UniversalForecastCard: React.FC<Props> = ({
   return (
     <>
     <View style={styles.card}>
-      <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 0.6 }} style={StyleSheet.absoluteFill} />
       {/* --- CARD HEADER --- */}
       <View style={styles.header}>
         {badgeContent && (
@@ -192,9 +212,9 @@ export const UniversalForecastCard: React.FC<Props> = ({
           </View>
         )}
         <View style={styles.headerTextContainer}>
-          <Text style={styles.dateTitle}>{getLabel()}</Text>
-          <Text style={styles.subTitle}>{getHeaderTitle()}</Text>
-          <Text style={styles.mainTitle}>{data.title}</Text>
+          <Text style={styles.dateTitle} numberOfLines={1}>{getLabel()}</Text>
+          <Text style={styles.subTitle} numberOfLines={1}>{getHeaderTitle()}</Text>
+          <Text style={styles.mainTitle} numberOfLines={3}>{data.title}</Text>
         </View>
       </View>
 
@@ -205,37 +225,41 @@ export const UniversalForecastCard: React.FC<Props> = ({
 
     {/* --- ASPECTS --- */}
     <View style={styles.aspectsHeader}>
-      <Text style={styles.aspectsTitle}>{aspectsTitles[type]}</Text>
+      <Text style={styles.aspectsTitle} numberOfLines={2}>{aspectsTitles[type]}</Text>
       <View style={styles.countPill}>
         <Text style={styles.countText}>{t('forecast.aspectsCount').replace('{count}', String(aspects.length))}</Text>
       </View>
     </View>
     <View style={styles.aspectsList}>
       {aspects.map((aspect) => (
-        <AspectRow key={aspect.key} icon={aspect.icon} label={aspect.label} text={aspect.text} warning={aspect.warning} />
+        <AspectRow key={aspect.key} icon={aspect.icon} label={aspect.label} text={aspect.text} />
       ))}
     </View>
     </>
   );
 };
 
-// Collapsed rows show the opening lines; tapping reveals the full text
-const AspectRow = ({ icon, label, text, warning }: {
+// Collapsed rows show the opening lines; tapping reveals the full text.
+// Neutral: the icon tells the aspects apart, gold stays on the number/sign badge
+const AspectRow = ({ icon, label, text }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   text: string;
-  warning?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const tint = warning ? COLORS.warningChipText : COLORS.accent;
 
   return (
-    <TouchableOpacity style={styles.aspectRow} onPress={() => setExpanded((v) => !v)} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={styles.aspectRow}
+      onPress={() => setExpanded((v) => !v)}
+      activeOpacity={0.7}
+      accessibilityState={{ expanded }}
+    >
       <View style={styles.aspectMedallion}>
-        <Ionicons name={icon} size={20} color={tint} />
+        <Ionicons name={icon} size={20} color={COLORS.textTertiary} />
       </View>
       <View style={styles.aspectContent}>
-        <Text style={[styles.aspectLabel, { color: tint }]}>{label}</Text>
+        <Text style={styles.aspectLabel}>{label}</Text>
         <Text style={styles.aspectText} numberOfLines={expanded ? undefined : 2}>{text}</Text>
       </View>
       <View style={styles.aspectChevron}>
@@ -245,52 +269,47 @@ const AspectRow = ({ icon, label, text, warning }: {
   );
 };
 
+// Captions at the 12pt minimum
+const caption = { fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight };
+
 const styles = StyleSheet.create({
   card: {
-    overflow: 'hidden',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.borderSubtle,
+    borderColor: COLORS.hairline,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
   },
-  loadingContainer: { padding: SPACING.xl, alignItems: 'center' },
+  loadingContainer: { padding: SPACING.lg, alignItems: 'center' },
   loadingText: { ...TYPE.bodySm, marginTop: SPACING.sm },
   emptyContainer: {
-    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
-    paddingTop: SPACING.xl,
     marginBottom: SPACING.lg,
-    ...SHADOWS.card,
   },
   emptyRing: {
-    width: 104,
-    height: 104,
-    borderRadius: 52,
-    borderWidth: 10,
-    borderColor: COLORS.accentSoft,
+    width: LAYOUT.emblemHero + SPACING.gutterSm * 2,
+    height: LAYOUT.emblemHero + SPACING.gutterSm * 2,
+    borderRadius: RADIUS.full,
+    borderWidth: SPACING.gutterSm,
+    borderColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
-    shadowColor: COLORS.accent,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 28,
   },
   emptyMedallion: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emptyEyebrow: { ...TYPE.labelMd, color: COLORS.accent, letterSpacing: 2, marginBottom: SPACING.sm },
-  emptyTitle: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
+  emptyEyebrow: { ...TYPE.labelMd, ...caption, letterSpacing: 2, marginBottom: SPACING.sm },
+  emptyTitle: { ...TYPE.headlineLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center', marginBottom: SPACING.sm },
   emptyText: { ...TYPE.bodyMd, color: COLORS.textTertiary, textAlign: 'center', marginBottom: SPACING.lg },
   emptyChip: {
     flexDirection: 'row',
@@ -305,30 +324,43 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   emptyChipText: { ...TYPE.bodySm, color: COLORS.textTertiary },
-  emptyChipDate: { ...TYPE.labelSm, color: COLORS.textTertiary },
-  emptyChipAccent: { color: COLORS.accent },
-  emptyChipDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: COLORS.textMuted },
+  emptyChipDate: { ...TYPE.labelSm, ...caption, color: COLORS.textTertiary },
+  emptyChipAccent: { color: COLORS.text, fontVariant: ['tabular-nums'] },
+  emptyChipDot: { width: SPACING.xs, height: SPACING.xs, borderRadius: RADIUS.full, backgroundColor: COLORS.textMuted },
   emptyButton: { alignSelf: 'stretch' },
+  // Secondary action: outlined, gold text (rules §4)
+  secondaryButton: {
+    alignSelf: 'stretch',
+    height: LAYOUT.buttonHeight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  secondaryButtonText: { ...TYPE.labelLg, color: COLORS.accentLight },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.lg },
+  // The screen's hero: the personal number or zodiac sign
   numberBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
     borderColor: COLORS.borderAccent,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
-    ...SHADOWS.goldenButtonSoft,
   },
-  numberText: { fontFamily: FONT_FAMILY.serif.medium, fontSize: 30, lineHeight: 36, color: COLORS.accent },
+  numberText: { ...TYPE.heroNumber, fontVariant: ['tabular-nums'] },
   headerTextContainer: { flex: 1 },
-  dateTitle: TYPE.labelSm,
-  subTitle: { ...TYPE.labelMd, color: COLORS.accent, marginTop: 2, marginBottom: SPACING.xs },
-  mainTitle: { ...TYPE.headlineMd },
+  dateTitle: { ...TYPE.labelSm, ...caption },
+  subTitle: { ...TYPE.labelMd, ...caption, color: COLORS.textTertiary, marginTop: SPACING.xs, marginBottom: SPACING.xs },
+  mainTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold },
 
   summary: { ...TYPE.bodyLg, color: COLORS.textTertiary },
 
@@ -340,42 +372,42 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
     marginBottom: SPACING.md,
   },
-  aspectsTitle: { ...TYPE.headlineMd, flex: 1 },
+  aspectsTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, flex: 1 },
   countPill: {
-    paddingVertical: 3,
-    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.gutterSm,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.accentSoft,
+    backgroundColor: COLORS.surfaceRaised,
   },
-  countText: { ...TYPE.labelSm, color: COLORS.accent },
+  countText: { ...TYPE.labelSm, ...caption, color: COLORS.textTertiary },
   aspectsList: { gap: SPACING.gutterSm, marginBottom: SPACING.lg },
   aspectRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: SPACING.gutterSm + 2,
+    gap: SPACING.gutterSm,
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
   },
   aspectMedallion: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
   },
   aspectContent: { flex: 1 },
-  aspectLabel: { ...TYPE.labelSm, marginBottom: 4 },
+  aspectLabel: { ...TYPE.labelSm, ...caption, color: COLORS.textTertiary, marginBottom: SPACING.xs },
   aspectText: { ...TYPE.bodyMd, color: COLORS.textTertiary },
   aspectChevron: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: SPACING.lg,
+    height: SPACING.lg,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
 
 
