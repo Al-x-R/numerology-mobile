@@ -21,6 +21,8 @@ interface NotificationsContextType {
   settings: ReminderSettings;
   // null until checked
   permissionGranted: boolean | null;
+  // False until saved settings are read; until then `settings` holds defaults and must not be saved over
+  isLoaded: boolean;
   // Returns false if the user turned something on but did not allow notifications
   updateSettings: (patch: Partial<ReminderSettings>) => Promise<boolean>;
 }
@@ -87,7 +89,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [settings, language]);
 
   return (
-    <NotificationsContext.Provider value={{ settings, permissionGranted, updateSettings }}>
+    <NotificationsContext.Provider value={{ settings, permissionGranted, isLoaded, updateSettings }}>
       {children}
     </NotificationsContext.Provider>
   );

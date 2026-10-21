@@ -24,6 +24,7 @@ import { formatReminderTime, hasActiveReminders } from '@/lib/notifications/fore
 import { COLORS, FONT_FAMILY, GRADIENTS, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { CapsLabel } from '@/components/ui/CapsLabel';
+import { ProChip } from '@/components/ui/ProChip';
 import { formatBirthDate } from '@/lib/utils/date';
 import { toRoman } from '@/lib/utils/roman';
 import { pluralize } from '@/lib/utils/plural';
@@ -58,12 +59,6 @@ const MenuRow = ({ icon, title, value, onPress, isLast }: MenuRowProps) => (
   </TouchableOpacity>
 );
 
-const ProBadge = () => (
-  <View style={styles.proChip}>
-    <CapsLabel style={styles.proChipText}>PRO</CapsLabel>
-  </View>
-);
-
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -81,7 +76,7 @@ export default function ProfileScreen() {
     : null;
 
   const remindersValue = !isPremium
-    ? <ProBadge />
+    ? <ProChip />
     : hasActiveReminders(reminders) ? formatReminderTime(reminders) : t('notifications.statusOff');
 
   const storageValue = savedItems.length
@@ -350,21 +345,6 @@ const styles = StyleSheet.create({
   rowTitle: { ...TYPE.bodyLg, flex: 1 },
   // A long value (e.g. "Українська (UK)") truncates instead of pushing the title out
   rowValue: { ...TYPE.bodyMd, flexShrink: 1, maxWidth: '50%' },
-  proChip: {
-    paddingVertical: SPACING.xs,
-    paddingHorizontal: SPACING.sm,
-    borderRadius: RADIUS.full,
-    backgroundColor: COLORS.accentSoft,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  proChipText: {
-    ...TYPE.labelMd,
-    fontSize: TYPE.bodySm.fontSize,
-    lineHeight: TYPE.bodySm.lineHeight,
-    color: COLORS.accent,
-    letterSpacing: 1,
-  },
 
   // Destructive action: danger color, confirmed by an alert
   resetButton: {
