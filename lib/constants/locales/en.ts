@@ -336,6 +336,10 @@ export const en = {
     remove: 'Remove',
     networkError: 'Network error. Check your connection.',
   },
+  errors: {
+    tryAgain: "Couldn't save your profile. Please try again.",
+    calculationFailed: "Couldn't complete the calculation. Check the dates and try again.",
+  },
   matrixForm: {
     eyebrow: "Sacred numerology",
     description: "An ancient number system revealing character, life vectors and innate potential",
@@ -511,6 +515,7 @@ export const en = {
     removeTitle: "Delete entry?",
     removeText: "\u201c{label}\u201d will be removed from storage.",
     proUpsell: "Keep up to {limit} matrices and {limit} compatibility checks with PRO",
+    loadError: "Couldn't read your saved calculations",
   },
 
   premium: {

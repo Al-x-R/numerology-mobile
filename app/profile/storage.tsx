@@ -1,6 +1,6 @@
 // app/profile/storage.tsx
 import React from 'react';
-import { Alert, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import {
   SavedCalculation,
   useSavedCalculations,
 } from '@/contexts/SavedCalculationsContext';
-import { COLORS, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { AuraBackground } from '@/components/ui/AuraBackground';
 import { CapsLabel } from '@/components/ui/CapsLabel';
 
@@ -38,7 +38,7 @@ export default function StorageScreen() {
   const insets = useSafeAreaInsets();
   const { isPremium } = useProfile();
   const { t } = useAppTranslation();
-  const { items, limit, remove } = useSavedCalculations();
+  const { items, isLoaded, loadError, limit, remove } = useSavedCalculations();
 
   const fill = (key: string, values: Record<string, string>) =>
     Object.entries(values).reduce((text, [name, value]) => text.split(`{${name}}`).join(value), t(key));
@@ -77,23 +77,42 @@ export default function StorageScreen() {
       >
         <View style={styles.medallion}>
           {item.kind === 'matrix' ? (
-            <Ionicons name="grid-outline" size={18} color={COLORS.accent} />
+            <Ionicons name="grid-outline" size={18} color={COLORS.textTertiary} />
           ) : (
-            <MaterialCommunityIcons name="infinity" size={18} color={COLORS.accent} />
+            <MaterialCommunityIcons name="infinity" size={18} color={COLORS.textTertiary} />
           )}
         </View>
         <View style={styles.rowText}>
           <Text style={styles.rowTitle} numberOfLines={1}>{item.label}</Text>
-          <Text style={styles.rowDates}>
+          <Text style={styles.rowDates} numberOfLines={1}>
             {item.kind === 'matrix' ? item.date : `${item.date1}  •  ${item.date2}`}
           </Text>
         </View>
-        <TouchableOpacity onPress={() => confirmRemove(item)} hitSlop={12} style={styles.removeButton}>
+        <TouchableOpacity onPress={() => confirmRemove(item)} hitSlop={12} style={styles.removeButton} activeOpacity={0.7}>
           <Ionicons name="trash-outline" size={18} color={COLORS.textMuted} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
+
+  // Loading and a failed read must not look like an empty storage
+  if (!isLoaded || loadError) {
+    return (
+      <View style={styles.container}>
+        <AuraBackground />
+        <View style={styles.state}>
+          {loadError ? (
+            <>
+              <Ionicons name="alert-circle-outline" size={24} color={COLORS.error} />
+              <Text style={styles.stateText}>{t('storage.loadError')}</Text>
+            </>
+          ) : (
+            <ActivityIndicator color={COLORS.textTertiary} />
+          )}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -104,7 +123,7 @@ export default function StorageScreen() {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         stickySectionHeadersEnabled={false}
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + SPACING.xl }]}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + SPACING.lg }]}
         renderSectionHeader={({ section }) => (
           <View style={styles.sectionHeader}>
             <CapsLabel style={styles.sectionLabel}>{section.title}</CapsLabel>
@@ -116,9 +135,9 @@ export default function StorageScreen() {
         }
         ListFooterComponent={
           isPremium ? null : (
-            <TouchableOpacity style={styles.upsell} onPress={() => router.push('/premium/upgrade')} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.upsell} onPress={() => router.push('/premium/upgrade')} activeOpacity={0.7}>
               <MaterialCommunityIcons name="crown-outline" size={20} color={COLORS.accent} />
-              <Text style={styles.upsellText}>{fill('storage.proUpsell', { limit: String(SAVED_LIMITS.pro) })}</Text>
+              <Text style={styles.upsellText} numberOfLines={2}>{fill('storage.proUpsell', { limit: String(SAVED_LIMITS.pro) })}</Text>
               <Ionicons name="arrow-forward" size={18} color={COLORS.accent} />
             </TouchableOpacity>
           )
@@ -130,24 +149,34 @@ export default function StorageScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
-  content: { paddingTop: SPACING.md, paddingHorizontal: SPACING.margin },
+  content: { paddingTop: SPACING.sm, paddingHorizontal: SPACING.margin },
 
+  state: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, padding: SPACING.lg },
+  stateText: { ...TYPE.bodyMd, textAlign: 'center' },
+
+  // 24pt between sections; the first header sits closer to the top
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginTop: SPACING.md,
+    marginTop: SPACING.lg,
     marginBottom: SPACING.sm,
     marginHorizontal: SPACING.xs,
   },
-  sectionLabel: { ...TYPE.labelMd, color: COLORS.textMuted, letterSpacing: 2.2 },
-  sectionCount: TYPE.bodySm,
+  sectionLabel: {
+    ...TYPE.labelMd,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    color: COLORS.textMuted,
+    letterSpacing: 2.2,
+  },
+  sectionCount: { ...TYPE.bodySm, fontVariant: ['tabular-nums'] },
 
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.md,
-    paddingVertical: 14,
+    paddingVertical: SPACING.gutterSm,
     paddingHorizontal: SPACING.md,
     backgroundColor: COLORS.surface,
     borderLeftWidth: 1,
@@ -158,8 +187,8 @@ const styles = StyleSheet.create({
   rowLast: { borderBottomWidth: 1, borderBottomLeftRadius: RADIUS.lg, borderBottomRightRadius: RADIUS.lg },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
   medallion: {
-    width: 38,
-    height: 38,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
@@ -169,7 +198,7 @@ const styles = StyleSheet.create({
   },
   rowText: { flex: 1 },
   rowTitle: TYPE.bodyLg,
-  rowDates: { ...TYPE.bodySm, marginTop: 2 },
+  rowDates: { ...TYPE.bodyMd, marginTop: SPACING.xs },
   removeButton: { padding: SPACING.xs },
 
   empty: {
@@ -179,15 +208,16 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     textAlign: 'center',
   },
 
+  // The screen's only gold element: the PRO offer for free users
   upsell: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.md,
-    marginTop: SPACING.xl,
+    marginTop: SPACING.lg,
     padding: SPACING.md,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surfaceSelected,

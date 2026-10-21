@@ -26,6 +26,11 @@ export type SavedCalculation = CalculationInput & {
 
 interface SavedCalculationsContextType {
   items: SavedCalculation[];
+  // False until the stored list is read; until then `items` is empty but not known to be empty
+  isLoaded: boolean;
+  loadError: boolean;
+  // Writes are allowed only after a successful read, so a failed read never gets saved over
+  writable: boolean;
   limit: number;
   canSave: (kind: CalculationKind) => boolean;
   findSaved: (input: CalculationInput) => SavedCalculation | undefined;
@@ -47,14 +52,23 @@ const isSameInput = (a: CalculationInput, b: CalculationInput): boolean => {
 export const SavedCalculationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isPremium } = useProfile();
   const [items, setItems] = useState<SavedCalculation[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
       .then(json => setItems(json ? JSON.parse(json) : []))
-      .catch(e => console.error('Error loading saved calculations:', e));
+      .catch(e => {
+        console.error('Error loading saved calculations:', e);
+        setLoadError(true);
+      })
+      .finally(() => setIsLoaded(true));
   }, []);
 
+  const writable = isLoaded && !loadError;
+
   const persist = async (next: SavedCalculation[]) => {
+    if (!writable) throw new Error('Saved calculations are not loaded, refusing to overwrite them');
     setItems(next);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   };
@@ -87,7 +101,7 @@ export const SavedCalculationsProvider: React.FC<{ children: React.ReactNode }> 
   };
 
   return (
-    <SavedCalculationsContext.Provider value={{ items, limit, canSave, findSaved, save, remove, clear }}>
+    <SavedCalculationsContext.Provider value={{ items, isLoaded, loadError, writable, limit, canSave, findSaved, save, remove, clear }}>
       {children}
     </SavedCalculationsContext.Provider>
   );

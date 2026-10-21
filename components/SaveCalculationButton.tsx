@@ -31,7 +31,7 @@ interface SaveCalculationButtonProps {
 export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonProps) => {
   const { isPremium } = useProfile();
   const { t } = useAppTranslation();
-  const { limit, canSave, findSaved, save, remove } = useSavedCalculations();
+  const { writable, limit, canSave, findSaved, save, remove } = useSavedCalculations();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [label, setLabel] = useState('');
@@ -56,6 +56,10 @@ export const SaveCalculationButton = ({ input, style }: SaveCalculationButtonPro
   };
 
   const handlePress = () => {
+    if (!writable) {
+      Alert.alert(t('common.error'), t('storage.loadError'));
+      return;
+    }
     if (saved) {
       Alert.alert(t('storage.removeTitle'), fill('storage.removeText', { label: saved.label }), [
         { text: t('common.cancel'), style: 'cancel' },
