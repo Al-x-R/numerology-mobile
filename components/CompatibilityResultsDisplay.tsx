@@ -1,11 +1,10 @@
 // components/CompatibilityResultsDisplay.tsx
 
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, {
@@ -18,9 +17,10 @@ import Animated, {
 import { router } from 'expo-router';
 
 import { CompatibilityResult } from '@/lib/calculators/compatibilityCalculator';
-import { COLORS, FONT_FAMILY, GRADIENTS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { PremiumTeaserModal } from '@/components/PremiumTeaserModal';
+import { ProChip } from '@/components/ui/ProChip';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
 // --- INTERFACES ---
@@ -29,7 +29,6 @@ interface CompatibilityResultsDisplayProps {
   result: CompatibilityResult;
   date1: string;
   date2: string;
-  onBack?: () => void;
   onUnlockRequest: () => void;
 }
 
@@ -80,7 +79,6 @@ function GeneralAnalysisCard({
 
   return (
     <Animated.View style={[styles.analysisCard, animatedStyle]}>
-      <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
       <Text style={styles.datesText}>
         {date1}  ⇄  {date2}
       </Text>
@@ -130,18 +128,10 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
     transform: [{ translateY: translateY.value }, { scale: scale.value }],
   }));
 
-  const getColorForPercentage = (pct: number) => {
-    if (pct >= 85) return COLORS.battery.full;
-    if (pct >= 70) return COLORS.accent;
-    if (pct >= 50) return COLORS.primaryDark;
-    return COLORS.error;
-  };
-
-  const percentageColor = getColorForPercentage(pct);
-
+  // The level reads from the number and the bar length, so no colour tiers (red would read as an error)
   return (
     <Animated.View style={[styles.paramCard, animatedStyle]}>
-      <Text style={styles.paramTitle}>{title}</Text>
+      <Text style={styles.paramTitle} numberOfLines={1}>{title}</Text>
       <View style={styles.paramValues}>
         <View style={styles.partnerValue}>
           <Text style={styles.partnerLabel}>{t('compatibility.partner1')}</Text>
@@ -149,11 +139,11 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
         </View>
 
         <View style={styles.percentageContainer}>
-          <Text style={[styles.percentage, { color: percentageColor }]}>
+          <Text style={styles.percentage}>
             {pct}%
           </Text>
           <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${pct}%`, backgroundColor: percentageColor }]} />
+            <View style={[styles.progressFill, { width: `${pct}%` }]} />
           </View>
         </View>
 
@@ -169,11 +159,11 @@ function CompatibilityParamCard({ title, p1, p2, pct, index }: CompatibilityPara
 interface AnimatedTotalCardProps {
   label: string;
   value: number;
-  color: string;
   index: number;
 }
 
-function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProps) {
+// The screen's hero: the compatibility percentage people came for
+function AnimatedTotalCard({ label, value, index }: AnimatedTotalCardProps) {
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(40);
   const scale = useSharedValue(0.9);
@@ -193,9 +183,8 @@ function AnimatedTotalCard({ label, value, color, index }: AnimatedTotalCardProp
   return (
     <Animated.View style={[styles.totalContainer, animatedStyle]}>
       <View style={styles.totalCard}>
-        <LinearGradient colors={GRADIENTS.accentCard} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
-        <Text style={styles.totalLabel}>{label}</Text>
-        <Text style={[styles.totalValue, { color }]}>{value}%</Text>
+        <Text style={styles.totalLabel} numberOfLines={2}>{label}</Text>
+        <Text style={styles.totalValue}>{value}%</Text>
       </View>
     </Animated.View>
   );
@@ -214,7 +203,7 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
       <Text style={styles.sectionTitle}>{t('compatibility.conclusionTitle')}</Text>
 
       <View style={styles.labelRow}>
-        <Ionicons name="compass-outline" size={18} color={COLORS.accent} />
+        <Ionicons name="compass-outline" size={18} color={COLORS.textTertiary} />
         <Text style={styles.destinyMissionLabel}>{t('compatibility.missionLabel')}</Text>
       </View>
       <Text style={styles.missionText}>{destinyInfo.mission}</Text>
@@ -222,7 +211,7 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
       {destinyInfo.purpose && (
         <View>
           <View style={styles.labelRow}>
-            <Ionicons name="flag-outline" size={18} color={COLORS.accent} />
+            <Ionicons name="flag-outline" size={18} color={COLORS.textTertiary} />
             <Text style={styles.destinyPurposeLabel}>{t('compatibility.purposeLabel')}</Text>
           </View>
           <Text style={styles.purposeTextBody}>{destinyInfo.purpose}</Text>
@@ -232,13 +221,13 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
       {destinyInfo.challenges && destinyInfo.challenges.length > 0 && (
         <View style={styles.challengesList}>
           <View style={styles.labelRow}>
-            <Ionicons name="warning-outline" size={18} color={COLORS.error} />
+            <Ionicons name="warning-outline" size={18} color={COLORS.textTertiary} />
             <Text style={styles.challengesListTitle}>{t('compatibility.challengesLabel')}</Text>
           </View>
           {destinyInfo.challenges.map((challenge, i) => (
             <View key={i} style={styles.challengeItem}>
               <View style={styles.challengeIcon}>
-                <Ionicons name="remove" size={12} color={COLORS.error} />
+                <Ionicons name="remove" size={12} color={COLORS.textTertiary} />
               </View>
               <Text style={styles.challengeItemText}>{challenge}</Text>
             </View>
@@ -258,7 +247,7 @@ function PremiumConclusionCard({ destinyInfo, recommendations }: PremiumConclusi
       {recommendations.length > 0 && (
         <View style={styles.recommendationsList}>
           <View style={styles.labelRow}>
-            <Ionicons name="bulb-outline" size={18} color={COLORS.accent} />
+            <Ionicons name="bulb-outline" size={18} color={COLORS.textTertiary} />
             <Text style={styles.recommendationsListTitle}>{t('compatibility.recommendations')}</Text>
           </View>
           {recommendations.map((rec, i) => (
@@ -283,32 +272,14 @@ export function CompatibilityResultsDisplay({
 }: CompatibilityResultsDisplayProps) {
   const { t } = useAppTranslation();
 
-  const getTotalColor = (pct: number) => {
-    if (pct >= 85) return COLORS.battery.full;
-    if (pct >= 70) return COLORS.accent;
-    if (pct >= 50) return COLORS.primaryDark;
-    return COLORS.error;
-  };
-
   const showFullTotal = result.fullTotalPct !== undefined;
   const finalTotal = result.fullTotalPct ?? result.totalPct;
   const finalTotalLabel = showFullTotal ? t('compatibility.fullTotal') : t('compatibility.baseTotal');
-  const finalTotalColor = getTotalColor(finalTotal);
 
   const paramSectionTitle = t('compatibility.paramsSectionTitle');
 
+  // Opened from the locked-analysis card only, never on a timer while the user reads
   const [isTeaserVisible, setIsTeaserVisible] = useState(false);
-
-  // Teaser display logic
-  useEffect(() => {
-    if (!showFullTotal) {
-      const timer = setTimeout(() => {
-        setIsTeaserVisible(true);
-      }, 8000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showFullTotal]);
 
   const handleGetPremium = () => {
     setIsTeaserVisible(false);
@@ -324,10 +295,11 @@ export function CompatibilityResultsDisplay({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    // The screen's ScrollView scrolls this content
+    <View style={styles.content}>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('compatibility.lpAnalysisSection')}</Text>
+        <Text style={styles.sectionTitle} numberOfLines={2}>{t('compatibility.lpAnalysisSection')}</Text>
         <GeneralAnalysisCard
           lifePath1={result.lifePath1}
           lifePath2={result.lifePath2}
@@ -340,7 +312,7 @@ export function CompatibilityResultsDisplay({
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{paramSectionTitle}</Text>
+        <Text style={styles.sectionTitle} numberOfLines={2}>{paramSectionTitle}</Text>
 
         <CompatibilityParamCard title={t('compatibility.energy')}   p1={result.energy.p1}    p2={result.energy.p2}    pct={result.energy.pct}    index={1} />
         <CompatibilityParamCard title={t('compatibility.character')} p1={result.character.p1} p2={result.character.p2} pct={result.character.pct} index={2} />
@@ -354,12 +326,24 @@ export function CompatibilityResultsDisplay({
             <CompatibilityParamCard title={t('compatibility.spirituality')} p1={result.spirituality.p1} p2={result.spirituality.p2} pct={result.spirituality.pct} index={8} />
           </>
         )}
+
+        {!showFullTotal && (
+          <TouchableOpacity style={styles.lockedCard} onPress={() => setIsTeaserVisible(true)} activeOpacity={0.7}>
+            <View style={styles.lockedIcon}>
+              <Ionicons name="lock-closed-outline" size={18} color={COLORS.textTertiary} />
+            </View>
+            <View style={styles.lockedText}>
+              <Text style={styles.paramTitle} numberOfLines={2}>{t('premiumTeaser.title')}</Text>
+              <Text style={styles.lockedDescription} numberOfLines={3}>{t('premiumTeaser.description')}</Text>
+            </View>
+            <ProChip />
+          </TouchableOpacity>
+        )}
       </View>
 
       <AnimatedTotalCard
         label={finalTotalLabel}
         value={finalTotal}
-        color={finalTotalColor}
         index={showFullTotal ? 9 : 4}
       />
 
@@ -383,45 +367,50 @@ export function CompatibilityResultsDisplay({
         onGetPremium={handleGetPremium}
         onWatchAd={handleWatchAd}
       />
-    </ScrollView>
+    </View>
   );
 }
 
 // --- STYLES ---
 
+// Captions at the 12pt minimum
+const caption = { fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight };
+
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: SPACING.xl * 2,
+  content: {
+    width: '100%',
+    paddingBottom: SPACING.lg,
   },
   section: {
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.lg,
   },
   sectionTitle: {
     ...TYPE.headlineLg,
+    fontFamily: FONT_FAMILY.serif.semibold,
     marginBottom: SPACING.md,
   },
 
-  // --- Union hero card ---
+  // --- Union card (neutral; the total below is the hero) ---
   analysisCard: {
-    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     padding: SPACING.lg,
   },
-  datesText: { ...TYPE.labelMd, color: COLORS.text, letterSpacing: 1.6 },
-  analysisTitleLabel: { ...TYPE.labelSm, marginTop: SPACING.md },
-  analysisTitleValues: { ...TYPE.headlineMd, color: COLORS.accent, marginTop: SPACING.xs },
+  datesText: { ...TYPE.labelMd, ...caption, color: COLORS.text, letterSpacing: 1.6, fontVariant: ['tabular-nums'] },
+  analysisTitleLabel: { ...TYPE.labelSm, ...caption, marginTop: SPACING.md },
+  analysisTitleValues: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, marginTop: SPACING.xs, fontVariant: ['tabular-nums'] },
   destinyNumber: {
-    fontFamily: FONT_FAMILY.serif.medium,
-    fontSize: 72,
-    lineHeight: 80,
-    color: COLORS.accent,
+    ...TYPE.heroNumber,
+    fontSize: 56,
+    lineHeight: 64,
+    color: COLORS.text,
+    fontVariant: ['tabular-nums'],
     marginTop: SPACING.sm,
   },
-  destinyTitle: { ...TYPE.headlineMd, textAlign: 'center', marginBottom: SPACING.md },
+  destinyTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center', marginBottom: SPACING.md },
   destinyOverviewText: { ...TYPE.bodyMd, color: COLORS.textTertiary, textAlign: 'center' },
 
   // --- Parameter cards ---
@@ -437,35 +426,56 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
   },
-  partnerValue: { alignItems: 'center', minWidth: 64 },
-  partnerLabel: { ...TYPE.labelSm, marginBottom: 2 },
-  partnerNumber: { ...TYPE.titleLg },
+  partnerValue: { alignItems: 'center', minWidth: LAYOUT.emblemHero },
+  partnerLabel: { ...TYPE.labelSm, ...caption, marginBottom: SPACING.xs },
+  partnerNumber: { ...TYPE.titleLg, fontVariant: ['tabular-nums'] },
   percentageContainer: { flex: 1, alignItems: 'center', paddingHorizontal: SPACING.md },
-  percentage: { fontFamily: FONT_FAMILY.sans.bold, fontSize: 18, marginBottom: 6 },
+  percentage: { ...TYPE.titleLg, fontFamily: FONT_FAMILY.sans.bold, fontVariant: ['tabular-nums'], marginBottom: SPACING.sm },
   progressTrack: {
     width: '100%',
-    height: 4,
-    borderRadius: 2,
+    height: SPACING.xs,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', borderRadius: 2 },
+  progressFill: { height: '100%', borderRadius: RADIUS.full, backgroundColor: COLORS.accent },
 
-  // --- Total ---
-  totalContainer: { marginBottom: SPACING.xl },
+  // --- Locked full analysis (free users) ---
+  lockedCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.gutterSm,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: COLORS.hairline,
+    padding: SPACING.md,
+  },
+  lockedIcon: {
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lockedText: { flex: 1 },
+  lockedDescription: TYPE.bodyMd,
+
+  // --- Total: the hero ---
+  totalContainer: { marginBottom: SPACING.lg },
   totalCard: {
-    overflow: 'hidden',
     alignItems: 'center',
     backgroundColor: COLORS.surfaceSelected,
     borderRadius: RADIUS.lg,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: COLORS.accent,
     paddingVertical: SPACING.lg,
     paddingHorizontal: SPACING.md,
-    ...SHADOWS.goldenButtonSoft,
   },
-  totalLabel: { ...TYPE.labelMd, color: COLORS.accent },
-  totalValue: { fontFamily: FONT_FAMILY.serif.medium, fontSize: 56, lineHeight: 64, marginTop: SPACING.xs },
+  totalLabel: { ...TYPE.labelMd, ...caption, color: COLORS.textTertiary, textAlign: 'center' },
+  totalValue: { ...TYPE.heroNumber, fontSize: 56, lineHeight: 64, fontVariant: ['tabular-nums'], marginTop: SPACING.xs },
 
   // --- Free conclusion ---
   lpAnalysisTextSection: {
@@ -473,23 +483,24 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
   },
-  analysisTextTitle: { ...TYPE.headlineMd, marginBottom: SPACING.sm },
+  analysisTextTitle: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.serif.semibold, marginBottom: SPACING.sm },
   analysisTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
 
   // --- Premium conclusion ---
   premiumConclusionSection: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.md + 4,
+    padding: SPACING.margin,
   },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.lg, marginBottom: SPACING.sm },
-  destinyMissionLabel: { ...TYPE.titleMd, color: COLORS.accent },
-  destinyPurposeLabel: { ...TYPE.titleMd, color: COLORS.accent },
+  destinyMissionLabel: TYPE.titleMd,
+  destinyPurposeLabel: TYPE.titleMd,
   missionText: { ...TYPE.bodyLg, color: COLORS.textTertiary },
   purposeTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
   summaryTextBody: { ...TYPE.bodyLg, color: COLORS.textTertiary },
   challengesList: {},
-  challengesListTitle: { ...TYPE.titleMd, color: COLORS.error },
+  // Challenges are content, not an error: neutral, marked by the warning icon
+  challengesListTitle: TYPE.titleMd,
   challengeItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -500,33 +511,32 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   challengeIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.warningChip,
+    width: SPACING.margin,
+    height: SPACING.margin,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 1,
   },
   challengeItemText: { ...TYPE.bodyMd, color: COLORS.textTertiary, flex: 1 },
   adviceContainer: {
     marginTop: SPACING.lg,
     borderLeftWidth: 2,
-    borderLeftColor: COLORS.accent,
+    borderLeftColor: COLORS.hairline,
     backgroundColor: COLORS.background,
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
   },
   adviceMotto: {
+    ...TYPE.headlineMd,
     fontFamily: FONT_FAMILY.serif.italic,
-    fontSize: 22,
     lineHeight: 30,
-    color: COLORS.accent,
+    color: COLORS.textTertiary,
     textAlign: 'center',
   },
   recommendationsList: {},
-  recommendationsListTitle: { ...TYPE.titleMd, color: COLORS.accent },
+  recommendationsListTitle: TYPE.titleMd,
   recommendationItem: { flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.sm },
-  recommendationBullet: { ...TYPE.bodyLg, color: COLORS.accent },
+  recommendationBullet: { ...TYPE.bodyLg, color: COLORS.textSecondary },
   recommendationItemText: { ...TYPE.bodyMd, color: COLORS.textTertiary, flex: 1 },
 });

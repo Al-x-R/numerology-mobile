@@ -1,7 +1,8 @@
 // components/DoubleDateInputForm.tsx
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Animated, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { COLORS, FONT_FAMILY, FONTS, GRADIENTS, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
 import { useProfile } from '@/contexts/ProfileContext';
@@ -42,30 +43,9 @@ export function DoubleDateInputForm({
   const [localError2, setLocalError2] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [input1Opacity] = useState(() => new Animated.Value(0));
-  const [input1Y] = useState(() => new Animated.Value(30));
-  const [input2Opacity] = useState(() => new Animated.Value(0));
-  const [input2Y] = useState(() => new Animated.Value(30));
-  const [buttonOpacity] = useState(() => new Animated.Value(0));
-  const [buttonY] = useState(() => new Animated.Value(20));
-  const [buttonScale] = useState(() => new Animated.Value(1));
-
-  useEffect(() => {
-    Animated.stagger(200, [
-      Animated.parallel([
-        Animated.spring(input1Y, { toValue: 0, friction: 8, tension: 100, useNativeDriver: true }),
-        Animated.timing(input1Opacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.spring(input2Y, { toValue: 0, friction: 8, tension: 100, useNativeDriver: true }),
-        Animated.timing(input2Opacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.spring(buttonY, { toValue: 0, friction: 8, tension: 100, useNativeDriver: true }),
-        Animated.timing(buttonOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]),
-    ]).start();
-  }, []);
+  // Reanimated respects the system Reduce Motion setting; entering animations live on the views below
+  const buttonScale = useSharedValue(1);
+  const buttonPressStyle = useAnimatedStyle(() => ({ transform: [{ scale: buttonScale.value }] }));
 
   const handleTextChange1 = (text: string) => {
     const formattedText = formatRussianDate(text);
@@ -81,12 +61,12 @@ export function DoubleDateInputForm({
 
   const handlePressIn = () => {
     if (isLoading) return;
-    Animated.spring(buttonScale, { toValue: 0.95, useNativeDriver: true }).start();
+    buttonScale.set(withSpring(0.97));
   };
 
   const handlePressOut = () => {
     if (isLoading) return;
-    Animated.spring(buttonScale, { toValue: 1, useNativeDriver: true }).start();
+    buttonScale.set(withSpring(1));
   };
 
   const handleSubmit = () => {
@@ -127,49 +107,20 @@ export function DoubleDateInputForm({
     }, 2000);
   };
 
-  const [error1Opacity] = useState(() => new Animated.Value(0));
-  const [error1Y] = useState(() => new Animated.Value(-10));
-  const [error2Opacity] = useState(() => new Animated.Value(0));
-  const [error2Y] = useState(() => new Animated.Value(-10));
-
-  useEffect(() => {
-    if (localError1) {
-      Animated.parallel([
-        Animated.timing(error1Opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(error1Y, { toValue: 0, friction: 8, useNativeDriver: true }),
-      ]).start();
-    } else {
-      error1Opacity.setValue(0);
-      error1Y.setValue(-10);
-    }
-  }, [error1Opacity, error1Y, localError1]);
-
-  useEffect(() => {
-    if (localError2) {
-      Animated.parallel([
-        Animated.timing(error2Opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(error2Y, { toValue: 0, friction: 8, useNativeDriver: true }),
-      ]).start();
-    } else {
-      error2Opacity.setValue(0);
-      error2Y.setValue(-10);
-    }
-  }, [error2Opacity, error2Y, localError2]);
-
   return (
     <View style={styles.container}>
       <View style={styles.chip}>
-        <MaterialCommunityIcons name="star-four-points" size={11} color={COLORS.accent} />
+        <MaterialCommunityIcons name="star-four-points" size={12} color={COLORS.textSecondary} />
         <Text style={styles.chipText}>{t('compatibility.eyebrow')}</Text>
       </View>
-      <Text style={styles.title}>{t('compatibility.heroTitle')}</Text>
-      <Text style={styles.subtitle}>{t('compatibility.subtitle')}</Text>
+      <Text style={styles.title} numberOfLines={2}>{t('compatibility.heroTitle')}</Text>
+      <Text style={styles.subtitle} numberOfLines={3}>{t('compatibility.subtitle')}</Text>
 
       {/* Partner 1 */}
-      <Animated.View style={[styles.card, { opacity: input1Opacity, transform: [{ translateY: input1Y }] }]}>
+      <Animated.View entering={FadeInDown.duration(400)} style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.medallion}>
-            <Ionicons name="person-outline" size={18} color={COLORS.accent} />
+            <Ionicons name="person-outline" size={18} color={COLORS.textTertiary} />
           </View>
           <Text style={styles.cardLabel}>{t('compatibility.youLabel')}</Text>
           {!!profileDate && date1 === profileDate && (
@@ -191,27 +142,27 @@ export function DoubleDateInputForm({
             cursorColor={COLORS.accent}
           />
             {isValidRussianDate(date1) ? (
-              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.accent} />
+              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.textTertiary} />
             ) : (
               <Ionicons name="calendar-clear-outline" size={20} color={COLORS.textMuted} />
             )}
           </View>
           {localError1 && (
-            <Animated.Text style={[styles.errorText, { opacity: error1Opacity, transform: [{ translateY: error1Y }] }]}>
+            <Animated.Text entering={FadeInUp.duration(300)} style={styles.errorText}>
               {localError1}
             </Animated.Text>
           )}
       </Animated.View>
 
       <View style={styles.connector}>
-        <MaterialCommunityIcons name="infinity" size={20} color={COLORS.accent} />
+        <MaterialCommunityIcons name="infinity" size={20} color={COLORS.textTertiary} />
       </View>
 
       {/* Partner 2 */}
-      <Animated.View style={[styles.card, { opacity: input2Opacity, transform: [{ translateY: input2Y }] }]}>
+      <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.medallion}>
-            <Ionicons name="heart" size={18} color={COLORS.accent} />
+            <Ionicons name="heart" size={18} color={COLORS.textTertiary} />
           </View>
           <Text style={styles.cardLabel}>{t('compatibility.partnerLabel')}</Text>
         </View>
@@ -230,13 +181,13 @@ export function DoubleDateInputForm({
             cursorColor={COLORS.accent}
           />
             {isValidRussianDate(date2) ? (
-              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.accent} />
+              <MaterialCommunityIcons name="check-decagram-outline" size={22} color={COLORS.textTertiary} />
             ) : (
               <Ionicons name="calendar-clear-outline" size={20} color={COLORS.textMuted} />
             )}
           </View>
           {localError2 && (
-            <Animated.Text style={[styles.errorText, { opacity: error2Opacity, transform: [{ translateY: error2Y }] }]}>
+            <Animated.Text entering={FadeInUp.duration(300)} style={styles.errorText}>
               {localError2}
             </Animated.Text>
           )}
@@ -251,12 +202,7 @@ export function DoubleDateInputForm({
         ))}
       </View>
 
-      <Animated.View
-        style={[
-          styles.buttonContainer,
-          { opacity: buttonOpacity, transform: [{ translateY: buttonY }, { scale: buttonScale }] },
-        ]}
-      >
+      <Animated.View entering={FadeInDown.delay(400).duration(300)} style={[styles.buttonContainer, buttonPressStyle]}>
         <TouchableOpacity
           activeOpacity={1}
           onPressIn={handlePressIn}
@@ -283,7 +229,7 @@ export function DoubleDateInputForm({
 
       <View style={styles.footer}>
         <Ionicons name="lock-closed-outline" size={14} color={COLORS.textMuted} />
-        <Text style={styles.footerText}>{t('compatibility.footer')}</Text>
+        <Text style={styles.footerText} numberOfLines={2}>{t('compatibility.footer')}</Text>
       </View>
     </View>
   );
@@ -295,18 +241,19 @@ const styles = StyleSheet.create({
     maxWidth: LAYOUT.formMaxWidth,
     alignItems: 'center',
   },
+  // Neutral: gold on the form belongs to the Calculate button and the focused field
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 5,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.accentSoft,
+    backgroundColor: COLORS.surfaceRaised,
     marginBottom: SPACING.md,
   },
-  chipText: { ...TYPE.labelMd, color: COLORS.accent },
-  title: { ...TYPE.displayLg, textAlign: 'center' },
+  chipText: { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight, color: COLORS.textTertiary },
+  title: { ...TYPE.displayLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center' },
   subtitle: { ...TYPE.bodyMd, textAlign: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
   card: {
     width: '100%',
@@ -316,9 +263,9 @@ const styles = StyleSheet.create({
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginBottom: SPACING.md },
   medallion: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: LAYOUT.iconButton,
+    height: LAYOUT.iconButton,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
@@ -334,36 +281,43 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderWidth: 1,
     borderColor: COLORS.transparent,
-    paddingHorizontal: SPACING.md + 4,
+    paddingHorizontal: SPACING.margin,
   },
-  input: { ...TYPE.headlineMd, fontFamily: FONT_FAMILY.sans.medium, letterSpacing: 3, flex: 1, height: '100%' },
+  input: {
+    ...TYPE.headlineMd,
+    fontFamily: FONT_FAMILY.sans.semibold,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 3,
+    flex: 1,
+    height: '100%',
+  },
   inputFocused: { borderColor: COLORS.accent },
   inputError: { borderColor: COLORS.error },
   errorText: { ...FONTS.error, marginTop: SPACING.sm },
+  // Overlaps both cards by 12pt to link them visually
   connector: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    marginVertical: -10,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
+    borderRadius: RADIUS.full,
+    marginVertical: -SPACING.gutterSm,
     zIndex: 1,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
-    ...SHADOWS.goldenButtonSoft,
   },
   tags: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: SPACING.sm, marginTop: SPACING.lg },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.gutterSm,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.surface,
   },
-  tagDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.accent },
+  tagDot: { width: SPACING.sm, height: SPACING.sm, borderRadius: RADIUS.full, backgroundColor: COLORS.textSecondary },
   tagText: { ...TYPE.bodySm, color: COLORS.textTertiary },
   footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACING.sm, marginTop: SPACING.md },
   footerText: { ...TYPE.bodySm, textAlign: 'center', flexShrink: 1 },

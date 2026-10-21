@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Text, Alert, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useBottomTabBarHeight } from 'expo-router/js-tabs';
 
@@ -25,7 +25,6 @@ export default function CompatibilityScreen() {
   const [dateString1, setDateString1] = useState<string>(profileDate);
   const [dateString2, setDateString2] = useState<string>('');
   const [compatibilityResult, setCompatibilityResult] = useState<CompatibilityResult | null>(null);
-  const [isAdUnlocked, setIsAdUnlocked] = useState(false);
   // Set when a saved compatibility check is opened from storage
   const { date1: savedDate1, date2: savedDate2, open: openToken } =
     useLocalSearchParams<{ date1?: string; date2?: string; open?: string }>();
@@ -33,6 +32,7 @@ export default function CompatibilityScreen() {
 
   const navigation = useNavigation();
   const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
   const { t, language } = useAppTranslation();
   const { showRewarded } = useRewarded();
   const { showInterstitial } = useInterstitial();
@@ -44,10 +44,10 @@ export default function CompatibilityScreen() {
       try {
         setDateString1(savedDate1);
         setDateString2(savedDate2);
-        setIsAdUnlocked(false);
         setCompatibilityResult(calculateCompatibility(savedDate1, savedDate2, isPremium));
       } catch (e) {
         console.error('Saved compatibility error:', e);
+        Alert.alert(t('common.error'), t('errors.calculationFailed'));
       }
     }
   }
@@ -58,22 +58,21 @@ export default function CompatibilityScreen() {
     setCompatibilityResult(null);
     setDateString1(profileDate);
     setDateString2('');
-    setIsAdUnlocked(false);
   }, [profileDate]);
 
   useEffect(() => {
     if (hasResults) {
       navigation.setOptions({
         headerTitle: () => (
-          <View style={{ alignItems: 'center' }}>
-            <Text style={FONTS.headerTitle}>{t('compatibility.compatibilityResultsTitle')}</Text>
+          <View style={styles.resultHeader}>
+            <Text style={FONTS.headerTitle} numberOfLines={1}>{t('compatibility.compatibilityResultsTitle')}</Text>
           </View>
         ),
-        headerLeft: () => <BackButton onPress={handleBack} style={{ marginLeft: 20 }} />,
+        headerLeft: () => <BackButton onPress={handleBack} style={styles.headerLeft} />,
         headerRight: () => (
           <SaveCalculationButton
             input={{ kind: 'compatibility', date1: dateString1, date2: dateString2 }}
-            style={{ marginRight: 20 }}
+            style={styles.headerRight}
           />
         ),
         tabBarStyle: { display: 'none' },
@@ -94,13 +93,13 @@ export default function CompatibilityScreen() {
       const result = calculateCompatibility(d1, d2, effectivePremium);
       setCompatibilityResult(result);
     } catch (e) {
+      console.error('Compatibility calculation error:', e);
       Alert.alert(t('common.error'), t('errors.calculationFailed'));
     }
   };
 
   const handleCalculate = () => {
     if (!dateString1 || !dateString2 || dateString1.length < 10 || dateString2.length < 10) return;
-    setIsAdUnlocked(false);
     showInterstitial(() => calculateResult(dateString1, dateString2, false));
   };
 
@@ -112,12 +111,13 @@ export default function CompatibilityScreen() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={styles.fill}
       >
         <ScrollView
           contentContainerStyle={[
             styles.scrollContent,
-            !hasResults && { paddingBottom: tabBarHeight + 40 }
+            // Results hide the tab bar, so the home indicator inset applies instead
+            { paddingBottom: hasResults ? insets.bottom : tabBarHeight + SPACING.lg },
           ]}
           showsVerticalScrollIndicator={false}
         >
@@ -135,7 +135,6 @@ export default function CompatibilityScreen() {
                 result={compatibilityResult}
                 date1={dateString1}
                 date2={dateString2}
-                onBack={handleBack}
                 onUnlockRequest={() => showRewarded(() => calculateResult(dateString1, dateString2, true))}
               />
             )}
@@ -151,6 +150,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  // Transparent, so the aura background behind stays visible
+  fill: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
   },
@@ -158,6 +159,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: LAYOUT.contentPadding,
     alignItems: 'center',
-    // paddingTop: LAYOUT.topMarginLarge,
   },
+  resultHeader: { alignItems: 'center' },
+  headerLeft: { marginLeft: LAYOUT.contentPadding },
+  headerRight: { marginRight: LAYOUT.contentPadding },
 });

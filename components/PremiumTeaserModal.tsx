@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { COLORS, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
 import { GoldButton } from '@/components/ui/GoldButton';
 import { useAppTranslation } from '@/contexts/LanguageContext';
 
@@ -29,16 +29,16 @@ export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
         <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.7} accessibilityRole="button">
             <Ionicons name="close" size={20} color={COLORS.text} />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="lock-closed-outline" size={26} color={COLORS.accent} />
+            <Ionicons name="lock-closed-outline" size={26} color={COLORS.textTertiary} />
           </View>
 
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.description}>{description}</Text>
+          <Text style={styles.title} numberOfLines={2}>{title}</Text>
+          <Text style={styles.description} numberOfLines={4}>{description}</Text>
 
           <GoldButton
             title={adButtonText}
@@ -53,7 +53,7 @@ export function PremiumTeaserModal({ visible, onClose, onGetPremium, onWatchAd }
             <View style={styles.line} />
           </View>
 
-          <TouchableOpacity onPress={onGetPremium} style={styles.premiumLink}>
+          <TouchableOpacity onPress={onGetPremium} style={styles.premiumLink} activeOpacity={0.7}>
             <Text style={styles.premiumLinkText}>{premiumButtonText}</Text>
           </TouchableOpacity>
         </View>
@@ -70,42 +70,41 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.modalBackdrop,
     padding: SPACING.margin,
   },
+  // Gold in the dialog belongs to the primary button only
   modalContainer: {
     width: '100%',
-    maxWidth: 420,
+    maxWidth: LAYOUT.formMaxWidth,
     alignItems: 'center',
     backgroundColor: COLORS.surfaceRaised,
     borderRadius: RADIUS.xl,
     borderWidth: 1,
-    borderColor: COLORS.borderAccent,
+    borderColor: COLORS.hairline,
     padding: SPACING.lg,
-    paddingTop: SPACING.xl,
     ...SHADOWS.card,
   },
   closeButton: {
     position: 'absolute',
-    top: SPACING.md,
-    right: SPACING.md,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    top: SPACING.sm,
+    right: SPACING.sm,
+    width: LAYOUT.minTouch,
+    height: LAYOUT.minTouch,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.glass,
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.lg,
-    ...SHADOWS.goldenButtonSoft,
   },
-  title: { ...TYPE.headlineLg, textAlign: 'center', marginBottom: SPACING.sm },
+  title: { ...TYPE.headlineLg, fontFamily: FONT_FAMILY.serif.semibold, textAlign: 'center', marginBottom: SPACING.sm },
   description: { ...TYPE.bodyMd, textAlign: 'center', marginBottom: SPACING.lg },
   adButton: { alignSelf: 'stretch' },
   dividerContainer: {
@@ -116,7 +115,8 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   line: { flex: 1, height: 1, backgroundColor: COLORS.hairline },
-  orText: TYPE.labelSm,
-  premiumLink: { paddingVertical: SPACING.sm },
+  orText: { ...TYPE.labelSm, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight },
+  // Text link with a 44pt touch area
+  premiumLink: { minHeight: LAYOUT.minTouch, justifyContent: 'center', paddingHorizontal: SPACING.md },
   premiumLinkText: TYPE.labelLg,
 });
