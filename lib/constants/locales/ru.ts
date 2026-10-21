@@ -521,9 +521,7 @@ export const ru = {
   },
 
   premium: {
-    headerTitle: "PREMIUM",
     youArePro: "Вы в команде PRO",
-    unlockYourDestiny: "Открой свою судьбу",
     heroSubtitle: "Получите детальный анализ, прогнозы и рекомендации без ограничений.",
     featureCompatibility: "Полный анализ совместимости",
     featureForecasts: "Прогнозы на День, Месяц и Год",
@@ -550,24 +548,6 @@ export const ru = {
     subscriptionUpdated: "Статус подписки обновлен!",
     restoreTitle: "Восстановление",
     restoreSuccess: "Ваша подписка успешно восстановлена!",
-
-    title: 'Premium',
-    subtitle: 'Раскрой все тайны своей судьбы',
-    benefits: {
-      compatibility: 'Полная совместимость по Матрице Судьбы',
-      horoscope: 'Персональный гороскоп на каждый день',
-      karma: 'Расшифровка Кармического хвоста',
-      ads: 'Без рекламы и ограничений',
-    },
-    plans: {
-      year: '1 Год',
-      month: '1 Месяц',
-      priceYear: '2990 ₽ / год',
-      priceMonth: '499 ₽ / мес',
-      save: 'Выгода 50%',
-    },
-    disclaimer: 'Подписка продлевается автоматически. Отмена в любой момент.',
-    ctaTry: 'Попробовать бесплатно',
     badge: "Premium",
     featureCompatibilityDesc: "Все параметры союза, выводы и рекомендации для пары",
     featureForecastsDesc: "Персональные прогнозы по нумерологии и гороскопу",

@@ -4,7 +4,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/lib/constants/theme';
+import { COLORS, LAYOUT } from '@/lib/constants/theme';
 
 interface BackButtonProps {
   onPress?: () => void;
@@ -22,6 +22,8 @@ export const BackButton = ({
   icon = 'chevron-back',
 }: BackButtonProps) => {
   const router = useRouter();
+  // Keeps the visual size but grows the touch area to the 44pt minimum
+  const slop = Math.max(0, (LAYOUT.minTouch - size) / 2);
 
   const handlePress = () => {
     if (onPress) {
@@ -41,6 +43,7 @@ export const BackButton = ({
         style
       ]}
       onPress={handlePress}
+      hitSlop={slop}
       activeOpacity={0.7}
     >
       {/* marginRight: 2 optically centres the chevron in the circle */}

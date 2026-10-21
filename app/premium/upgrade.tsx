@@ -5,8 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Stack } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
+import * as Haptics from 'expo-haptics';
 
-import { COLORS, FONT_FAMILY, RADIUS, SHADOWS, SPACING, TYPE } from '@/lib/constants/theme';
+import { COLORS, FONT_FAMILY, LAYOUT, RADIUS, SPACING, TYPE } from '@/lib/constants/theme';
 import { BackButton } from '@/components/ui/BackButton';
 import { GoldButton } from '@/components/ui/GoldButton';
 import { AuraBackground } from '@/components/ui/AuraBackground';
@@ -54,6 +55,12 @@ export default function PremiumScreen() {
       save: null,
       bestValue: t('premium.planYearlyBestValue')
     }
+  };
+
+  const selectPlan = (id: PlanId) => {
+    if (id === selectedPlan) return;
+    Haptics.selectionAsync();
+    setSelectedPlan(id);
   };
 
   const handlePurchase = async () => {
@@ -108,14 +115,15 @@ export default function PremiumScreen() {
         {/* --- HERO --- */}
         <View style={styles.hero}>
           <View style={styles.heroMedallion}>
-            <Ionicons name="diamond-outline" size={28} color={COLORS.accent} />
+            <Ionicons name="diamond-outline" size={28} color={COLORS.textTertiary} />
           </View>
+          {/* For PRO members the chip states their status instead of the product name */}
           <View style={styles.chip}>
-            <MaterialCommunityIcons name="star-four-points" size={11} color={COLORS.accent} />
-            <Text style={styles.chipText}>{t('premium.badge')}</Text>
+            <MaterialCommunityIcons name="star-four-points" size={12} color={COLORS.textSecondary} />
+            <Text style={styles.chipText}>{isPremium ? t('premium.youArePro') : t('premium.badge')}</Text>
           </View>
-          <Text style={styles.heroTitle}>DESTINY CODE PRO</Text>
-          <Text style={styles.heroSubtitle}>{t('premium.heroSubtitle')}</Text>
+          <Text style={styles.heroTitle} numberOfLines={2}>DESTINY CODE PRO</Text>
+          <Text style={styles.heroSubtitle} numberOfLines={3}>{t('premium.heroSubtitle')}</Text>
         </View>
 
         {/* --- FEATURES --- */}
@@ -123,18 +131,18 @@ export default function PremiumScreen() {
           {features.map((feature, index) => (
             <View key={feature.title} style={[styles.featureRow, index < features.length - 1 && styles.featureDivider]}>
               <View style={styles.featureCheck}>
-                <Ionicons name="checkmark" size={14} color={COLORS.accent} />
+                <Ionicons name="checkmark" size={14} color={COLORS.textTertiary} />
               </View>
               <View style={styles.featureTextBlock}>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>{feature.description}</Text>
+                <Text style={styles.featureTitle} numberOfLines={2}>{feature.title}</Text>
+                <Text style={styles.featureDescription} numberOfLines={2}>{feature.description}</Text>
               </View>
             </View>
           ))}
         </View>
 
-        {/* --- PLANS --- */}
-        <View style={styles.plans}>
+        {/* --- PLANS (only for those who can buy) --- */}
+        {!isPremium && <View style={styles.plans}>
           {(['weekly', 'monthly', 'yearly'] as PlanId[]).map((id) => {
             const plan = plansData[id];
             const isSelected = selectedPlan === id;
@@ -143,9 +151,9 @@ export default function PremiumScreen() {
             return (
               <TouchableOpacity
                 key={id}
-                activeOpacity={0.9}
+                activeOpacity={0.7}
                 style={[styles.planCard, isSelected && styles.planCardSelected]}
-                onPress={() => setSelectedPlan(id)}
+                onPress={() => selectPlan(id)}
               >
                 {badge && (
                   <View style={styles.planBadge}>
@@ -158,9 +166,9 @@ export default function PremiumScreen() {
                 </View>
 
                 <View style={styles.planInfo}>
-                  <Text style={styles.planTitle}>{plan.title}</Text>
+                  <Text style={styles.planTitle} numberOfLines={1}>{plan.title}</Text>
                   {!!(plan.subtitle || plan.subtext) && (
-                    <Text style={[styles.planSubtitle, isSelected && id === 'yearly' && styles.planSubtitleAccent]}>
+                    <Text style={styles.planSubtitle} numberOfLines={1}>
                       {plan.subtitle || plan.subtext}
                     </Text>
                   )}
@@ -173,7 +181,7 @@ export default function PremiumScreen() {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </View>}
 
         {/* --- ACTION --- */}
         {!isPremium ? (
@@ -184,27 +192,32 @@ export default function PremiumScreen() {
               loading={isLoading}
               iconRight={<Ionicons name="arrow-forward" size={18} color={COLORS.blackText} />}
             />
-            <Text style={styles.disclaimer}>{t('premium.subscriptionDisclaimer')}</Text>
+            <Text style={styles.disclaimer} numberOfLines={3}>{t('premium.subscriptionDisclaimer')}</Text>
           </>
         ) : (
-          <TouchableOpacity style={styles.manageButton} onPress={handleManageSubscription}>
+          <TouchableOpacity style={styles.manageButton} onPress={handleManageSubscription} activeOpacity={0.7}>
             <Text style={styles.manageButtonText}>{t('premium.manageSubscription')}</Text>
           </TouchableOpacity>
         )}
 
         {/* --- FOOTER --- */}
         <View style={styles.footer}>
-          <TouchableOpacity onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => openLink('https://telegra.ph/Terms-of-Use-EULA-01-03')} activeOpacity={0.7}>
             <Text style={styles.footerLink}>{t('premium.terms')}</Text>
           </TouchableOpacity>
           <Text style={styles.footerDot}>·</Text>
-          <TouchableOpacity onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => openLink('https://telegra.ph/Privacy-Policy-for-Destiny-Code-01-03')} activeOpacity={0.7}>
             <Text style={styles.footerLink}>{t('premium.privacy')}</Text>
           </TouchableOpacity>
-          <Text style={styles.footerDot}>·</Text>
-          <TouchableOpacity onPress={handleRestore}>
-            <Text style={[styles.footerLink, styles.footerLinkAccent]}>{t('premium.restore')}</Text>
-          </TouchableOpacity>
+          {/* Restoring only makes sense before the subscription is active */}
+          {!isPremium && (
+            <>
+              <Text style={styles.footerDot}>·</Text>
+              <TouchableOpacity style={styles.footerButton} onPress={handleRestore} activeOpacity={0.7}>
+                <Text style={styles.footerLink}>{t('premium.restore')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -216,31 +229,37 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: SPACING.margin },
 
   // --- HERO ---
+  // Neutral: gold on this screen marks the selected plan, the best-value badge and the CTA
   hero: { alignItems: 'center', marginTop: SPACING.sm, marginBottom: SPACING.lg },
   heroMedallion: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: LAYOUT.emblemHero,
+    height: LAYOUT.emblemHero,
+    borderRadius: RADIUS.full,
     backgroundColor: COLORS.surfaceRaised,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
-    ...SHADOWS.goldenButtonSoft,
   },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 5,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.xs,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.full,
-    backgroundColor: COLORS.accentSoft,
+    backgroundColor: COLORS.surfaceRaised,
     marginBottom: SPACING.md,
   },
-  chipText: { ...TYPE.labelMd, color: COLORS.accent },
-  heroTitle: { ...TYPE.displayLg, fontSize: 32, letterSpacing: 1.5, textAlign: 'center', marginBottom: SPACING.sm },
+  chipText: { ...TYPE.labelMd, fontSize: TYPE.bodySm.fontSize, lineHeight: TYPE.bodySm.lineHeight, color: COLORS.textTertiary },
+  heroTitle: {
+    ...TYPE.displayLg,
+    fontFamily: FONT_FAMILY.serif.semibold,
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+  },
   heroSubtitle: { ...TYPE.bodyLg, color: COLORS.textTertiary, textAlign: 'center', paddingHorizontal: SPACING.md },
 
   // --- FEATURES ---
@@ -253,17 +272,16 @@ const styles = StyleSheet.create({
   featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, paddingVertical: SPACING.md },
   featureDivider: { borderBottomWidth: 1, borderBottomColor: COLORS.divider },
   featureCheck: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.accentSoft,
+    width: SPACING.lg,
+    height: SPACING.lg,
+    borderRadius: RADIUS.full,
+    backgroundColor: COLORS.surfaceRaised,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 2,
   },
   featureTextBlock: { flex: 1 },
   featureTitle: { ...TYPE.titleMd },
-  featureDescription: { ...TYPE.bodyMd, marginTop: 2 },
+  featureDescription: { ...TYPE.bodyMd, marginTop: SPACING.xs },
 
   // --- PLANS ---
   plans: { gap: SPACING.md, marginBottom: SPACING.lg },
@@ -271,7 +289,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.md,
-    padding: SPACING.md + 2,
+    padding: SPACING.md,
     borderRadius: RADIUS.lg,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
@@ -279,43 +297,47 @@ const styles = StyleSheet.create({
   },
   planCardSelected: {
     backgroundColor: COLORS.surfaceSelected,
-    borderWidth: 1.5,
     borderColor: COLORS.accent,
-    ...SHADOWS.goldenButtonSoft,
   },
+  // Sits on the card's top edge, half above it
   planBadge: {
     position: 'absolute',
-    top: -10,
+    top: -SPACING.gutterSm,
     right: SPACING.md,
-    paddingVertical: 3,
-    paddingHorizontal: SPACING.sm + 2,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.gutterSm,
     borderRadius: RADIUS.full,
     backgroundColor: COLORS.accentAmber,
   },
-  planBadgeText: { ...TYPE.labelSm, fontFamily: FONT_FAMILY.sans.bold, color: COLORS.blackText },
+  planBadgeText: {
+    ...TYPE.labelSm,
+    fontSize: TYPE.bodySm.fontSize,
+    lineHeight: TYPE.bodySm.lineHeight,
+    fontFamily: FONT_FAMILY.sans.bold,
+    color: COLORS.blackText,
+  },
+  // Unselected ring uses text4 so the control stays visible on the card (>= 3:1)
   radio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: COLORS.surfaceRaised,
+    width: SPACING.lg,
+    height: SPACING.lg,
+    borderRadius: RADIUS.full,
     borderWidth: 1,
-    borderColor: COLORS.hairline,
+    borderColor: COLORS.textMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },
   radioSelected: { backgroundColor: COLORS.accent, borderColor: COLORS.accent },
   planInfo: { flex: 1 },
   planTitle: { ...TYPE.titleLg },
-  planSubtitle: { ...TYPE.bodyMd, marginTop: 2 },
-  planSubtitleAccent: { color: COLORS.accent },
+  planSubtitle: { ...TYPE.bodyMd, marginTop: SPACING.xs },
   priceBlock: { alignItems: 'flex-end' },
-  price: { ...TYPE.titleLg, fontSize: 20 },
-  period: { ...TYPE.bodySm, marginTop: 2 },
+  price: { ...TYPE.titleLg, fontVariant: ['tabular-nums'] },
+  period: { ...TYPE.bodySm, marginTop: SPACING.xs },
 
   // --- ACTION ---
   disclaimer: { ...TYPE.bodySm, textAlign: 'center', marginTop: SPACING.md },
   manageButton: {
-    height: 54,
+    height: LAYOUT.buttonHeight,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -325,8 +347,16 @@ const styles = StyleSheet.create({
   manageButtonText: { ...TYPE.labelLg },
 
   // --- FOOTER ---
-  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.xl },
+  footer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    columnGap: SPACING.xs,
+    marginTop: SPACING.lg,
+  },
+  // Text links get a 44pt touch area
+  footerButton: { minHeight: LAYOUT.minTouch, justifyContent: 'center', paddingHorizontal: SPACING.xs },
   footerLink: { ...TYPE.bodySm },
-  footerLinkAccent: { color: COLORS.accent },
   footerDot: { ...TYPE.bodySm, color: COLORS.textMuted },
 });

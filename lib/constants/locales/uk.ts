@@ -521,9 +521,7 @@ export const uk = {
   },
 
   premium: {
-    headerTitle: "PREMIUM",
     youArePro: "Ви в команді PRO",
-    unlockYourDestiny: "Відкрий свою долю",
     heroSubtitle: "Отримайте детальний аналіз, прогнози та рекомендації без обмежень.",
     featureCompatibility: "Повний аналіз сумісності",
     featureForecasts: "Прогнози на День, Місяць та Рік",
@@ -550,24 +548,6 @@ export const uk = {
     subscriptionUpdated: "Статус підписки оновлено!",
     restoreTitle: "Відновлення",
     restoreSuccess: "Вашу підписку успішно відновлено!",
-
-    title: 'Premium',
-    subtitle: 'Розкрий усі таємниці своєї долі',
-    benefits: {
-      compatibility: 'Повна сумісність за Матрицею Долі',
-      horoscope: 'Персональний гороскоп на кожен день',
-      karma: 'Розшифровка Кармічного хвоста',
-      ads: 'Без реклами та обмежень',
-    },
-    plans: {
-      year: '1 Рік',
-      month: '1 Місяць',
-      priceYear: '2990 ₴ / рік',
-      priceMonth: '499 ₴ / міс',
-      save: 'Вигода 50%',
-    },
-    disclaimer: 'Підписка продовжується автоматично. Скасування у будь-який момент.',
-    ctaTry: 'Спробувати безкоштовно',
     badge: "Premium",
     featureCompatibilityDesc: "Усі параметри союзу, висновки й поради для пари",
     featureForecastsDesc: "Персональні прогнози з нумерології та гороскопа",

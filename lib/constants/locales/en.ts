@@ -516,9 +516,7 @@ export const en = {
   },
 
   premium: {
-    headerTitle: "PREMIUM",
     youArePro: "You are PRO",
-    unlockYourDestiny: "Unlock Your Destiny",
     heroSubtitle: "Get detailed analysis, forecasts, and recommendations without limits.",
     featureCompatibility: "Unlimited Compatibility Analysis",
     featureForecasts: "Daily, Monthly & Yearly Forecasts",
@@ -545,24 +543,6 @@ export const en = {
     subscriptionUpdated: "Subscription status updated!",
     restoreTitle: "Restore",
     restoreSuccess: "Your subscription has been successfully restored!",
-
-    title: 'Premium',
-    subtitle: 'Unlock all secrets of your destiny',
-    benefits: {
-      compatibility: 'Full Matrix of Destiny compatibility',
-      horoscope: 'Personal daily horoscope',
-      karma: 'Karmic Tail deciphering',
-      ads: 'No ads and limits',
-    },
-    plans: {
-      year: '1 Year',
-      month: '1 Month',
-      priceYear: '$29.99 / year',
-      priceMonth: '$4.99 / mo',
-      save: 'Save 50%',
-    },
-    disclaimer: 'Subscription auto-renews. Cancel anytime.',
-    ctaTry: 'Try for Free',
     badge: "Premium",
     featureCompatibilityDesc: "Every union parameter, conclusions and advice for the couple",
     featureForecastsDesc: "Personal numerology and horoscope forecasts",
